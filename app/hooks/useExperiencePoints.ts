@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   getStoredUserId,
   USER_ID_EVENT,
@@ -60,8 +60,11 @@ export function useExperiencePoints(options?: ExperiencePointsOptions) {
 
     window.addEventListener(USER_ID_EVENT, handleProfileEvent as EventListener);
     // Ensure we pick up any stored ID even if we mounted before login finalized.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    syncUserId(getStoredUserId());
+    const stored = getStoredUserId();
+    if (stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      syncUserId(stored);
+    }
 
     return () => {
       window.removeEventListener(USER_ID_EVENT, handleProfileEvent as EventListener);
@@ -110,34 +113,15 @@ export function useExperiencePoints(options?: ExperiencePointsOptions) {
     [broadcastPoints, persistPoints]
   );
 
+  const previousUserIdRef = useRef<string | null>(userId);
+
   useEffect(() => {
-    if (!userId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+    const previousUserId = previousUserIdRef.current;
+    previousUserIdRef.current = userId;
+    if (previousUserId && !userId) {
       setPoints(0);
-      return;
     }
-
-    let isActive = true;
-    (async () => {
-      try {
-        const response = await fetch("/api/points");
-        const data = (await response.json().catch(() => null)) ?? {};
-        const fetched = Number(data?.points ?? 0);
-        if (isActive) {
-          applyPoints(Number.isFinite(fetched) ? fetched : 0, { persist: false });
-        }
-      } catch (error) {
-        if (isActive) {
-          setPoints(0);
-        }
-        console.error("Failed to load points", error);
-      }
-    })();
-
-    return () => {
-      isActive = false;
-    };
-  }, [userId, applyPoints]);
+  }, [userId]);
 
   useEffect(() => {
     if (typeof window === "undefined") {

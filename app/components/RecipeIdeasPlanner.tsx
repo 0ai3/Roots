@@ -76,7 +76,6 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
   const [zone, setZone] = useState("");
   const [dietaryFocus, setDietaryFocus] = useState("");
   const [notes, setNotes] = useState("");
-  const [limit, setLimit] = useState(3);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [responseContent, setResponseContent] = useState<RecipePayload | null>(null);
@@ -109,7 +108,7 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
           zone,
           dietaryFocus,
           notes,
-          limit,
+          limit: 2,
         }),
       });
 
@@ -199,25 +198,6 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
             onChange={(event) => setNotes(event.target.value)}
             placeholder="Occasion, spice tolerance, ingredients to avoid..."
             rows={3}
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none"
-          />
-        </label>
-
-        <label className="space-y-2 text-sm font-medium text-white/80">
-          <span>Number of ideas</span>
-          <input
-            type="number"
-            min={1}
-            max={5}
-            value={limit}
-            onChange={(event) => {
-              const next = Number(event.target.value);
-              if (Number.isNaN(next)) {
-                setLimit(1);
-              } else {
-                setLimit(Math.min(Math.max(Math.floor(next), 1), 5));
-              }
-            }}
             className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none"
           />
         </label>
@@ -363,22 +343,21 @@ function RecipeResults({
     if (!recipe?.name) {
       return;
     }
-    setCompletedRecipes((prev) => {
-      if (prev[recipe.name]) {
-        return prev;
-      }
-      onRecipeLogged();
-      return { ...prev, [recipe.name]: true };
-    });
+    if (completedRecipes[recipe.name]) {
+      return;
+    }
+    setCompletedRecipes((prev) => ({ ...prev, [recipe.name]: true }));
+    onRecipeLogged();
   };
 
   const selectedRecipeLogged = selectedRecipe?.name
     ? Boolean(completedRecipes[selectedRecipe.name])
     : false;
+  const hasSelection = Boolean(selectedRecipe);
 
   return (
     <div className="space-y-6">
-      {recipes.length > 0 && (
+      {recipes.length > 0 && !hasSelection && (
         <div className="grid gap-5 md:grid-cols-2">
           {recipes.map((recipe) => (
             <article
@@ -567,14 +546,16 @@ function RecipeResults({
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={onRegenerate}
-        disabled={isLoading}
-        className="rounded-full border border-white/20 px-6 py-2 text-sm font-semibold text-white transition hover:border-emerald-300 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {isLoading ? "Refreshing..." : "Show different recipes"}
-      </button>
+      {!hasSelection && (
+        <button
+          type="button"
+          onClick={onRegenerate}
+          disabled={isLoading}
+          className="rounded-full border border-white/20 px-6 py-2 text-sm font-semibold text-white transition hover:border-emerald-300 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isLoading ? "Refreshing..." : "Show different recipes"}
+        </button>
+      )}
     </div>
   );
 }
