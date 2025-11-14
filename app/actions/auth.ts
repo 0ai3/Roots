@@ -60,8 +60,6 @@ async function ensureProfileDocuments(
       $setOnInsert: {
         _id: userObjectId,
         profileId,
-        email: doc.email,
-        role: doc.role,
         name: defaultName,
         location: "",
         favoriteMuseums: "",
@@ -76,10 +74,10 @@ async function ensureProfileDocuments(
         },
       },
       $set: {
-        updatedAt: now,
         email: doc.email,
         role: doc.role,
         name: defaultName,
+        updatedAt: now,
       },
     },
     { upsert: true }
