@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { setStoredUserId } from "../lib/userId";
 
 type Props = {
   borderClassName?: string;
@@ -33,11 +34,12 @@ export default function DashboardSidebar({ borderClassName }: Props) {
     setIsLoggingOut(true);
     try {
       await fetch("/api/auth/logout", { method: "POST" });
+      setStoredUserId(null);
+      router.push("/");
     } catch (error) {
       console.error("Logout failed", error);
     } finally {
       setIsLoggingOut(false);
-      router.push("/");
     }
   };
 

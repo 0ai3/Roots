@@ -30,6 +30,11 @@ type RecipeDetail = {
   tips?: string;
 };
 
+type Props = {
+  initialPoints?: number;
+  initialUserId?: string | null;
+};
+
 function parseRecipePayload(raw: string): RecipePayload | null {
   let trimmed = raw.trim();
   if (!trimmed) {
@@ -66,7 +71,7 @@ function parseRecipePayload(raw: string): RecipePayload | null {
   return parsed;
 }
 
-export default function RecipeIdeasPlanner() {
+export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Props = {}) {
   const [country, setCountry] = useState("");
   const [zone, setZone] = useState("");
   const [dietaryFocus, setDietaryFocus] = useState("");
@@ -75,7 +80,7 @@ export default function RecipeIdeasPlanner() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [responseContent, setResponseContent] = useState<RecipePayload | null>(null);
-  const { points, addPoints } = useExperiencePoints();
+  const { points, addPoints } = useExperiencePoints({ initialPoints, initialUserId });
 
   const canSubmit =
     country.trim().length > 0 && zone.trim().length > 0 && !isLoading;

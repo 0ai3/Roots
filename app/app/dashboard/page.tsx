@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import DashboardContent from "../../components/DashboardContent";
 import { getDb } from "../../lib/mongo";
 
+export const dynamic = "force-dynamic";
+
 const AUTH_COOKIE_NAME = "roots_user";
 
 type Role = "client" | "admin";
@@ -11,8 +13,6 @@ type Role = "client" | "admin";
 type StoredUser = {
   _id: ObjectId;
   email: string;
-  passwordHash: string;
-  salt: string;
   role: Role;
   createdAt: Date;
   name?: string;
@@ -34,8 +34,8 @@ async function getCurrentUser(): Promise<DashboardUser | null> {
   }
 
   const db = await getDb();
-  const users = db.collection<StoredUser>("users");
-  const user = await users.findOne({ _id: new ObjectId(userId) });
+  const profiles = db.collection<StoredUser>("profiles");
+  const user = await profiles.findOne({ _id: new ObjectId(userId) });
 
   if (!user) {
     return null;

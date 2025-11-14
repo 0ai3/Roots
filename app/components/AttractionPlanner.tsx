@@ -39,6 +39,11 @@ function parseAssistantContent(raw: string): AssistantPayload | null {
 
 type VisitedMap = Record<string, boolean>;
 
+type Props = {
+  initialPoints?: number;
+  initialUserId?: string | null;
+};
+
 function MessageBubble({
   message,
   onLogAttraction,
@@ -199,7 +204,7 @@ function createMessageId() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-export default function AttractionPlanner() {
+export default function AttractionPlanner({ initialPoints, initialUserId }: Props = {}) {
   const [location, setLocation] = useState("");
   const [budget, setBudget] = useState("");
   const [interests, setInterests] = useState("");
@@ -211,7 +216,7 @@ export default function AttractionPlanner() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [visitedAttractions, setVisitedAttractions] = useState<VisitedMap>({});
-  const { points, addPoints } = useExperiencePoints();
+  const { points, addPoints } = useExperiencePoints({ initialPoints, initialUserId });
   const hasAssistantReply = messages.some((message) => message.role === "assistant");
   const showSetupForm = !hasAssistantReply;
 

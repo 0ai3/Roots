@@ -10,14 +10,34 @@ export async function GET() {
       .collection("profiles")
       .aggregate([
         {
+          $addFields: {
+            resolvedPoints: {
+              $ifNull: ["$points", "$experiencePoints.points", 0],
+            },
+            resolvedUserId: {
+              $ifNull: [
+                "$userId",
+                "$profileId",
+                {
+                  $cond: [
+                    { $ifNull: ["$_id", false] },
+                    { $toString: "$_id" },
+                    null,
+                  ],
+                },
+              ],
+            },
+          },
+        },
+        {
           $match: {
-            "experiencePoints.points": { $gte: 0 },
+            resolvedPoints: { $gte: 0 },
           },
         },
         {
           $project: {
             _id: 0,
-            profileId: "$profileId",
+            userId: "$resolvedUserId",
             name: {
               $cond: [
                 { $gt: [{ $strLenCP: "$name" }, 0] },
@@ -25,16 +45,16 @@ export async function GET() {
                 "$email",
               ],
             },
-            points: "$experiencePoints.points",
+            points: "$resolvedPoints",
           },
         },
-        { $sort: { points: -1, profileId: 1 } },
+        { $sort: { points: -1, userId: 1 } },
         { $limit: MAX_ENTRIES },
       ])
       .toArray();
 
     const entries = results.map((entry, index) => ({
-      profileId: entry.profileId,
+      userId: entry.userId,
       name: entry.name ?? "Roots Explorer",
       points: entry.points ?? 0,
       rank: index + 1,

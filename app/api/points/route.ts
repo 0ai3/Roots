@@ -1,32 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
+import { cookies } from "next/headers";
 import { getDb } from "@/app/lib/mongo";
 
-export async function GET(request: NextRequest) {
+function buildUserFilters(userId: string) {
+  const filters: Record<string, unknown>[] = [];
+  if (ObjectId.isValid(userId)) {
+    filters.push({ _id: new ObjectId(userId) });
+  }
+  filters.push({ userId });
+  filters.push({ profileId: userId });
+  return filters;
+}
+
+export async function GET() {
   try {
-    const profileId = request.nextUrl.searchParams.get("profileId")?.trim();
-    if (!profileId) {
+    const cookieStore = await cookies();
+    const userId = cookieStore.get("roots_user")?.value?.trim();
+    if (!userId) {
       return NextResponse.json(
-        { error: "profileId is required." },
-        { status: 400 }
+        { error: "Not authenticated." },
+        { status: 401 }
       );
     }
 
     const db = await getDb();
-    const doc = await db.collection("profiles").findOne(
-      { profileId },
+    const profiles = db.collection("profiles");
+    const doc = await profiles.findOne(
+      { $or: buildUserFilters(userId) },
       {
         projection: {
           _id: 0,
-          "experiencePoints.points": 1,
+          points: 1,
         },
       }
     );
 
-    return NextResponse.json({ points: doc?.experiencePoints?.points ?? 0 });
+    return NextResponse.json({ points: doc?.points ?? 0 });
   } catch (error) {
-    console.error("Experience points GET error", error);
+    console.error("Points GET error", error);
     return NextResponse.json(
-      { error: "Unable to load experience points." },
+      { error: "Unable to load points." },
       { status: 500 }
     );
   }
@@ -34,44 +48,59 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const cookieStore = await cookies();
+    const userId = cookieStore.get("roots_user")?.value?.trim();
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Not authenticated." },
+        { status: 401 }
+      );
+    }
+
     const payload = await request.json();
-    const profileId = String(payload?.profileId ?? "").trim();
     const pointsValue = Number(payload?.points);
 
-    if (!profileId || !Number.isFinite(pointsValue)) {
+    if (!Number.isFinite(pointsValue)) {
       return NextResponse.json(
-        { error: "profileId and numeric points are required." },
+        { error: "Numeric points are required." },
         { status: 400 }
       );
     }
 
     const normalized = Math.max(0, Math.round(pointsValue));
     const db = await getDb();
+    const profiles = db.collection("profiles");
+    const existing = await profiles.findOne(
+      { $or: buildUserFilters(userId) },
+      { projection: { _id: 1 } }
+    );
+
+    if (!existing?._id) {
+      return NextResponse.json(
+        { error: "Profile not found." },
+        { status: 404 }
+      );
+    }
+
     const now = new Date();
 
-    await db.collection("profiles").updateOne(
-      { profileId },
+    await profiles.updateOne(
+      { _id: existing._id },
       {
         $set: {
-          "experiencePoints.points": normalized,
-          "experiencePoints.updatedAt": now,
+          userId,
+          points: normalized,
+          updatedAt: now,
         },
-        $setOnInsert: {
-          experiencePoints: {
-            points: normalized,
-            createdAt: now,
-            updatedAt: now,
-          },
-        },
-      },
-      { upsert: true }
+        $unset: { profileId: "" },
+      }
     );
 
     return NextResponse.json({ points: normalized });
   } catch (error) {
-    console.error("Experience points POST error", error);
+    console.error("Points POST error", error);
     return NextResponse.json(
-      { error: "Unable to save experience points." },
+      { error: "Unable to save points." },
       { status: 500 }
     );
   }

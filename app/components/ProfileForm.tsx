@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { getStoredProfileId } from "../lib/profileId";
+import { getStoredUserId } from "../lib/userId";
 
 type ProfileFormState = {
   name: string;
@@ -34,20 +34,20 @@ const DEFAULT_STATE: ProfileFormState = {
 };
 
 export default function ProfileForm() {
-  const [profileId, setProfileId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [formState, setFormState] = useState<ProfileFormState>(DEFAULT_STATE);
   const [status, setStatus] = useState<"idle" | "loading" | "saving" | "success">("loading");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const stored = getStoredProfileId();
+    const stored = getStoredUserId();
     if (stored) {
-      setProfileId(stored);
+      setUserId(stored);
     }
   }, []);
 
   useEffect(() => {
-    if (!profileId) {
+    if (!userId) {
       return;
     }
     const controller = new AbortController();
@@ -55,7 +55,7 @@ export default function ProfileForm() {
       setStatus("loading");
       setError(null);
       try {
-        const response = await fetch(`/api/profile?profileId=${profileId}`, {
+        const response = await fetch("/api/profile", {
           method: "GET",
           signal: controller.signal,
         });
@@ -84,7 +84,7 @@ export default function ProfileForm() {
     return () => {
       controller.abort();
     };
-  }, [profileId]);
+  }, [userId]);
 
   const isSaving = status === "saving";
 
@@ -99,7 +99,7 @@ export default function ProfileForm() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!profileId) {
+    if (!userId) {
       return;
     }
     setStatus("saving");
@@ -109,7 +109,6 @@ export default function ProfileForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          profileId,
           ...formState,
         }),
       });
@@ -128,7 +127,7 @@ export default function ProfileForm() {
     }
   }
 
-  if (!profileId) {
+  if (!userId) {
     return (
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-white/70">
         Sign in to manage your Roots profile and experience points.
@@ -154,7 +153,7 @@ export default function ProfileForm() {
           </div>
         </div>
         <p className="text-xs text-white/40">
-          Your profile ID: <span className="font-semibold">{profileId ?? "…"}</span>
+          Your user ID: <span className="font-semibold">{userId ?? "…"}</span>
         </p>
       </div>
 
@@ -211,7 +210,7 @@ export default function ProfileForm() {
 
       <button
         type="submit"
-        disabled={isSaving || !profileId}
+        disabled={isSaving || !userId}
         className="w-full rounded-full bg-emerald-500 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSaving ? "Saving profile..." : "Save profile"}

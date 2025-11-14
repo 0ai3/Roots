@@ -5,7 +5,7 @@ import DashboardPageLayout from "./DashboardPageLayout";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 
 type LeaderboardEntry = {
-  profileId: string;
+  userId: string;
   name: string;
   points: number;
   rank: number;
@@ -17,14 +17,14 @@ const fetcher = (url: string) =>
     .catch(() => ({ entries: [] }));
 
 export default function LeaderboardPage() {
-  const { profileId } = useExperiencePoints();
+  const { userId } = useExperiencePoints();
   const { data, isLoading } = useSWR("/api/leaderboard", fetcher, {
     refreshInterval: 30_000,
   });
 
   const entries: LeaderboardEntry[] = data?.entries ?? [];
-  const current = profileId
-    ? entries.find((entry) => entry.profileId === profileId)
+  const current = userId
+    ? entries.find((entry) => entry.userId === userId)
     : undefined;
 
   return (
@@ -34,7 +34,7 @@ export default function LeaderboardPage() {
     >
       <div className="space-y-6">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-white/80">
-          {profileId ? (
+          {userId ? (
             current ? (
               <p>
                 You’re currently <strong>#{current.rank}</strong> with{" "}
@@ -77,12 +77,12 @@ function LeaderboardTable({ entries, isLoading }: { entries: LeaderboardEntry[];
         <span>Rank</span>
         <span>Name</span>
         <span className="text-center">Points</span>
-        <span className="text-right">Profile</span>
+        <span className="text-right">User</span>
       </div>
       <ul className="divide-y divide-white/5">
         {entries.map((entry) => (
           <li
-            key={entry.profileId}
+            key={entry.userId}
             className="grid grid-cols-4 items-center px-6 py-4 text-sm text-white/80"
           >
             <span className="font-semibold text-white">#{entry.rank}</span>
@@ -91,7 +91,7 @@ function LeaderboardTable({ entries, isLoading }: { entries: LeaderboardEntry[];
               {entry.points}
             </span>
             <span className="text-right text-xs text-white/50">
-              {entry.profileId.slice(-6)}
+              {entry.userId.slice(-6)}
             </span>
           </li>
         ))}

@@ -7,19 +7,31 @@ import { getDb } from "../lib/mongo";
 
 type Role = "client" | "admin";
 
-type UserDoc = {
+
+type ProfileDoc = {
   _id?: ObjectId;
+  userId?: string;
+  profileId?: string; // legacy support
   email: string;
   passwordHash: string;
   salt: string;
   role: Role;
+  name: string;
+  location: string;
+  favoriteMuseums: string;
+  favoriteRecipes: string;
+  bio: string;
+  socialHandle: string;
   createdAt: Date;
+  updatedAt: Date;
+  points: number;
 };
 
 const MIN_PASSWORD_LENGTH = 6;
 const DEFAULT_ROLE: Role = "client";
 const AUTH_COOKIE_NAME = "roots_user";
 const AUTH_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+const PROFILES_COLLECTION = "profiles";
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
@@ -39,58 +51,27 @@ function passwordsMatch(password: string, salt: string, storedHash: string) {
   return timingSafeEqual(storedBuffer, derivedKey);
 }
 
-async function getUsersCollection() {
-  const db = await getDb();
-  return db.collection<UserDoc>("users");
+function buildDefaultName(email: string) {
+  return email.split("@")[0]?.replace(/\W+/g, " ").trim() || "Roots Explorer";
 }
 
-async function ensureUserDocuments(
-  userObjectId: ObjectId,
-  doc: { email: string; role: Role }
-) {
+async function getProfilesCollection() {
   const db = await getDb();
-  const now = new Date();
-  const userId = userObjectId.toString();
-  const defaultName =
-    doc.email.split("@")[0]?.replace(/\W+/g, " ").trim() || "Roots Explorer";
+  return db.collection<ProfileDoc>(PROFILES_COLLECTION);
+}
 
-  await db.collection("user").updateOne(
-    { userId },
+async function ensurePoints(user: ProfileDoc & { _id: ObjectId }) {
+  if (typeof user.points === "number") {
+    return;
+  }
+  const profiles = await getProfilesCollection();
+  const now = new Date();
+  await profiles.updateOne(
+    { _id: user._id },
     {
-      $setOnInsert: {
-        _id: userObjectId,
-        userId,
-        name: defaultName,
-        location: "",
-        favoriteMuseums: "",
-        favoriteRecipes: "",
-        bio: "",
-        socialHandle: "",
-        createdAt: now,
-        experiencePoints: {
-          points: 0,
-          createdAt: now,
-          updatedAt: now,
-        },
-      },
       $set: {
-        email: doc.email,
-        role: doc.role,
-        name: defaultName,
+        points: 0,
         updatedAt: now,
-      },
-    },
-    { upsert: true }
-  );
-  await db.collection("users").updateOne(
-    { userId, experiencePoints: { $exists: false } },
-    {
-      $set: {
-        experiencePoints: {
-          points: 0,
-          createdAt: now,
-          updatedAt: now,
-        },
       },
     }
   );
@@ -102,8 +83,8 @@ export async function checkEmailAction(email: string) {
     throw new Error("Email is required");
   }
 
-  const users = await getUsersCollection();
-  const existing = await users.findOne(
+  const profiles = await getProfilesCollection();
+  const existing = await profiles.findOne(
     { email: normalizedEmail },
     { projection: { _id: 1 } }
   );
@@ -139,11 +120,18 @@ export async function loginAction(
     return { ok: false, message: "Email and password are required." };
   }
 
-  const users = await getUsersCollection();
-  const user = await users.findOne({ email: normalizedEmail });
+  const profiles = await getProfilesCollection();
+  const user = await profiles.findOne({ email: normalizedEmail });
 
   if (!user) {
     return { ok: false, message: "Account not found. Please register." };
+  }
+
+
+  if (!user.salt || !user.passwordHash) {
+    // Delete corrupted user so they can register again
+    await profiles.deleteOne({ _id: user._id });
+    return { ok: false, message: "Account data was corrupted. Please register again." };
   }
 
   const validPassword = passwordsMatch(password, user.salt, user.passwordHash);
@@ -156,12 +144,19 @@ export async function loginAction(
     return { ok: false, message: "Unable to locate your account id." };
   }
 
-  await ensureUserDocuments(user._id, {
-    email: user.email,
-    role: user.role ?? DEFAULT_ROLE,
-  });
+  const userIdValue = user.userId ?? user.profileId ?? user._id.toString();
+  if (!user.userId || user.userId !== userIdValue || user.profileId) {
+    const updateOperators: Record<string, Record<string, unknown>> = {
+      $set: { userId: userIdValue },
+    };
+    if (user.profileId) {
+      updateOperators.$unset = { profileId: "" };
+    }
+    await profiles.updateOne({ _id: user._id }, updateOperators);
+  }
+  await ensurePoints({ ...user, _id: user._id });
 
-  const userId = user._id.toString();
+  const userId = userIdValue;
   await persistSession(userId);
 
   return {
@@ -189,8 +184,8 @@ export async function registerAction(
     };
   }
 
-  const users = await getUsersCollection();
-  const existing = await users.findOne(
+  const profiles = await getProfilesCollection();
+  const existing = await profiles.findOne(
     { email: normalizedEmail },
     { projection: { _id: 1 } }
   );
@@ -200,26 +195,38 @@ export async function registerAction(
   }
 
   const { hash, salt } = createPasswordHash(password);
+  const now = new Date();
+  const profileObjectId = new ObjectId();
+  const userIdValue = profileObjectId.toString();
 
-  const userDoc: UserDoc = {
+  const profileDoc: ProfileDoc = {
+    _id: profileObjectId,
+    userId: userIdValue,
     email: normalizedEmail,
     passwordHash: hash,
     salt,
     role: DEFAULT_ROLE,
-    createdAt: new Date(),
+    name: buildDefaultName(normalizedEmail),
+    location: "",
+    favoriteMuseums: "",
+    favoriteRecipes: "",
+    bio: "",
+    socialHandle: "",
+    createdAt: now,
+    updatedAt: now,
+    points: 0,
   };
 
-  const insertResult = await users.insertOne(userDoc);
-  await ensureUserDocuments(insertResult.insertedId, userDoc);
-  const userId = insertResult.insertedId.toString();
+  await profiles.insertOne(profileDoc);
+  const userId = userIdValue;
 
   await persistSession(userId);
 
   return {
     ok: true,
     message: "Account created and ready to use.",
-    email: userDoc.email,
-    role: userDoc.role,
+    email: profileDoc.email,
+    role: profileDoc.role,
     userId,
   };
 }
