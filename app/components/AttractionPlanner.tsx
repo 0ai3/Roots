@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useExperiencePoints } from "../hooks/useExperiencePoints";
 
 type ChatMessage = {
   id: string;
@@ -36,11 +37,27 @@ function parseAssistantContent(raw: string): AssistantPayload | null {
   }
 }
 
-function MessageBubble({ message }: { message: ChatMessage }) {
+type VisitedMap = Record<string, boolean>;
+
+function MessageBubble({
+  message,
+  onLogAttraction,
+  visitedAttractions,
+}: {
+  message: ChatMessage;
+  onLogAttraction: (title: string) => void;
+  visitedAttractions: VisitedMap;
+}) {
   if (message.role === "assistant") {
     const parsed = parseAssistantContent(message.content);
     if (parsed) {
-      return <AssistantCard payload={parsed} />;
+      return (
+        <AssistantCard
+          payload={parsed}
+          onLogAttraction={onLogAttraction}
+          visitedAttractions={visitedAttractions}
+        />
+      );
     }
   }
 
@@ -66,7 +83,15 @@ function MessageBubble({ message }: { message: ChatMessage }) {
   );
 }
 
-function AssistantCard({ payload }: { payload: AssistantPayload }) {
+function AssistantCard({
+  payload,
+  onLogAttraction,
+  visitedAttractions,
+}: {
+  payload: AssistantPayload;
+  onLogAttraction: (title: string) => void;
+  visitedAttractions: VisitedMap;
+}) {
   const tips = payload.tips?.filter(Boolean) ?? [];
   const attractions = payload.attractions ?? [];
 
@@ -139,6 +164,18 @@ function AssistantCard({ payload }: { payload: AssistantPayload }) {
                   ))}
                 </ul>
               )}
+              <button
+                type="button"
+                onClick={() => onLogAttraction(item.title)}
+                disabled={Boolean(visitedAttractions[item.title])}
+                className={`mt-4 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wide transition ${
+                  visitedAttractions[item.title]
+                    ? "border border-emerald-300/40 text-emerald-200"
+                    : "border border-white/20 text-white hover:border-emerald-300 hover:text-emerald-200"
+                }`}
+              >
+                {visitedAttractions[item.title] ? "Logged (+2 pts)" : "I visited (+2 pts)"}
+              </button>
             </article>
           ))}
         </div>
@@ -173,6 +210,8 @@ export default function AttractionPlanner() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [visitedAttractions, setVisitedAttractions] = useState<VisitedMap>({});
+  const { points, addPoints } = useExperiencePoints();
   const hasAssistantReply = messages.some((message) => message.role === "assistant");
   const showSetupForm = !hasAssistantReply;
 
@@ -181,6 +220,19 @@ export default function AttractionPlanner() {
     budget.trim().length > 0 &&
     input.trim().length > 0 &&
     !isLoading;
+
+  const handleLogAttraction = (title: string) => {
+    if (!title) {
+      return;
+    }
+    setVisitedAttractions((prev) => {
+      if (prev[title]) {
+        return prev;
+      }
+      addPoints(2);
+      return { ...prev, [title]: true };
+    });
+  };
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -245,10 +297,18 @@ export default function AttractionPlanner() {
     setNotes("");
     setError(null);
     setIsLoading(false);
+    setVisitedAttractions({});
   };
 
   return (
     <section className="space-y-6">
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+        <p className="text-xs uppercase tracking-wide text-white/50">Experience points</p>
+        <p className="text-3xl font-semibold text-white">{points}</p>
+        <p className="text-xs text-white/50">
+          Log any museum or attraction visit to earn +2 pts.
+        </p>
+      </div>
       {showSetupForm && (
         <form
           onSubmit={handleSubmit}
@@ -389,11 +449,16 @@ export default function AttractionPlanner() {
              : "Waiting for the Roots guide to respond..."}
          </p>
        ) : (
-          <div className="space-y-4">
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
-          </div>
+        <div className="space-y-4">
+          {messages.map((message) => (
+            <MessageBubble
+              key={message.id}
+              message={message}
+              onLogAttraction={handleLogAttraction}
+              visitedAttractions={visitedAttractions}
+            />
+          ))}
+        </div>
        )}
 
         {error && !showSetupForm && (

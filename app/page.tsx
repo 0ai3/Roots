@@ -1414,6 +1414,12 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    // Ensure InteractiveGarden only renders on the client after hydration
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
+
   return (
     <ThemeProvider>
       <div className="relative">
