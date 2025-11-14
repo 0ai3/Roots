@@ -18,109 +18,9 @@ import {
   Moon,
   Sun,
 } from "lucide-react";
-<<<<<<< Updated upstream
-
-type Theme = "light" | "dark";
-
-interface ThemeContextType {
-  theme: Theme;
-  toggleTheme: () => void;
-}
-
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
-
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const storedTheme = localStorage.getItem("theme") as Theme | null;
-    if (storedTheme) {
-      setTheme(storedTheme);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    setTheme((currentTheme) => {
-      const newTheme = currentTheme === "dark" ? "light" : "dark";
-      if (typeof window !== "undefined") {
-        localStorage.setItem("theme", newTheme);
-      }
-      return newTheme;
-    });
-  };
-
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-}
-
-function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-  return context;
-}
-
-function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
-
-  return (
-    <motion.button
-      onClick={toggleTheme}
-      className={`fixed top-4 right-4 z-50 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm border transition-all shadow-lg ${
-        theme === "dark"
-          ? "bg-neutral-800/80 border-neutral-700 hover:bg-neutral-700/80"
-          : "bg-white/90 border-neutral-200 hover:bg-neutral-50/90"
-      }`}
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.95 }}
-      aria-label="Toggle theme"
-    >
-      <motion.div
-        initial={false}
-        animate={{
-          rotate: theme === "dark" ? 0 : 180,
-          scale: theme === "dark" ? 1 : 0,
-        }}
-        transition={{ duration: 0.3 }}
-        className="absolute"
-      >
-        <Moon
-          className={`w-5 h-5 ${
-            theme === "dark" ? "text-lime-400" : "text-neutral-900"
-          }`}
-        />
-      </motion.div>
-      <motion.div
-        initial={false}
-        animate={{
-          rotate: theme === "dark" ? -180 : 0,
-          scale: theme === "dark" ? 0 : 1,
-        }}
-        transition={{ duration: 0.3 }}
-        className="absolute"
-      >
-        <Sun
-          className={`w-5 h-5 ${
-            theme === "dark" ? "text-lime-400" : "text-amber-600"
-          }`}
-        />
-      </motion.div>
-    </motion.button>
-  );
-}
-=======
 import Navbar from "./components/Navbar";
 import { useTheme } from "./components/ThemeProvider";
 import ThemeToggle from "./components/ThemeToggle";
->>>>>>> Stashed changes
 
 interface NavbarProps {
   scrollY: number;
@@ -1288,7 +1188,6 @@ export default function App() {
     };
   }, []);
 
-<<<<<<< Updated upstream
   useEffect(() => {
     // Ensure InteractiveGarden only renders on the client after hydration
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -1296,7 +1195,7 @@ export default function App() {
   }, []);
 
   return (
-    <ThemeProvider>
+    // <ThemeProvider>
       <div className="relative">
         <Navbar scrollY={scrollY} />
         <ThemeToggle />
@@ -1306,9 +1205,6 @@ export default function App() {
         {mounted && <InteractiveGarden mousePosition={mousePosition} />}
         <CTASection />
       </div>
-    </ThemeProvider>
+    // </ThemeProvider>
   );
-=======
-  return <AppInner mousePosition={mousePosition} scrollY={scrollY} />;
->>>>>>> Stashed changes
 }
