@@ -1,18 +1,35 @@
+
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import dynamic from "next/dynamic";
 
 type Theme = "light" | "dark";
 
 interface NavbarProps {
-  scrollY: number;
   theme: Theme;
 }
 
-export default function Navbar({ scrollY, theme }: NavbarProps) {
+// Dynamic imports for icons to prevent hydration errors
+const MenuIcon = dynamic(() => import("lucide-react").then(mod => mod.Menu), {
+  ssr: false,
+});
+const XIcon = dynamic(() => import("lucide-react").then(mod => mod.X), {
+  ssr: false,
+});
+
+export default function Navbar({ theme }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+
+  // Update scrollY on client only
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const isScrolled = scrollY > 50;
 
   const navLinks = [
@@ -37,10 +54,7 @@ export default function Navbar({ scrollY, theme }: NavbarProps) {
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between h-20">
-          <motion.div
-            className="flex items-center gap-2"
-            whileHover={{ scale: 1.02 }}
-          >
+          <motion.div className="flex items-center gap-2" whileHover={{ scale: 1.02 }}>
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                 theme === "dark" ? "bg-lime-400" : "bg-emerald-600"
@@ -70,11 +84,7 @@ export default function Navbar({ scrollY, theme }: NavbarProps) {
                 />
               </svg>
             </div>
-            <span
-              className={`text-xl ${
-                theme === "dark" ? "text-white" : "text-neutral-900"
-              }`}
-            >
+            <span className={`text-xl ${theme === "dark" ? "text-white" : "text-neutral-900"}`}>
               Roots
             </span>
           </motion.div>
@@ -108,15 +118,9 @@ export default function Navbar({ scrollY, theme }: NavbarProps) {
 
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`md:hidden p-2 ${
-              theme === "dark" ? "text-white" : "text-neutral-900"
-            }`}
+            className={`md:hidden p-2 ${theme === "dark" ? "text-white" : "text-neutral-900"}`}
           >
-            {isMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
+            {isMenuOpen ? <XIcon className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
           </button>
         </div>
 
@@ -144,9 +148,7 @@ export default function Navbar({ scrollY, theme }: NavbarProps) {
             ))}
             <button
               className={`w-full mt-4 px-6 py-2.5 rounded-full transition-colors ${
-                theme === "dark"
-                  ? "bg-lime-400 text-neutral-950"
-                  : "bg-emerald-600 text-white"
+                theme === "dark" ? "bg-lime-400 text-neutral-950" : "bg-emerald-600 text-white"
               }`}
             >
               Get Started

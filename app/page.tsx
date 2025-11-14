@@ -36,18 +36,27 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
+  const [theme, setTheme] = useState<Theme>("dark");
+
+  useEffect(() => {
     if (typeof window === "undefined") {
-      return "dark";
+      return;
     }
 
-    return (localStorage.getItem("theme") as Theme | null) ?? "dark";
-  });
+    const storedTheme = localStorage.getItem("theme") as Theme | null;
+    if (storedTheme) {
+      setTheme(storedTheme);
+    }
+  }, []);
 
   const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
+    setTheme((currentTheme) => {
+      const newTheme = currentTheme === "dark" ? "light" : "dark";
+      if (typeof window !== "undefined") {
+        localStorage.setItem("theme", newTheme);
+      }
+      return newTheme;
+    });
   };
 
   return (
@@ -845,6 +854,24 @@ interface PlantItem {
 
 function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
   const { theme } = useTheme();
+  const [viewportSize, setViewportSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const updateSize = () => {
+      setViewportSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
 
   const plants = useMemo(() => {
     const items: PlantItem[] = [];
@@ -907,12 +934,12 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
   };
 
   const getInteraction = (plant: PlantItem) => {
-    if (typeof window === "undefined") {
+    if (!viewportSize) {
       return { rotation: 0, scale: 1, strength: 0, show: false };
     }
 
-    const plantX = (plant.x / 100) * window.innerWidth;
-    const plantY = (plant.y / 100) * window.innerHeight;
+    const plantX = (plant.x / 100) * viewportSize.width;
+    const plantY = (plant.y / 100) * viewportSize.height;
 
     const distance = calculateDistance(
       mousePosition.x,
