@@ -230,13 +230,11 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
     if (!title) {
       return;
     }
-    setVisitedAttractions((prev) => {
-      if (prev[title]) {
-        return prev;
-      }
-      addPoints(2);
-      return { ...prev, [title]: true };
-    });
+    if (visitedAttractions[title]) {
+      return;
+    }
+    setVisitedAttractions((prev) => ({ ...prev, [title]: true }));
+    addPoints(2);
   };
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
