@@ -1,13 +1,19 @@
 import DashboardPageLayout from "../../components/DashboardPageLayout";
+import ProfileForm from "../../components/ProfileForm";
+import { getExperiencePointsFromSession } from "../../lib/experiencePoints.server";
 
+export default async function ProfilePage() {
+  const experience = await getExperiencePointsFromSession();
 
-export default function ProfilePage() {
   return (
     <DashboardPageLayout
       title="Profile"
       description="Tell Roots about your favorite museums, dishes, and travel stories."
     >
-a
+      <ProfileForm
+        initialPoints={experience.points}
+        initialUserId={experience.userId}
+      />
     </DashboardPageLayout>
   );
 }
