@@ -414,7 +414,7 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
         className={`rounded-3xl border border-white/10 p-6 ${
           showSetupForm
             ? "bg-slate-950/50"
-            : "bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.15),_rgba(2,6,23,0.95))]"
+            : "bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.15),rgba(2,6,23,0.95))]"
         }`}
       >
         <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
