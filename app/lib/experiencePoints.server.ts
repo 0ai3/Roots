@@ -9,6 +9,14 @@ type ExperiencePointsResult = {
   points: number;
 };
 
+type ExperiencePointsDocument = {
+  userId?: string;
+  points?: number;
+  experiencePoints?: {
+    points?: number;
+  } | null;
+};
+
 export async function getExperiencePointsFromSession(): Promise<ExperiencePointsResult> {
   const cookieStore = await cookies();
   const cookieUserId = cookieStore.get(AUTH_COOKIE_NAME)?.value?.trim() ?? null;
@@ -23,10 +31,9 @@ export async function getExperiencePointsFromSession(): Promise<ExperiencePoints
     { _id: new ObjectId(cookieUserId) },
     { profileId: cookieUserId },
   ];
-  let doc: { points?: number; userId?: string; experiencePoints?: { points?: number } } | null =
-    null;
+  let doc: ExperiencePointsDocument | null = null;
   for (const filter of filters) {
-    const current = await db.collection("profiles").findOne(filter, {
+    const current = await db.collection("profiles").findOne<ExperiencePointsDocument>(filter, {
       projection: {
         _id: 0,
         userId: 1,
