@@ -1395,6 +1395,7 @@ function ImageWithFallback({
 export default function App() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -1428,7 +1429,7 @@ export default function App() {
         <HeroSection scrollY={scrollY} />
         <FeaturesSection />
         <ExploreSection />
-        <InteractiveGarden mousePosition={mousePosition} />
+        {mounted && <InteractiveGarden mousePosition={mousePosition} />}
         <CTASection />
       </div>
     </ThemeProvider>
