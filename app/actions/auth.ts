@@ -44,22 +44,22 @@ async function getUsersCollection() {
   return db.collection<UserDoc>("users");
 }
 
-async function ensureProfileDocuments(
+async function ensureUserDocuments(
   userObjectId: ObjectId,
   doc: { email: string; role: Role }
 ) {
   const db = await getDb();
   const now = new Date();
-  const profileId = userObjectId.toString();
+  const userId = userObjectId.toString();
   const defaultName =
     doc.email.split("@")[0]?.replace(/\W+/g, " ").trim() || "Roots Explorer";
 
-  await db.collection("profiles").updateOne(
-    { profileId },
+  await db.collection("user").updateOne(
+    { userId },
     {
       $setOnInsert: {
         _id: userObjectId,
-        profileId,
+        userId,
         name: defaultName,
         location: "",
         favoriteMuseums: "",
@@ -82,8 +82,8 @@ async function ensureProfileDocuments(
     },
     { upsert: true }
   );
-  await db.collection("profiles").updateOne(
-    { profileId, experiencePoints: { $exists: false } },
+  await db.collection("users").updateOne(
+    { userId, experiencePoints: { $exists: false } },
     {
       $set: {
         experiencePoints: {
@@ -156,7 +156,7 @@ export async function loginAction(
     return { ok: false, message: "Unable to locate your account id." };
   }
 
-  await ensureProfileDocuments(user._id, {
+  await ensureUserDocuments(user._id, {
     email: user.email,
     role: user.role ?? DEFAULT_ROLE,
   });
@@ -210,7 +210,7 @@ export async function registerAction(
   };
 
   const insertResult = await users.insertOne(userDoc);
-  await ensureProfileDocuments(insertResult.insertedId, userDoc);
+  await ensureUserDocuments(insertResult.insertedId, userDoc);
   const userId = insertResult.insertedId.toString();
 
   await persistSession(userId);
