@@ -2,21 +2,15 @@
 
 import { motion } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
-import React from "react";
+import { useTheme } from "./ThemeProvider";
 
-type Theme = "light" | "dark";
+export default function ThemeToggle() {
+  const { theme, toggleTheme } = useTheme();
 
-export default function ThemeToggle({
-  theme,
-  toggleTheme,
-}: {
-  theme: Theme;
-  toggleTheme: () => void;
-}) {
   return (
     <motion.button
       onClick={toggleTheme}
-      className={`fixed top-4 right-4 z-50 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm border transition-all shadow-lg ${
+      className={`fixed top-4 right-4 z-9999 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm border transition-all shadow-lg ${
         theme === "dark"
           ? "bg-neutral-800/80 border-neutral-700 hover:bg-neutral-700/80"
           : "bg-white/90 border-neutral-200 hover:bg-neutral-50/90"

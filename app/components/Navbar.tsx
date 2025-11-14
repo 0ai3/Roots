@@ -1,13 +1,19 @@
 
 "use client";
 
+<<<<<<< Updated upstream
 import React, { useState, useEffect } from "react";
+=======
+import React, { useState } from "react";
+import { useTheme } from "./ThemeProvider";
+>>>>>>> Stashed changes
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 
 type Theme = "light" | "dark";
 
 interface NavbarProps {
+<<<<<<< Updated upstream
   theme: Theme;
 }
 
@@ -20,6 +26,13 @@ const XIcon = dynamic(() => import("lucide-react").then(mod => mod.X), {
 });
 
 export default function Navbar({ theme }: NavbarProps) {
+=======
+  scrollY: number;
+}
+
+export default function Navbar({ scrollY }: NavbarProps) {
+  const { theme } = useTheme();
+>>>>>>> Stashed changes
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
 
@@ -84,9 +97,17 @@ export default function Navbar({ theme }: NavbarProps) {
                 />
               </svg>
             </div>
+<<<<<<< Updated upstream
             <span className={`text-xl ${theme === "dark" ? "text-white" : "text-neutral-900"}`}>
+=======
+            <a href="/"
+              className={`text-xl ${
+                theme === "dark" ? "text-white" : "text-neutral-900"
+              }`}
+            >
+>>>>>>> Stashed changes
               Roots
-            </span>
+            </a>
           </motion.div>
 
           <div className="hidden md:flex items-center gap-8">
