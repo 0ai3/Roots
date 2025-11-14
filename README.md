@@ -113,6 +113,3 @@ Feel free to use, modify and distribute the code as per the license.
 Thanks to all the contributors, designers, cultural partners and testers who help bring culture closer to people in fun and meaningful ways.
 
 Enjoy exploring and building with Roots! 🌍🎮
-
-
----
