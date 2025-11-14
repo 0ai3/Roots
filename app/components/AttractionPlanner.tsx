@@ -2,6 +2,8 @@
 
 import { FormEvent, useState } from "react";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
+import { motion } from "framer-motion";
+import { Compass, MapPin, DollarSign, Heart, MessageCircle, RotateCcw } from "lucide-react";
 
 type ChatMessage = {
   id: string;
@@ -67,15 +69,17 @@ function MessageBubble({
   }
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
       className={`flex ${
         message.role === "user" ? "justify-end" : "justify-start"
       }`}
     >
       <div
-        className={`max-w-2xl rounded-3xl border px-5 py-4 text-sm leading-relaxed shadow-md ${
+        className={`max-w-2xl rounded-2xl border px-5 py-4 backdrop-blur-sm shadow-lg ${
           message.role === "user"
-            ? "border-emerald-400/50 bg-emerald-400/10 text-emerald-50"
+            ? "border-lime-400/30 bg-lime-400/10 text-lime-50"
             : "border-white/10 bg-white/5 text-white/90"
         }`}
       >
@@ -84,7 +88,7 @@ function MessageBubble({
         </p>
         <p className="whitespace-pre-line">{message.content}</p>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -101,103 +105,133 @@ function AssistantCard({
   const attractions = payload.attractions ?? [];
 
   return (
-    <div className="rounded-3xl border border-emerald-300/30 bg-slate-900/70 p-6 shadow-xl">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-2xl border border-lime-400/20 bg-neutral-900/50 p-6 backdrop-blur-sm shadow-xl"
+    >
       {payload.intro && (
-        <p className="text-base text-emerald-50">{payload.intro}</p>
+        <p className="text-base text-white/90 leading-relaxed">{payload.intro}</p>
       )}
 
       {tips.length > 0 && (
         <div className="mt-6">
-          <p className="text-xs uppercase tracking-wide text-white/40">
-            Quick tips
-          </p>
-          <ul className="mt-3 flex flex-wrap gap-2 text-sm text-white/70">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 rounded-full bg-lime-400" />
+            <p className="text-xs uppercase tracking-wide text-white/60">
+              Quick Tips
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
             {tips.map((tip) => (
-              <li key={tip} className="rounded-full border border-white/10 px-3 py-1">
+              <motion.span
+                key={tip}
+                whileHover={{ scale: 1.05 }}
+                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/80"
+              >
                 {tip}
-              </li>
+              </motion.span>
             ))}
-          </ul>
+          </div>
         </div>
       )}
 
       {attractions.length > 0 && (
         <div className="mt-8 space-y-4">
-          {attractions.map((item) => (
-            <article
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-lime-400" />
+            <p className="text-xs uppercase tracking-wide text-white/60">
+              Recommended Attractions
+            </p>
+          </div>
+          {attractions.map((item, index) => (
+            <motion.article
               key={item.title}
-              className="rounded-2xl border border-white/10 bg-white/5 p-5"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
             >
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
                 <div>
-                  <p className="text-lg font-semibold text-white">{item.title}</p>
+                  <h3 className="text-lg font-semibold text-white">{item.title}</h3>
                   {item.neighborhood && (
-                    <p className="text-xs uppercase tracking-wide text-white/40">
-                      {item.neighborhood}
-                    </p>
+                    <div className="flex items-center gap-1 mt-1">
+                      <MapPin className="w-3 h-3 text-white/40" />
+                      <p className="text-xs text-white/40">{item.neighborhood}</p>
+                    </div>
                   )}
                 </div>
                 {item.cost && (
-                  <span className="rounded-full border border-emerald-300/40 px-3 py-1 text-xs text-emerald-200">
-                    {item.cost}
-                  </span>
+                  <div className="flex items-center gap-1">
+                    <DollarSign className="w-3 h-3 text-lime-400/80" />
+                    <span className="rounded-full border border-lime-400/30 bg-lime-400/10 px-3 py-1 text-xs text-lime-300">
+                      {item.cost}
+                    </span>
+                  </div>
                 )}
               </div>
 
               {item.description && (
-                <p className="mt-3 text-sm text-white/80">{item.description}</p>
+                <p className="text-sm text-white/80 leading-relaxed mb-3">{item.description}</p>
               )}
 
               {item.mapLink && (
-                <a
+                <motion.a
                   href={item.mapLink}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-emerald-300 hover:text-emerald-200"
+                  whileHover={{ scale: 1.05 }}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-lime-400 hover:text-lime-300 transition-colors"
                 >
+                  <Compass className="w-4 h-4" />
                   Open in Maps
-                </a>
+                </motion.a>
               )}
 
               {Array.isArray(item.notes) && item.notes.length > 0 && (
                 <ul className="mt-4 space-y-2 text-sm text-white/70">
                   {item.notes.map((note) => (
                     <li key={note} className="flex gap-2">
-                      <span className="text-emerald-300">•</span>
+                      <span className="text-lime-400">•</span>
                       <span>{note}</span>
                     </li>
                   ))}
                 </ul>
               )}
-              <button
+              
+              <motion.button
                 type="button"
                 onClick={() => onLogAttraction(item.title)}
                 disabled={Boolean(visitedAttractions[item.title])}
-                className={`mt-4 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wide transition ${
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`mt-4 rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-wide transition-all flex items-center gap-2 ${
                   visitedAttractions[item.title]
-                    ? "border border-emerald-300/40 text-emerald-200"
-                    : "border border-white/20 text-white hover:border-emerald-300 hover:text-emerald-200"
+                    ? "border border-lime-400/40 text-lime-300 bg-lime-400/10"
+                    : "border border-white/20 text-white/90 hover:border-lime-400 hover:text-lime-300 hover:bg-lime-400/10"
                 }`}
               >
+                <Heart className="w-3 h-3" />
                 {visitedAttractions[item.title] ? "Logged (+2 pts)" : "I visited (+2 pts)"}
-              </button>
-            </article>
+              </motion.button>
+            </motion.article>
           ))}
         </div>
       )}
 
       {payload.closing && (
-        <p className="mt-6 text-sm text-white/70">{payload.closing}</p>
+        <p className="mt-6 text-sm text-white/70 leading-relaxed">{payload.closing}</p>
       )}
-    </div>
+    </motion.div>
   );
 }
 
 const samplePrompts = [
-  "Plan a Saturday focused on art and design.",
-  "Suggest budget-friendly outdoor adventures.",
+  "Plan a Saturday focused on art and design",
+  "Suggest budget-friendly outdoor adventures",
   "Where should I eat if I love street food?",
-  "Give me rainy-day ideas with indoor options.",
+  "Give me rainy-day ideas with indoor options",
 ];
 
 function createMessageId() {
@@ -271,11 +305,11 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
       const data = (await response.json().catch(() => null)) ?? {};
 
       if (!response.ok) {
-        throw new Error(data?.error ?? "Unable to reach the Gemini travel guide.");
+        throw new Error(data?.error ?? "Unable to reach the Roots travel guide.");
       }
 
       if (!data?.reply) {
-        throw new Error("Gemini reply was empty. Try asking again.");
+        throw new Error("Guide reply was empty. Try asking again.");
       }
 
       setMessages((prev) => [
@@ -305,196 +339,248 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
 
   return (
     <section className="space-y-6">
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-        <p className="text-xs uppercase tracking-wide text-white/50">Experience points</p>
-        <p className="text-3xl font-semibold text-white">{points}</p>
-        <p className="text-xs text-white/50">
-          Log any museum or attraction visit to earn +2 pts.
+      {/* Points Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
+      >
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-2 h-2 rounded-full bg-lime-400" />
+          <p className="text-xs uppercase tracking-wide text-white/60">Experience Points</p>
+        </div>
+        <p className="text-3xl font-bold text-white mb-1">{points}</p>
+        <p className="text-sm text-white/60">
+          Log any museum or attraction visit to earn +2 points
         </p>
-      </div>
+      </motion.div>
+
+      {/* Setup Form */}
       {showSetupForm && (
-        <form
+        <motion.form
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           onSubmit={handleSubmit}
-          className="space-y-5 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur"
+          className="space-y-6 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
         >
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="space-y-2 text-sm font-medium text-white/80">
-              <span>City or region</span>
+            <label className="space-y-3">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-white/60" />
+                <span className="text-sm font-medium text-white/80">City or Region</span>
+              </div>
               <input
                 type="text"
                 value={location}
                 onChange={(event) => setLocation(event.target.value)}
                 placeholder="e.g., Mexico City historic center"
-                className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
               />
             </label>
 
-            <label className="space-y-2 text-sm font-medium text-white/80">
-              <span>Budget</span>
+            <label className="space-y-3">
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-4 h-4 text-white/60" />
+                <span className="text-sm font-medium text-white/80">Budget</span>
+              </div>
               <input
                 type="text"
                 value={budget}
                 onChange={(event) => setBudget(event.target.value)}
                 placeholder="e.g., $120 per day"
-                className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
               />
             </label>
           </div>
 
-          <label className="space-y-2 text-sm font-medium text-white/80">
-            <span>Interests or vibe</span>
+          <label className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Heart className="w-4 h-4 text-white/60" />
+              <span className="text-sm font-medium text-white/80">Interests or Vibe</span>
+            </div>
             <input
               type="text"
               value={interests}
               onChange={(event) => setInterests(event.target.value)}
               placeholder="Night markets, architecture, coffee shops…"
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
             />
           </label>
 
-          <label className="space-y-2 text-sm font-medium text-white/80">
-            <span>Extra notes</span>
+          <label className="space-y-3">
+            <div className="flex items-center gap-2">
+              <MessageCircle className="w-4 h-4 text-white/60" />
+              <span className="text-sm font-medium text-white/80">Extra Notes</span>
+            </div>
             <textarea
               value={notes}
               onChange={(event) => setNotes(event.target.value)}
               placeholder="Travel dates, accessibility needs, people traveling with you…"
               rows={3}
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
             />
           </label>
 
-          <label className="space-y-2 text-sm font-medium text-white/80">
-            <span>What would you like to ask?</span>
+          <label className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Compass className="w-4 h-4 text-white/60" />
+              <span className="text-sm font-medium text-white/80">What would you like to ask?</span>
+            </div>
             <textarea
               value={input}
               onChange={(event) => setInput(event.target.value)}
               placeholder="Ask for a themed itinerary or request specific suggestions…"
               rows={3}
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
             />
           </label>
 
-          <div className="flex flex-wrap items-center gap-4">
-            <button
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <motion.button
               type="submit"
               disabled={!canSubmit}
-              className="rounded-full bg-emerald-500 px-6 py-2 text-sm font-semibold uppercase tracking-wide text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="rounded-xl bg-lime-500 px-6 py-3 text-sm font-semibold text-neutral-950 transition-all hover:bg-lime-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isLoading ? "Planning..." : "Plan Activities"}
-            </button>
+            </motion.button>
             <p className="text-xs uppercase tracking-wide text-white/50">
               Powered by Google Gemini
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2 text-sm text-white/70">
+          <div className="flex flex-wrap gap-2">
             {samplePrompts.map((prompt) => (
-              <button
+              <motion.button
                 key={prompt}
                 type="button"
                 onClick={() => setInput(prompt)}
-                className="rounded-full border border-white/20 px-4 py-2 transition hover:border-emerald-300 hover:text-white"
+                whileHover={{ scale: 1.05 }}
+                className="rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-white/70 transition-all hover:border-lime-400 hover:text-white"
               >
                 {prompt}
-              </button>
+              </motion.button>
             ))}
           </div>
 
           {error && (
-            <p className="rounded-2xl border border-rose-400/40 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">
-              {error}
-            </p>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-3"
+            >
+              <p className="text-sm text-rose-100">{error}</p>
+            </motion.div>
           )}
-        </form>
+        </motion.form>
       )}
 
-      <div
-        className={`rounded-3xl border border-white/10 p-6 ${
+      {/* Chat Interface */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`rounded-2xl border border-white/10 p-6 backdrop-blur-sm ${
           showSetupForm
-            ? "bg-slate-950/50"
-            : "bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.15),rgba(2,6,23,0.95))]"
+            ? "bg-neutral-900/50"
+            : "bg-gradient-to-br from-neutral-900/50 to-lime-500/10"
         }`}
       >
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-white/60">
-              {showSetupForm ? "Conversation" : "Roots Concierge"}
-            </p>
-            <p className="text-xs text-white/40">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-2 h-2 rounded-full bg-lime-400" />
+              <p className="text-sm font-semibold uppercase tracking-wide text-white">
+                {showSetupForm ? "Conversation" : "Roots Concierge"}
+              </p>
+            </div>
+            <p className="text-xs text-white/60">
               {showSetupForm
-                ? "Share more context to refine your plan."
-                : "Continue chatting with your Roots guide."}
+                ? "Share more context to refine your plan"
+                : "Continue chatting with your Roots guide"}
             </p>
           </div>
           {hasAssistantReply && (
-            <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-wide text-white/60">
-              <span className="rounded-full border border-white/20 px-3 py-1">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="rounded-xl border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/60">
                 {location || "Location set"}
               </span>
-              <span className="rounded-full border border-white/20 px-3 py-1">
+              <span className="rounded-xl border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/60">
                 {budget || "Flexible budget"}
               </span>
-              <button
+              <motion.button
                 type="button"
                 onClick={handleReset}
-                className="rounded-full border border-white/20 px-3 py-1 text-white/80 transition hover:border-rose-300 hover:text-white"
+                whileHover={{ scale: 1.05 }}
+                className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/60 transition-all hover:border-rose-400 hover:text-white"
               >
-                Reset trip
-              </button>
+                <RotateCcw className="w-3 h-3" />
+                Reset
+              </motion.button>
             </div>
           )}
         </div>
 
-       {messages.length === 0 ? (
-         <p className="text-sm text-white/60">
-           {showSetupForm
-             ? "Fill out the form and ask a question to start discovering curated attractions."
-             : "Waiting for the Roots guide to respond..."}
-         </p>
-       ) : (
-        <div className="space-y-4">
-          {messages.map((message) => (
-            <MessageBubble
-              key={message.id}
-              message={message}
-              onLogAttraction={handleLogAttraction}
-              visitedAttractions={visitedAttractions}
-            />
-          ))}
-        </div>
-       )}
+        {messages.length === 0 ? (
+          <p className="text-sm text-white/60 text-center py-8">
+            {showSetupForm
+              ? "Fill out the form and ask a question to start discovering curated attractions"
+              : "Waiting for the Roots guide to respond..."}
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {messages.map((message) => (
+              <MessageBubble
+                key={message.id}
+                message={message}
+                onLogAttraction={handleLogAttraction}
+                visitedAttractions={visitedAttractions}
+              />
+            ))}
+          </div>
+        )}
 
         {error && !showSetupForm && (
-          <p className="mt-4 rounded-2xl border border-rose-400/40 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">
-            {error}
-          </p>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-4 rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-3"
+          >
+            <p className="text-sm text-rose-100">{error}</p>
+          </motion.div>
         )}
 
         {hasAssistantReply && (
-          <form
+          <motion.form
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             onSubmit={handleSubmit}
-            className="mt-6 flex flex-col gap-3 rounded-3xl border border-white/10 bg-white/5 p-4"
+            className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm"
           >
             <textarea
               value={input}
               onChange={(event) => setInput(event.target.value)}
               placeholder="Tell the Roots guide what you'd like to explore next..."
               rows={3}
-              className="w-full rounded-2xl border border-white/10 bg-transparent px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
             />
-            <div className="flex items-center justify-between text-xs uppercase tracking-wide text-white/50">
-              <span>Powered by Google Gemini</span>
-              <button
+            <div className="flex items-center justify-between mt-3">
+              <p className="text-xs uppercase tracking-wide text-white/50">
+                Powered by Google Gemini
+              </p>
+              <motion.button
                 type="submit"
                 disabled={!canSubmit}
-                className="rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="rounded-xl bg-lime-500 px-5 py-2 text-sm font-semibold text-neutral-950 transition-all hover:bg-lime-400 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isLoading ? "Sending..." : "Send"}
-              </button>
+                {isLoading ? "Sending..." : "Send Message"}
+              </motion.button>
             </div>
-          </form>
+          </motion.form>
         )}
-      </div>
+      </motion.div>
     </section>
   );
 }
