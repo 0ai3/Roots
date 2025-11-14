@@ -10,6 +10,8 @@ import {
   TileLayer,
   useMap,
 } from "react-leaflet";
+import { motion } from "framer-motion";
+import { Compass, Navigation, Globe, MapPin } from "lucide-react";
 
 type Bounds = LatLngBoundsExpression;
 
@@ -544,9 +546,14 @@ export default function WorldExplorerMap() {
   };
 
   return (
-    <section className="min-h-screen bg-slate-950 px-4 py-10 text-white">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 lg:flex-row">
-        <div className="flex-1 overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-xl">
+    <section className="min-h-screen bg-gradient-to-br from-neutral-950 to-neutral-900 px-6 py-10 text-white">
+      <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:flex-row">
+        {/* Map Container */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex-1 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900/50 shadow-xl backdrop-blur-sm"
+        >
           <MapContainer
             center={[20, 0]}
             zoom={2}
@@ -561,42 +568,75 @@ export default function WorldExplorerMap() {
             <MapViewport bounds={activeBounds} freeMode={freeMode} />
             <CityMarkers city={selectedCity} freeMode={freeMode} />
           </MapContainer>
-        </div>
+        </motion.div>
 
-        <div className="w-full rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur lg:w-96">
+        {/* Controls Panel */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          className="w-full rounded-2xl border border-white/10 bg-neutral-900/50 p-6 backdrop-blur-sm lg:w-96"
+        >
+          {/* Header */}
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">World Explorer</h2>
-            <button
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-lime-400" />
+              <h2 className="text-xl font-bold">World Explorer</h2>
+            </div>
+            <motion.button
               type="button"
               onClick={() => setFreeMode((prev) => !prev)}
-              className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${
-                freeMode ? "bg-emerald-400 text-slate-950" : "bg-white/10"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-wide transition-all flex items-center gap-2 ${
+                freeMode 
+                  ? "bg-lime-400 text-neutral-950" 
+                  : "bg-white/10 text-white/90 hover:bg-white/20"
               }`}
             >
-              {freeMode ? "Free mode on" : "Enable free mode"}
-            </button>
+              <Compass className="w-4 h-4" />
+              {freeMode ? "Free Mode" : "Free Mode"}
+            </motion.button>
           </div>
 
+          {/* Description */}
           {freeMode ? (
-            <p className="mt-4 text-sm text-white/70">
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mt-4 text-sm text-white/70 leading-relaxed"
+            >
               Free mode lets you pan, zoom, and explore anywhere on the map.
               Disable it to return to guided continent/country navigation.
-            </p>
+            </motion.p>
           ) : (
-            <p className="mt-4 text-sm text-white/70">
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mt-4 text-sm text-white/70 leading-relaxed"
+            >
               Select a continent to zoom in. Continue drilling down to countries,
               regions, and cities to focus on specific areas.
-            </p>
+            </motion.p>
           )}
 
+          {/* Navigation Sections */}
           <div className="mt-6 space-y-6">
-            <div>
-              <div className="flex items-center justify-between text-xs uppercase tracking-wide text-white/60">
-                <span>Continents</span>
+            {/* Continents */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="flex items-center justify-between text-xs uppercase tracking-wide text-white/60 mb-3">
+                <span className="flex items-center gap-2">
+                  <Globe className="w-4 h-4" />
+                  Continents
+                </span>
                 {selectedContinent && (
-                  <button
+                  <motion.button
                     type="button"
-                    className="text-emerald-300"
+                    className="text-lime-300 hover:text-lime-200 transition-colors"
                     onClick={() => {
                       setSelectedContinent(null);
                       setSelectedCountry(null);
@@ -605,17 +645,19 @@ export default function WorldExplorerMap() {
                     }}
                   >
                     Clear
-                  </button>
+                  </motion.button>
                 )}
               </div>
-              <div className="mt-2 grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 {atlas.map((continent) => (
-                  <button
+                  <motion.button
                     key={continent.name}
-                    className={`rounded-2xl border px-3 py-2 text-sm font-semibold ${
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
                       selectedContinent?.name === continent.name
-                        ? "border-emerald-400 bg-emerald-400/10 text-emerald-100"
-                        : "border-white/10 bg-white/5 text-white/80 hover:border-white/30"
+                        ? "border-lime-400 bg-lime-400/10 text-lime-100 shadow-lg"
+                        : "border-white/10 bg-white/5 text-white/80 hover:border-white/30 hover:bg-white/10"
                     }`}
                     onClick={() => {
                       setSelectedContinent(continent);
@@ -626,28 +668,35 @@ export default function WorldExplorerMap() {
                     }}
                   >
                     {continent.name}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
-            <div>
-              <div className="text-xs uppercase tracking-wide text-white/60">
+            {/* Countries */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div className="text-xs uppercase tracking-wide text-white/60 mb-3 flex items-center gap-2">
+                <Navigation className="w-4 h-4" />
                 Countries
               </div>
-              <div className="mt-2 space-y-2">
+              <div className="space-y-2">
                 {availableCountries.length === 0 && (
-                  <p className="text-sm text-white/50">
+                  <p className="text-sm text-white/50 px-2">
                     Choose a continent first.
                   </p>
                 )}
                 {availableCountries.map((country) => (
-                  <button
+                  <motion.button
                     key={country.name}
-                    className={`w-full rounded-2xl border px-3 py-2 text-left text-sm font-semibold ${
+                    whileHover={{ x: 5 }}
+                    className={`w-full rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all ${
                       selectedCountry?.name === country.name
-                        ? "border-emerald-400 bg-emerald-400/10 text-emerald-100"
-                        : "border-white/10 bg-white/5 text-white/80 hover:border-white/30"
+                        ? "border-lime-400 bg-lime-400/10 text-lime-100 shadow-lg"
+                        : "border-white/10 bg-white/5 text-white/80 hover:border-white/30 hover:bg-white/10"
                     }`}
                     onClick={() => {
                       setSelectedCountry(country);
@@ -657,28 +706,35 @@ export default function WorldExplorerMap() {
                     }}
                   >
                     {country.name}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
-            <div>
-              <div className="text-xs uppercase tracking-wide text-white/60">
+            {/* Regions */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <div className="text-xs uppercase tracking-wide text-white/60 mb-3 flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
                 Regions
               </div>
-              <div className="mt-2 space-y-2">
+              <div className="space-y-2">
                 {availableRegions.length === 0 && (
-                  <p className="text-sm text-white/50">
+                  <p className="text-sm text-white/50 px-2">
                     Select a country to explore regions.
                   </p>
                 )}
                 {availableRegions.map((region) => (
-                  <button
+                  <motion.button
                     key={region.name}
-                    className={`w-full rounded-2xl border px-3 py-2 text-left text-sm font-semibold ${
+                    whileHover={{ x: 5 }}
+                    className={`w-full rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all ${
                       selectedRegion?.name === region.name
-                        ? "border-emerald-400 bg-emerald-400/10 text-emerald-100"
-                        : "border-white/10 bg-white/5 text-white/80 hover:border-white/30"
+                        ? "border-lime-400 bg-lime-400/10 text-lime-100 shadow-lg"
+                        : "border-white/10 bg-white/5 text-white/80 hover:border-white/30 hover:bg-white/10"
                     }`}
                     onClick={() => {
                       setSelectedRegion(region);
@@ -687,28 +743,35 @@ export default function WorldExplorerMap() {
                     }}
                   >
                     {region.name}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
-            <div>
-              <div className="text-xs uppercase tracking-wide text-white/60">
+            {/* Cities */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <div className="text-xs uppercase tracking-wide text-white/60 mb-3 flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
                 Cities
               </div>
-              <div className="mt-2 space-y-2">
+              <div className="space-y-2">
                 {availableCities.length === 0 && (
-                  <p className="text-sm text-white/50">
+                  <p className="text-sm text-white/50 px-2">
                     Pick a region to focus on cities.
                   </p>
                 )}
                 {availableCities.map((city) => (
-                  <button
+                  <motion.button
                     key={city.name}
-                    className={`w-full rounded-2xl border px-3 py-2 text-left text-sm font-semibold ${
+                    whileHover={{ x: 5 }}
+                    className={`w-full rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all ${
                       selectedCity?.name === city.name
-                        ? "border-emerald-400 bg-emerald-400/10 text-emerald-100"
-                        : "border-white/10 bg-white/5 text-white/80 hover:border-white/30"
+                        ? "border-lime-400 bg-lime-400/10 text-lime-100 shadow-lg"
+                        : "border-white/10 bg-white/5 text-white/80 hover:border-white/30 hover:bg-white/10"
                     }`}
                     onClick={() => {
                       setSelectedCity(city);
@@ -716,14 +779,20 @@ export default function WorldExplorerMap() {
                     }}
                   >
                     {city.name}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
-            </div>
+            </motion.div>
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-3">
-            <button
+          {/* Action Buttons */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mt-6 flex flex-wrap gap-3"
+          >
+            <motion.button
               type="button"
               onClick={() => {
                 setSelectedCity(null);
@@ -733,21 +802,24 @@ export default function WorldExplorerMap() {
                   setFreeMode(false);
                 }
               }}
-              className="rounded-full border border-white/20 px-4 py-2 text-sm text-white/80 hover:border-white/40"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="rounded-xl border border-white/20 px-4 py-2 text-sm text-white/80 transition-all hover:border-white/40 hover:bg-white/10"
             >
               Back a level
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               type="button"
               onClick={resetSelections}
-              className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-400"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="rounded-xl bg-green-500 px-4 py-2 text-sm font-semibold text-neutral-950 transition-all hover:bg-green-400"
             >
               Reset explorer
-            </button>
-          </div>
-        </div>
+            </motion.button>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );
 }
-
