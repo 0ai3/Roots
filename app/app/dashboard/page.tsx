@@ -16,6 +16,7 @@ type StoredUser = {
   role: Role;
   createdAt: Date;
   name?: string;
+  points: number;
 };
 
 type DashboardUser = {
@@ -23,6 +24,7 @@ type DashboardUser = {
   role: Role;
   createdAt: string;
   name?: string | null;
+  points: number;
 };
 
 async function getCurrentUser(): Promise<DashboardUser | null> {
@@ -46,6 +48,7 @@ async function getCurrentUser(): Promise<DashboardUser | null> {
     role: user.role,
     createdAt: user.createdAt.toISOString(),
     name: user.name ?? null,
+    points: user.points,
   };
 }
 

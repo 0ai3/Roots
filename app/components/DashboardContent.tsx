@@ -2,13 +2,14 @@
 
 import { useMemo, useState } from "react";
 import DashboardSidebar from "./DashboardSidebar";
-import { useExperiencePoints } from "../hooks/useExperiencePoints";
+
 
 type Role = "client" | "admin";
 
 type DashboardUser = {
   email: string;
   role: Role;
+  points: number;
   createdAt: string;
   name?: string | null;
 };
@@ -17,9 +18,8 @@ type Props = {
   user: DashboardUser;
 };
 
-export default function DashboardContent({ user }: Props) {
+export default function DashboardContent({ user}: Props ) {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const { points } = useExperiencePoints();
   const greetingName = useMemo(() => {
     const trimmed = user.name?.trim();
     return trimmed && trimmed.length > 0 ? trimmed : "User";
@@ -33,6 +33,7 @@ export default function DashboardContent({ user }: Props) {
   const pillStyles = isDarkMode
     ? "bg-white/10 text-white"
     : "bg-slate-900/5 text-slate-900";
+    console.log(user)
 
   return (
     <main
@@ -97,7 +98,7 @@ export default function DashboardContent({ user }: Props) {
                       Experience Points
                     </dt>
                     <dd className="mt-2 text-3xl font-semibold">
-                      {points}
+                      {user.points}
                     </dd>
                     <p className="text-xs opacity-60">
                       Earned by logging attractions and recipes.
