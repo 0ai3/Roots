@@ -7,6 +7,7 @@ import {
   loginAction,
   registerAction,
 } from "../actions/auth";
+import { setStoredProfileId } from "../lib/profileId";
 
 type Stage = "email" | "login" | "register" | "success";
 
@@ -65,6 +66,7 @@ export default function AuthLogin() {
       action(normalizedEmail, password)
         .then((result) => {
           if (result.ok) {
+            setStoredProfileId(result.userId ?? null);
             setStage("success");
             setStatusMessage(result.message);
             setPassword("");

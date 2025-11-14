@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 type Props = {
   borderClassName?: string;
@@ -9,17 +10,36 @@ type Props = {
 
 const navLinks = [
   { label: "Dashboard", href: "/app/dashboard" },
+  { label: "Profile", href: "/app/profile" },
   { label: "Map", href: "/app/map" },
   { label: "Games", href: "/app/games" },
   { label: "Recipes", href: "/app/recipes" },
   { label: "Offerts", href: "/app/offerts" },
   { label: "News", href: "/app/news" },
   { label: "Attractions", href: "/app/attractions" },
+  { label: "Leaderboard", href: "/app/leaderboard" },
 ];
 
 export default function DashboardSidebar({ borderClassName }: Props) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const borderClass = borderClassName ?? "border-white/10";
+
+  const handleLogout = async () => {
+    if (isLoggingOut) {
+      return;
+    }
+    setIsLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (error) {
+      console.error("Logout failed", error);
+    } finally {
+      setIsLoggingOut(false);
+      router.push("/");
+    }
+  };
 
   return (
     <aside
@@ -55,6 +75,14 @@ export default function DashboardSidebar({ borderClassName }: Props) {
           );
         })}
       </nav>
+      <button
+        type="button"
+        onClick={handleLogout}
+        disabled={isLoggingOut}
+        className="mt-auto rounded-2xl border border-white/30 px-4 py-3 text-sm font-semibold tracking-wide text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-70"
+      >
+        {isLoggingOut ? "Signing out..." : "Logout"}
+      </button>
     </aside>
   );
 }

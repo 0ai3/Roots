@@ -2,11 +2,13 @@
 
 import { randomBytes, scryptSync, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
+import { ObjectId } from "mongodb";
 import { getDb } from "../lib/mongo";
 
 type Role = "client" | "admin";
 
 type UserDoc = {
+  _id?: ObjectId;
   email: string;
   passwordHash: string;
   salt: string;
@@ -40,6 +42,60 @@ function passwordsMatch(password: string, salt: string, storedHash: string) {
 async function getUsersCollection() {
   const db = await getDb();
   return db.collection<UserDoc>("users");
+}
+
+async function ensureProfileDocuments(
+  userObjectId: ObjectId,
+  doc: { email: string; role: Role }
+) {
+  const db = await getDb();
+  const now = new Date();
+  const profileId = userObjectId.toString();
+  const defaultName =
+    doc.email.split("@")[0]?.replace(/\W+/g, " ").trim() || "Roots Explorer";
+
+  await db.collection("profiles").updateOne(
+    { profileId },
+    {
+      $setOnInsert: {
+        _id: userObjectId,
+        profileId,
+        email: doc.email,
+        role: doc.role,
+        name: defaultName,
+        location: "",
+        favoriteMuseums: "",
+        favoriteRecipes: "",
+        bio: "",
+        socialHandle: "",
+        createdAt: now,
+        experiencePoints: {
+          points: 0,
+          createdAt: now,
+          updatedAt: now,
+        },
+      },
+      $set: {
+        updatedAt: now,
+        email: doc.email,
+        role: doc.role,
+        name: defaultName,
+      },
+    },
+    { upsert: true }
+  );
+  await db.collection("profiles").updateOne(
+    { profileId, experiencePoints: { $exists: false } },
+    {
+      $set: {
+        experiencePoints: {
+          points: 0,
+          createdAt: now,
+          updatedAt: now,
+        },
+      },
+    }
+  );
 }
 
 export async function checkEmailAction(email: string) {
@@ -102,6 +158,11 @@ export async function loginAction(
     return { ok: false, message: "Unable to locate your account id." };
   }
 
+  await ensureProfileDocuments(user._id, {
+    email: user.email,
+    role: user.role ?? DEFAULT_ROLE,
+  });
+
   const userId = user._id.toString();
   await persistSession(userId);
 
@@ -151,6 +212,7 @@ export async function registerAction(
   };
 
   const insertResult = await users.insertOne(userDoc);
+  await ensureProfileDocuments(insertResult.insertedId, userDoc);
   const userId = insertResult.insertedId.toString();
 
   await persistSession(userId);

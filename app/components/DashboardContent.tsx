@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import DashboardSidebar from "./DashboardSidebar";
+import { useExperiencePoints } from "../hooks/useExperiencePoints";
 
 type Role = "client" | "admin";
 
@@ -18,6 +19,7 @@ type Props = {
 
 export default function DashboardContent({ user }: Props) {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const { points } = useExperiencePoints();
   const greetingName = useMemo(() => {
     const trimmed = user.name?.trim();
     return trimmed && trimmed.length > 0 ? trimmed : "User";
@@ -71,7 +73,7 @@ export default function DashboardContent({ user }: Props) {
                   account starts as a client. Admin privileges can only be
                   granted directly through the database for security reasons.
                 </p>
-                <dl className="grid gap-4 sm:grid-cols-2">
+                <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   <div className={`rounded-2xl border ${cardBorder} p-4`}>
                     <dt className="text-xs uppercase tracking-wide opacity-60">
                       Member Since
@@ -89,6 +91,17 @@ export default function DashboardContent({ user }: Props) {
                     >
                       {user.role}
                     </dd>
+                  </div>
+                  <div className={`rounded-2xl border ${cardBorder} p-4`}>
+                    <dt className="text-xs uppercase tracking-wide opacity-60">
+                      Experience Points
+                    </dt>
+                    <dd className="mt-2 text-3xl font-semibold">
+                      {points}
+                    </dd>
+                    <p className="text-xs opacity-60">
+                      Earned by logging attractions and recipes.
+                    </p>
                   </div>
                 </dl>
               </div>
