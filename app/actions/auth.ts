@@ -1,16 +1,23 @@
 "use server";
 
 import { randomBytes, scryptSync, timingSafeEqual } from "crypto";
+import { cookies } from "next/headers";
 import { getDb } from "../lib/mongo";
+
+type Role = "client" | "admin";
 
 type UserDoc = {
   email: string;
   passwordHash: string;
   salt: string;
+  role: Role;
   createdAt: Date;
 };
 
 const MIN_PASSWORD_LENGTH = 6;
+const DEFAULT_ROLE: Role = "client";
+const AUTH_COOKIE_NAME = "roots_user";
+const AUTH_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
@@ -53,7 +60,21 @@ export async function checkEmailAction(email: string) {
 type AuthResponse = {
   ok: boolean;
   message: string;
+  email?: string;
+  role?: Role;
+  userId?: string;
 };
+
+async function persistSession(userId: string) {
+  const cookieStore = await cookies();
+  cookieStore.set(AUTH_COOKIE_NAME, userId, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: AUTH_COOKIE_MAX_AGE,
+  });
+}
 
 export async function loginAction(
   email: string,
@@ -77,7 +98,20 @@ export async function loginAction(
     return { ok: false, message: "Incorrect password. Try again." };
   }
 
-  return { ok: true, message: "You're logged in." };
+  if (!user._id) {
+    return { ok: false, message: "Unable to locate your account id." };
+  }
+
+  const userId = user._id.toString();
+  await persistSession(userId);
+
+  return {
+    ok: true,
+    message: "You're logged in.",
+    email: user.email,
+    role: user.role ?? DEFAULT_ROLE,
+    userId,
+  };
 }
 
 export async function registerAction(
@@ -108,12 +142,24 @@ export async function registerAction(
 
   const { hash, salt } = createPasswordHash(password);
 
-  await users.insertOne({
+  const userDoc: UserDoc = {
     email: normalizedEmail,
     passwordHash: hash,
     salt,
+    role: DEFAULT_ROLE,
     createdAt: new Date(),
-  });
+  };
 
-  return { ok: true, message: "Account created and ready to use." };
+  const insertResult = await users.insertOne(userDoc);
+  const userId = insertResult.insertedId.toString();
+
+  await persistSession(userId);
+
+  return {
+    ok: true,
+    message: "Account created and ready to use.",
+    email: userDoc.email,
+    role: userDoc.role,
+    userId,
+  };
 }

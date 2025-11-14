@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   checkEmailAction,
   loginAction,
@@ -10,6 +11,7 @@ import {
 type Stage = "email" | "login" | "register" | "success";
 
 export default function AuthLogin() {
+  const router = useRouter();
   const [stage, setStage] = useState<Stage>("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -66,6 +68,7 @@ export default function AuthLogin() {
             setStage("success");
             setStatusMessage(result.message);
             setPassword("");
+            router.push("/app/dashboard");
           } else {
             setErrorMessage(result.message);
           }
