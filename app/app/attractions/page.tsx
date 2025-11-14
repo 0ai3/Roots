@@ -1,10 +1,13 @@
+import DashboardPageLayout from "../../components/DashboardPageLayout";
+import AttractionPlanner from "../../components/AttractionPlanner";
+
 export default function AttractionsPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-      <div className="text-center">
-        <h1 className="text-3xl font-semibold">Attractions</h1>
-        <p className="mt-2 text-white/70">Discover upcoming attractions soon.</p>
-      </div>
-    </main>
+    <DashboardPageLayout
+      title="Attractions"
+      description="Share your travel details and let our Roots concierge craft activity ideas."
+    >
+      <AttractionPlanner />
+    </DashboardPageLayout>
   );
 }
