@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import DashboardSidebar from "./DashboardSidebar";
 
 type Role = "client" | "admin";
 
@@ -22,15 +23,6 @@ export default function DashboardContent({ user }: Props) {
     return trimmed && trimmed.length > 0 ? trimmed : "User";
   }, [user.name]);
 
-  const navLinks = [
-    { label: "Map", href: "/app/map" },
-    { label: "Games", href: "/app/games" },
-    { label: "Recipes", href: "/app/recipes" },
-    { label: "Offerts", href: "/app/offerts" },
-    { label: "News", href: "/app/news" },
-    { label: "Atractions", href: "/app/atractions" },
-  ];
-
   const themeClasses = isDarkMode
     ? "bg-slate-900 text-white"
     : "bg-white text-slate-900";
@@ -45,31 +37,7 @@ export default function DashboardContent({ user }: Props) {
       className={`${themeClasses} min-h-screen px-4 py-16 transition-colors duration-300`}
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-8 lg:flex-row">
-        <aside
-          className={`flex w-full flex-col gap-6 rounded-3xl border ${cardBorder} p-6 text-white shadow-lg lg:w-64`}
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(16,185,129,1) 0%, rgba(5,150,105,1) 60%, rgba(6,95,70,1) 100%)",
-          }}
-        >
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-white/80">
-              Roots
-            </p>
-            <p className="text-2xl font-semibold">Navigation</p>
-          </div>
-          <nav className="space-y-3">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="block rounded-2xl bg-white/10 px-4 py-3 text-sm font-semibold tracking-wide transition hover:bg-white/20"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
-        </aside>
+        <DashboardSidebar borderClassName={cardBorder} />
 
         <div className="flex-1 space-y-8">
           <div className="flex flex-col gap-4 rounded-3xl border p-6 shadow-lg md:flex-row md:items-center md:justify-between">

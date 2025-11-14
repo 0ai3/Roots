@@ -20,6 +20,23 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Environment variables
+
+Create a `.env.local` file (or `.env` for local-only work) with the following keys so the dashboard features can connect to data and to Google Gemini:
+
+```
+MONGODB_URI=mongodb+srv://<user>:<password>@cluster-url/
+# optional, defaults to roots-app
+MONGODB_DB=<database name>
+
+# used by /api/attractions/plan to contact Gemini
+GEMINI_API_KEY=AIza...your key...
+# optional override, defaults to gemini-2.5-flash
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+`MONGODB_URI` is required by `app/lib/mongo.ts` whenever user data is fetched (for example, the dashboard view), while `GEMINI_API_KEY` is read inside `app/api/attractions/plan/route.ts` to generate activity suggestions for the attractions planner. Without these values the corresponding features will throw a helpful error so you know what needs to be configured.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
