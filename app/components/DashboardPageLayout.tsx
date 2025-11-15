@@ -96,24 +96,6 @@ export default function DashboardPageLayout({
       <div className="mx-auto flex max-w-6xl flex-col gap-8 lg:flex-row">
         <DashboardSidebar borderClassName={sidebarBorder} />
         <section className={sectionClass}>
-          {(title || description) && (
-            <header className="mb-6 space-y-2">
-              {title && (
-                <h1 className="text-3xl font-semibold tracking-tight">
-                  {title}
-                </h1>
-              )}
-              {description && (
-                <p
-                  className={`text-sm ${
-                    isDarkMode ? "text-white/70" : "text-neutral-600"
-                  }`}
-                >
-                  {description}
-                </p>
-              )}
-            </header>
-          )}
           {children}
         </section>
       </div>
