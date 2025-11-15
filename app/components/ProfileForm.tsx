@@ -507,22 +507,10 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
                 disabled={isFormDisabled}
                 required
               />
-            </label>
-          </div>
+          </label>
+        </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
-              <span>{t("profile.fields.location")}</span>
-              <input
-                type="text"
-                value={formState.location}
-                onChange={handleChange("location")}
-                placeholder={t("profile.fields.locationPlaceholder")}
-                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
-                disabled={isFormDisabled}
-              />
-            </label>
-
+          <div className="grid gap-4 md:grid-cols-1">
             <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
               <span>{t("profile.fields.homeCountry")}</span>
               <div className="relative">

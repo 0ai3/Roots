@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -50,6 +50,31 @@ export default function DashboardSidebar({ borderClassName }: Props) {
   const { t } = useI18n();
 
   const [isDarkLocal, setIsDarkLocal] = useState<boolean>(false);
+  const [location, setLocation] = useState("");
+  const [isSavingLocation, setIsSavingLocation] = useState(false);
+  const [hasLocation, setHasLocation] = useState(true);
+  const profileDataRef = useRef<any>(null);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Load location from profile
+  useEffect(() => {
+    const loadLocation = async () => {
+      try {
+        const response = await fetch("/api/profile");
+        if (response.ok) {
+          const data = await response.json();
+          const profile = data.profile || {};
+          profileDataRef.current = profile;
+          const loc = profile.location || "";
+          setLocation(loc);
+          setHasLocation(loc.trim().length > 0);
+        }
+      } catch (error) {
+        console.error("Error loading location:", error);
+      }
+    };
+    loadLocation();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -104,6 +129,82 @@ export default function DashboardSidebar({ borderClassName }: Props) {
       window.removeEventListener("storage", storageHandler);
     };
   }, []);
+
+  // Auto-save location after user stops typing
+  useEffect(() => {
+    // Clear previous timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Skip if location hasn't been loaded yet from initial fetch
+    if (profileDataRef.current === null) {
+      return;
+    }
+
+    saveTimeoutRef.current = setTimeout(async () => {
+      const profileData = profileDataRef.current;
+      
+      // Update hasLocation state
+      if (location.trim().length === 0) {
+        setHasLocation(false);
+        return;
+      }
+      
+      setHasLocation(true);
+
+      // Only save if we have profile data and location changed
+      if (!profileData) {
+        console.log("No profile data yet, skipping save");
+        return;
+      }
+
+      // Check if location actually changed
+      const currentSavedLocation = profileData.location || "";
+      if (location.trim() === currentSavedLocation.trim()) {
+        console.log("Location unchanged, skipping save");
+        return;
+      }
+
+      console.log("Saving location:", location.trim());
+      setIsSavingLocation(true);
+      
+      try {
+        const response = await fetch("/api/profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: profileData.name || "",
+            email: profileData.email || "",
+            location: location.trim(),
+            homeCountry: profileData.homeCountry || "",
+            favoriteMuseums: profileData.favoriteMuseums || "",
+            favoriteRecipes: profileData.favoriteRecipes || "",
+            bio: profileData.bio || "",
+            socialHandle: profileData.socialHandle || "",
+          }),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          profileDataRef.current = data.profile;
+          console.log("✅ Location saved successfully:", location.trim());
+        } else {
+          console.error("Failed to save location:", response.status);
+        }
+      } catch (error) {
+        console.error("Error saving location:", error);
+      } finally {
+        setIsSavingLocation(false);
+      }
+    }, 1000); // Wait 1 second after user stops typing
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [location]);
 
   const handleLogout = async () => {
     if (isLoggingOut) {
@@ -183,7 +284,33 @@ export default function DashboardSidebar({ borderClassName }: Props) {
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-4">
+            {/* Location Input */}
+            <div className="relative">
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder={!hasLocation ? "⚠️ Set your location" : "Current location..."}
+                className={`w-52 px-3 py-2 text-sm rounded-full border transition-all focus:outline-none focus:ring-2 ${
+                  !hasLocation
+                    ? isDarkLocal
+                      ? "bg-red-900/20 border-red-500/50 text-red-200 placeholder:text-red-300 focus:ring-red-400/30 focus:border-red-400 animate-pulse"
+                      : "bg-red-50 border-red-400/50 text-red-900 placeholder:text-red-600 focus:ring-red-500/30 focus:border-red-500 animate-pulse"
+                    : isDarkLocal
+                    ? "bg-neutral-900 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-lime-400/30 focus:border-lime-400"
+                    : "bg-white border-neutral-300 text-neutral-900 placeholder:text-neutral-400 focus:ring-emerald-500/30 focus:border-emerald-500"
+                }`}
+              />
+              {isSavingLocation && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <div className={`w-4 h-4 border-2 border-t-transparent rounded-full animate-spin ${
+                    isDarkLocal ? "border-lime-400" : "border-emerald-600"
+                  }`} />
+                </div>
+              )}
+            </div>
+
             {navLinks.slice(0, 6).map((link) => {
               const isActive =
                 pathname === link.href || pathname?.startsWith(`${link.href}/`);
@@ -314,6 +441,41 @@ export default function DashboardSidebar({ borderClassName }: Props) {
               isDarkLocal ? "border-neutral-800" : "border-neutral-200"
             }`}
           >
+            {/* Mobile Location Input */}
+            <div className="px-4 mb-4">
+              <label className={`text-xs font-medium mb-2 block ${
+                !hasLocation
+                  ? isDarkLocal ? "text-red-400" : "text-red-600"
+                  : isDarkLocal ? "text-neutral-400" : "text-neutral-600"
+              }`}>
+                {!hasLocation ? "⚠️ Current Location (Required)" : "Current Location"}
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder={!hasLocation ? "⚠️ Please set your location" : "Enter your location..."}
+                  className={`w-full px-3 py-2 pr-10 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 ${
+                    !hasLocation
+                      ? isDarkLocal
+                        ? "bg-red-900/20 border-red-500/50 text-red-200 placeholder:text-red-300 focus:ring-red-400/30 focus:border-red-400 animate-pulse"
+                        : "bg-red-50 border-red-400/50 text-red-900 placeholder:text-red-600 focus:ring-red-500/30 focus:border-red-500 animate-pulse"
+                      : isDarkLocal
+                      ? "bg-neutral-900 border-neutral-700 text-white placeholder:text-neutral-500 focus:ring-lime-400/30 focus:border-lime-400"
+                      : "bg-white border-neutral-300 text-neutral-900 placeholder:text-neutral-400 focus:ring-emerald-500/30 focus:border-emerald-500"
+                  }`}
+                />
+                {isSavingLocation && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <div className={`w-4 h-4 border-2 border-t-transparent rounded-full animate-spin ${
+                      isDarkLocal ? "border-lime-400" : "border-emerald-600"
+                    }`} />
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-1">
               {navLinks.map((link) => {
                 const isActive =
