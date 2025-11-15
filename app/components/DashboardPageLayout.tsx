@@ -20,17 +20,24 @@ export default function DashboardPageLayout({
   contentClassName,
   isDarkMode: isDarkModeProp,
 }: Props) {
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    // On first render (client) prefer persisted theme if available, else prop or true
+  // Initialize from server-provided prop only to keep server and client markup deterministic.
+  // Read persisted theme from localStorage only after mount to avoid hydration mismatches.
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(
+    isDarkModeProp ?? false
+  );
+
+  useEffect(() => {
     try {
-      const saved =
-        typeof window !== "undefined" ? localStorage.getItem("theme") : null;
-      if (saved) return saved === "dark";
+      if (typeof window === "undefined") return;
+      const saved = localStorage.getItem("theme");
+      if (saved) {
+        setIsDarkMode(saved === "dark");
+      }
     } catch (e) {
       // ignore
     }
-    return isDarkModeProp ?? true;
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     // Sync html class immediately when state changes
