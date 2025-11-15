@@ -404,7 +404,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
               {t("profile.fields.homeCountryHelper")}
             </p>
           </label>
-        
+        </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-2 text-sm font-medium text-white/80">
@@ -476,4 +476,3 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
     </section>
   );
 }
-  
