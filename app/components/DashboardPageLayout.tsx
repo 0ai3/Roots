@@ -82,7 +82,7 @@ export default function DashboardPageLayout({
     : baseClass;
 
   const mainClass = isDarkMode
-    ? "min-h-screen bg-gradient-to-br from-neutral-950 to-neutral-900 px-4 py-16 transition-colors duration-300"
+    ? "min-h-screen bg-black px-4 py-16 transition-colors duration-300"
     : "min-h-screen bg-gradient-to-br from-amber-50 to-orange-50/30 px-4 py-16 transition-colors duration-300";
 
   const sidebarBorder = isDarkMode ? "border-neutral-800" : "border-white/50";

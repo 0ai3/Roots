@@ -93,7 +93,7 @@ export default function LogsPage() {
   // Color utility functions
   const getBgColor = (opacity: string = "") => {
     return isDarkMode 
-      ? `bg-slate-900${opacity}` 
+      ? `bg-black${opacity}` 
       : `bg-white${opacity}`;
   };
 
