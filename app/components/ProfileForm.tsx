@@ -63,7 +63,10 @@ const formatDate = (value?: string | null, locale?: string) => {
   });
 };
 
-export default function ProfileForm({ initialPoints, initialUserId }: Props = {}) {
+export default function ProfileForm({
+  initialPoints,
+  initialUserId,
+}: Props = {}) {
   const { points } = useExperiencePoints({ initialPoints, initialUserId });
   const { t, locale } = useI18n();
   const [formState, setFormState] = useState<ProfileFields>(EMPTY_FORM);
@@ -77,7 +80,9 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [homeCountryValidation, setHomeCountryValidation] = useState<"idle" | "validating" | "valid" | "invalid">("idle");
+  const [homeCountryValidation, setHomeCountryValidation] = useState<
+    "idle" | "validating" | "valid" | "invalid"
+  >("idle");
 
   useEffect(() => {
     let isActive = true;
@@ -127,9 +132,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
           return;
         }
         const message =
-          error instanceof Error
-            ? error.message
-            : t("profile.errors.generic");
+          error instanceof Error ? error.message : t("profile.errors.generic");
         setErrorMessage(message);
       } finally {
         if (isActive) {
@@ -158,12 +161,14 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
 
   const validateHomeCountry = async (country: string) => {
     setHomeCountryValidation("validating");
-    
+
     try {
       const response = await fetch(
-        `https://restcountries.com/v3.1/name/${encodeURIComponent(country)}?fullText=false`
+        `https://restcountries.com/v3.1/name/${encodeURIComponent(
+          country
+        )}?fullText=false`
       );
-      
+
       if (response.ok) {
         const data = await response.json();
         if (data.length > 0) {
@@ -257,9 +262,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
       setStatusMessage(t("profile.status.success"));
     } catch (error) {
       const message =
-        error instanceof Error
-          ? error.message
-          : t("profile.status.error");
+        error instanceof Error ? error.message : t("profile.status.error");
       setErrorMessage(message);
     } finally {
       setIsSaving(false);
@@ -296,7 +299,9 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
           <p className="text-xs uppercase tracking-wide text-white/50">
             {t("profile.accountLabel")}
           </p>
-          <p className="text-base font-semibold text-white">{profileMeta?.email || "—"}</p>
+          <p className="text-base font-semibold text-white">
+            {profileMeta?.email || "—"}
+          </p>
           <dl className="mt-4 space-y-2 text-sm text-white/70">
             <div className="flex items-center justify-between">
               <dt className="uppercase tracking-wide text-white/40">
@@ -340,26 +345,26 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
       >
         <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-2 text-sm font-medium text-white/80">
-          <span>{t("profile.fields.name")}</span>
-          <input
-            type="text"
-            value={formState.name}
-            onChange={handleChange("name")}
-            placeholder={t("profile.fields.namePlaceholder")}
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
+            <span>{t("profile.fields.name")}</span>
+            <input
+              type="text"
+              value={formState.name}
+              onChange={handleChange("name")}
+              placeholder={t("profile.fields.namePlaceholder")}
+              className="w-full rounded-2xl border border-white/10 dark:bg-slate-950/6  px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
               disabled={isFormDisabled}
               required
             />
           </label>
 
           <label className="space-y-2 text-sm font-medium text-white/80">
-          <span>{t("profile.fields.email")}</span>
-          <input
-            type="email"
-            value={formState.email}
-            onChange={handleChange("email")}
-            placeholder={t("profile.fields.emailPlaceholder")}
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
+            <span>{t("profile.fields.email")}</span>
+            <input
+              type="email"
+              value={formState.email}
+              onChange={handleChange("email")}
+              placeholder={t("profile.fields.emailPlaceholder")}
+              className="w-full rounded-2xl border border-white/10 dark:bg-slate-950/6 bg-gray-100 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
               disabled={isFormDisabled}
               required
             />
@@ -374,7 +379,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
               value={formState.location}
               onChange={handleChange("location")}
               placeholder={t("profile.fields.locationPlaceholder")}
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
+              className="w-full rounded-2xl border border-white/10 dark:bg-slate-950/40 bg-gray-100 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
               disabled={isFormDisabled}
             />
           </label>
@@ -392,7 +397,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
                     ? "border-red-400/50 bg-red-950/20"
                     : homeCountryValidation === "valid"
                     ? "border-emerald-400/50 bg-emerald-950/20"
-                    : "border-white/10 bg-slate-950/40"
+                    : "border-white/10 dark:bg-slate-950/40 bg-gray-50"
                 }`}
                 disabled={isFormDisabled}
               />
@@ -414,7 +419,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
               onChange={handleChange("favoriteMuseums")}
               placeholder={t("profile.fields.favoriteMuseumsPlaceholder")}
               rows={4}
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
+              className="w-full rounded-2xl border border-white/10 dark:bg-slate-950/40 bg-gray-50 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
               disabled={isFormDisabled}
             />
           </label>
@@ -426,7 +431,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
               onChange={handleChange("favoriteRecipes")}
               placeholder={t("profile.fields.favoriteRecipesPlaceholder")}
               rows={4}
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
+              className="w-full rounded-2xl border border-white/10 dark:bg-slate-950/40 br-gray-50 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
               disabled={isFormDisabled}
             />
           </label>
@@ -439,7 +444,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
             onChange={handleChange("bio")}
             placeholder={t("profile.fields.bioPlaceholder")}
             rows={4}
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
+            className="w-full rounded-2xl border border-white/10 dark:bg-slate-950/40 bg-gray-50 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
             disabled={isFormDisabled}
           />
         </label>
@@ -451,7 +456,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
             value={formState.socialHandle}
             onChange={handleChange("socialHandle")}
             placeholder={t("profile.fields.socialHandlePlaceholder")}
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
+            className="w-full rounded-2xl border border-white/10 dark:bg-slate-950/40 bg-gray-50 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
             disabled={isFormDisabled}
           />
         </label>
@@ -459,18 +464,20 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
         <div className="flex flex-wrap gap-3 pt-2">
           <button
             type="submit"
-            disabled={isFormDisabled || (formState.homeCountry !== "" && homeCountryValidation === "invalid")}
+            disabled={
+              isFormDisabled ||
+              (formState.homeCountry !== "" &&
+                homeCountryValidation === "invalid")
+            }
             className="rounded-full bg-emerald-500 px-6 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSaving
               ? t("profile.status.saving")
               : isLoading
-                ? t("profile.status.loading")
-                : t("profile.actions.save")}
+              ? t("profile.status.loading")
+              : t("profile.actions.save")}
           </button>
-          <p className="text-xs text-white/60">
-            {t("profile.actions.helper")}
-          </p>
+          <p className="text-xs text-white/60">{t("profile.actions.helper")}</p>
         </div>
       </form>
     </section>

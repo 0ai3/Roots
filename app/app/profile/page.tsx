@@ -16,13 +16,15 @@ export default async function ProfilePage() {
       description={t("profile.description")}
       isDarkMode={false}
     >
-      <div className="flex justify-end">
-        <PageThemeToggle />
+      <div className="profile-light">
+        <div className="flex justify-end -mt-10 mb-10 z-50">
+          <PageThemeToggle />
+        </div>
+        <ProfileForm
+          initialPoints={experience.points}
+          initialUserId={experience.userId}
+        />
       </div>
-      <ProfileForm
-        initialPoints={experience.points}
-        initialUserId={experience.userId}
-      />
     </DashboardPageLayout>
   );
 }
