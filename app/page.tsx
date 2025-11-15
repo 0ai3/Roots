@@ -1153,27 +1153,6 @@ function ImageWithFallback({
 }
 
 
-function AppInner({
-  mousePosition,
-  scrollY,
-}: {
-  mousePosition: { x: number; y: number };
-  scrollY: number;
-}) {
-  const { theme } = useTheme();
-
-  return (
-    <div className="relative">
-      <Navbar scrollY={scrollY} />
-      <ThemeToggle />
-      <HeroSection scrollY={scrollY} />
-      <FeaturesSection />
-      <ExploreSection />
-      <InteractiveGarden mousePosition={mousePosition} />
-      <CTASection />
-    </div>
-  );
-}
 
 export default function App() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
