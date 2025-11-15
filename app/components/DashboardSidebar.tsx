@@ -1,22 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { setStoredUserId } from "../lib/userId";
-import { 
-  Home, 
-  User, 
-  Map, 
-  Gamepad2, 
-  Utensils, 
-  Gift, 
-  Newspaper, 
-  Landmark, 
+import {
+  Home,
+  User,
+  Map,
+  Gamepad2,
+  Utensils,
+  Gift,
+  Newspaper,
+  Landmark,
   Trophy,
   LogOut,
-  BookOpen
+  BookOpen,
 } from "lucide-react";
 
 type Props = {
@@ -42,6 +42,53 @@ export default function DashboardSidebar({ borderClassName }: Props) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const borderClass = borderClassName ?? "border-white/10";
 
+  // Local theme sync so sidebar can adapt to per-page theme toggles without
+  // reading browser-only APIs during SSR. Start false to avoid hydration
+  // mismatches, then sync after mount.
+  const [isDarkLocal, setIsDarkLocal] = useState<boolean>(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("theme");
+      if (saved) {
+        setIsDarkLocal(saved === "dark");
+      } else {
+        setIsDarkLocal(document.documentElement.classList.contains("dark"));
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    const handler = (ev: Event) => {
+      try {
+        const detail = (ev as CustomEvent).detail;
+        if (detail && typeof detail.isDark === "boolean") {
+          setIsDarkLocal(detail.isDark);
+          return;
+        }
+      } catch (e) {
+        // ignore
+      }
+      try {
+        const saved = localStorage.getItem("theme");
+        setIsDarkLocal(saved === "dark");
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    const storageHandler = (e: StorageEvent) => {
+      if (e.key === "theme") setIsDarkLocal(e.newValue === "dark");
+    };
+
+    window.addEventListener("theme-change", handler as EventListener);
+    window.addEventListener("storage", storageHandler);
+    return () => {
+      window.removeEventListener("theme-change", handler as EventListener);
+      window.removeEventListener("storage", storageHandler);
+    };
+  }, []);
+
   const handleLogout = async () => {
     if (isLoggingOut) {
       return;
@@ -58,13 +105,18 @@ export default function DashboardSidebar({ borderClassName }: Props) {
     }
   };
 
+  const darkBg =
+    "linear-gradient(135deg, #050505 0%, #0b0b0b 60%, #0f0f0f 100%)";
+  const lightBg =
+    "linear-gradient(135deg, rgba(16,185,129,0.9) 0%, rgba(5,150,105,0.85) 60%, rgba(6,95,70,0.8) 100%)";
+
   return (
     <motion.aside
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      className={`flex w-full flex-col gap-6 rounded-2xl border ${borderClass} p-6 text-white shadow-xl backdrop-blur-sm lg:w-64`}
+      className={`flex w-full flex-col gap-6 rounded-2xl border ${borderClass} p-6 shadow-xl backdrop-blur-sm lg:w-64 text-white`}
       style={{
-        background: "linear-gradient(135deg, rgba(16,185,129,0.9) 0%, rgba(5,150,105,0.85) 60%, rgba(6,95,70,0.8) 100%)",
+        background: isDarkLocal ? darkBg : lightBg,
       }}
     >
       {/* Header */}
@@ -74,12 +126,18 @@ export default function DashboardSidebar({ borderClassName }: Props) {
         className="space-y-2"
       >
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-lime-300" />
-          <p className="text-xs uppercase tracking-[0.3em] text-white/90 font-medium">
+          <div
+            className={`w-2 h-2 rounded-full ${
+              isDarkLocal ? "bg-lime-300" : "bg-lime-300"
+            }`}
+          />
+          <p className="text-xs uppercase tracking-[0.3em] font-medium text-white/90">
             Roots
           </p>
         </div>
-        <h2 className="text-2xl font-bold tracking-tight">Navigation</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-white">
+          Navigation
+        </h2>
       </motion.div>
 
       {/* Navigation Links */}
@@ -104,9 +162,13 @@ export default function DashboardSidebar({ borderClassName }: Props) {
                     : "bg-white/5 text-white/90 hover:bg-white/10 hover:border-white/20 border border-transparent"
                 }`}
               >
-                <Icon className={`w-5 h-5 transition-transform duration-300 ${
-                  isActive ? "text-lime-300" : "text-white/80 group-hover:text-lime-200"
-                }`} />
+                <Icon
+                  className={`w-5 h-5 transition-transform duration-300 ${
+                    isActive
+                      ? "text-lime-300"
+                      : "text-white/80 group-hover:text-lime-200"
+                  }`}
+                />
                 <span className="flex-1">{link.label}</span>
                 {isActive && (
                   <motion.div
@@ -129,11 +191,13 @@ export default function DashboardSidebar({ borderClassName }: Props) {
         type="button"
         onClick={handleLogout}
         disabled={isLoggingOut}
-        className="mt-auto flex items-center gap-3 rounded-xl border border-white/30 px-4 py-3 text-sm font-medium text-white transition-all duration-300 hover:bg-white/10 hover:border-white/40 disabled:cursor-not-allowed disabled:opacity-70 group"
+        className={`mt-auto flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-70 group text-white border border-white/30 hover:bg-white/10 hover:border-white/40`}
       >
-        <LogOut className={`w-5 h-5 transition-transform duration-300 ${
-          isLoggingOut ? "animate-pulse" : "group-hover:translate-x-0.5"
-        }`} />
+        <LogOut
+          className={`w-5 h-5 transition-transform duration-300 ${
+            isLoggingOut ? "animate-pulse" : "group-hover:translate-x-0.5"
+          } text-white`}
+        />
         <span>{isLoggingOut ? "Signing out..." : "Logout"}</span>
       </motion.button>
     </motion.aside>

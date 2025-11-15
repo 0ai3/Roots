@@ -9,7 +9,6 @@ type Props = {
   title?: string;
   description?: string;
   contentClassName?: string;
-  // optional server-provided default; client may override based on saved theme
   isDarkMode?: boolean;
 };
 
@@ -20,8 +19,7 @@ export default function DashboardPageLayout({
   contentClassName,
   isDarkMode: isDarkModeProp,
 }: Props) {
-  // Initialize from server-provided prop only to keep server and client markup deterministic.
-  // Read persisted theme from localStorage only after mount to avoid hydration mismatches.
+
   const [isDarkMode, setIsDarkMode] = useState<boolean>(
     isDarkModeProp ?? false
   );
@@ -34,40 +32,32 @@ export default function DashboardPageLayout({
         setIsDarkMode(saved === "dark");
       }
     } catch (e) {
-      // ignore
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    // Sync html class immediately when state changes
     try {
       if (isDarkMode) document.documentElement.classList.add("dark");
       else document.documentElement.classList.remove("dark");
     } catch (e) {
-      // ignore
     }
   }, [isDarkMode]);
 
   useEffect(() => {
-    // Listen for external theme changes (PageThemeToggle or other components)
     const handler = (ev: Event) => {
       try {
         const detail = (ev as CustomEvent).detail;
         if (detail && typeof detail.isDark === "boolean") {
           setIsDarkMode(detail.isDark);
         } else {
-          // fallback to localStorage
           const saved = localStorage.getItem("theme");
           if (saved) setIsDarkMode(saved === "dark");
         }
       } catch (e) {
-        // ignore
       }
     };
 
     window.addEventListener("theme-change", handler as EventListener);
-    // also respond to storage events (other tabs)
     const storageHandler = (e: StorageEvent) => {
       if (e.key === "theme") {
         setIsDarkMode(e.newValue === "dark");
