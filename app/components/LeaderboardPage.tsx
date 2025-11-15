@@ -25,19 +25,81 @@ type Translator = ReturnType<typeof useI18n>["t"];
 export default function LeaderboardPage() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
+  // Theme management - improved version
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("theme");
-      if (saved) {
-        const dark = saved === "dark";
-        setIsDarkMode(dark);
-        if (dark) document.documentElement.classList.add("dark");
-        else document.documentElement.classList.remove("dark");
+    const updateTheme = () => {
+      try {
+        const saved = localStorage.getItem("theme");
+        if (saved) {
+          const dark = saved === "dark";
+          setIsDarkMode(dark);
+          if (dark) {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
+        } else {
+          // Fallback to system preference
+          const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          setIsDarkMode(systemDark);
+          if (systemDark) {
+            document.documentElement.classList.add("dark");
+          }
+        }
+      } catch (e) {
+        // ignore
       }
+    };
+
+    updateTheme();
+
+    // Listen for theme changes from other components
+    const handleThemeChange = (event: CustomEvent) => {
+      setIsDarkMode(event.detail.isDark);
+    };
+
+    window.addEventListener('theme-change', handleThemeChange as EventListener);
+    
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem("theme")) {
+        setIsDarkMode(e.matches);
+        if (e.matches) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+
+    return () => {
+      window.removeEventListener('theme-change', handleThemeChange as EventListener);
+      mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    };
+  }, []);
+
+  const toggleTheme = () => {
+    const next = !isDarkMode;
+    setIsDarkMode(next);
+    try {
+      if (next) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+      // Dispatch event for other components
+      window.dispatchEvent(
+        new CustomEvent("theme-change", { detail: { isDark: next } })
+      );
     } catch (e) {
       // ignore
     }
-  }, []);
+  };
 
   const { userId } = useExperiencePoints();
   const { data, isLoading } = useSWR("/api/leaderboard", fetcher, {
@@ -50,91 +112,100 @@ export default function LeaderboardPage() {
     ? entries.find((entry) => entry.userId === userId)
     : undefined;
 
+  // Color utility functions
+  const getBgColor = () => {
+    return isDarkMode ? "bg-black" : "bg-white";
+  };
+
+  const getTextColor = () => {
+    return isDarkMode ? "text-white" : "text-slate-900";
+  };
+
+  const getMutedTextColor = () => {
+    return isDarkMode ? "text-white/70" : "text-slate-600";
+  };
+
+  const getBorderColor = () => {
+    return isDarkMode ? "border-white/10" : "border-slate-200";
+  };
+
+  const getCardBg = () => {
+    return isDarkMode ? "bg-white/5" : "bg-slate-50";
+  };
+
   return (
     <DashboardPageLayout
       title={t("leaderboard.title")}
       description={t("leaderboard.description")}
       isDarkMode={isDarkMode}
     >
-      <div className="space-y-6">
-        {/* Theme toggle (dashboard-style) */}
-        <div className="flex justify-end">
-          <motion.button
-            type="button"
-            onClick={() => {
-              const next = !isDarkMode;
-              setIsDarkMode(next);
-              try {
-                if (next) document.documentElement.classList.add("dark");
-                else document.documentElement.classList.remove("dark");
-                localStorage.setItem("theme", next ? "dark" : "light");
-              } catch (e) {
-                // noop
-              }
-            }}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-colors ${
-              isDarkMode
-                ? "bg-neutral-800/60 text-white border border-neutral-700"
-                : "bg-white/90 text-neutral-900 border border-neutral-200"
-            }`}
-          >
-            {isDarkMode ? (
-              <Sun className="w-4 h-4 text-amber-300" />
-            ) : (
-              <Moon className="w-4 h-4 text-neutral-700" />
-            )}
-            <span>{isDarkMode ? "Light" : "Dark"}</span>
-          </motion.button>
-        </div>
-        {/* Current User Status */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={
-            `rounded-2xl p-6 backdrop-blur-sm ` +
-            (isDarkMode
-              ? "border border-white/10 bg-white/5 text-white"
-              : "border border-neutral-200 bg-white text-neutral-900 shadow-sm")
-          }
-        >
-          {userId ? (
-            current ? (
-              <div className="flex items-center gap-4">
-                <div className="w-2 h-2 rounded-full bg-lime-400" />
-                <p className="text-white/80">
-                  {t("leaderboard.status.rank", {
-                    rank: String(current.rank),
-                    points: current.points.toLocaleString(),
-                  })}
-                </p>
-              </div>
-            ) : (
-              <div className="flex items-center gap-4">
-                <div className="w-2 h-2 rounded-full bg-amber-400" />
-                <p className="text-white/80">
-                  {t("leaderboard.status.noRank")}
-                </p>
-              </div>
-            )
-          ) : (
-            <div className="flex items-center gap-4">
-              <div className="w-2 h-2 rounded-full bg-blue-400" />
-              <p className={isDarkMode ? "text-white/80" : "text-neutral-800"}>
-                {t("leaderboard.status.signedOut")}
-              </p>
-            </div>
-          )}
-        </motion.div>
+      <div className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}>
+        <div className="space-y-6 p-6">
+          {/* Theme toggle (dashboard-style) */}
+          <div className="flex justify-end">
+            <motion.button
+              type="button"
+              onClick={toggleTheme}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors border ${
+                isDarkMode
+                  ? "bg-neutral-800/60 text-white border-neutral-700 hover:bg-neutral-700/60"
+                  : "bg-white text-neutral-900 border-neutral-200 hover:bg-slate-50 shadow-sm"
+              }`}
+            >
+              {isDarkMode ? (
+                <Sun className="w-4 h-4 text-amber-300" />
+              ) : (
+                <Moon className="w-4 h-4 text-neutral-700" />
+              )}
+              <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
+            </motion.button>
+          </div>
 
-        {/* Leaderboard */}
-        <LeaderboardTable
-          entries={entries}
-          isLoading={isLoading}
-          isDarkMode={isDarkMode}
-          t={t}
-        />
+          {/* Current User Status */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`rounded-2xl p-6 backdrop-blur-sm border ${getBorderColor()} ${getCardBg()}`}
+          >
+            {userId ? (
+              current ? (
+                <div className="flex items-center gap-4">
+                  <div className="w-2 h-2 rounded-full bg-lime-400" />
+                  <p className={getMutedTextColor()}>
+                    {t("leaderboard.status.rank", {
+                      rank: String(current.rank),
+                      points: current.points.toLocaleString(),
+                    })}
+                  </p>
+                </div>
+              ) : (
+                <div className="flex items-center gap-4">
+                  <div className="w-2 h-2 rounded-full bg-amber-400" />
+                  <p className={getMutedTextColor()}>
+                    {t("leaderboard.status.noRank")}
+                  </p>
+                </div>
+              )
+            ) : (
+              <div className="flex items-center gap-4">
+                <div className="w-2 h-2 rounded-full bg-blue-400" />
+                <p className={getMutedTextColor()}>
+                  {t("leaderboard.status.signedOut")}
+                </p>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Leaderboard */}
+          <LeaderboardTable
+            entries={entries}
+            isLoading={isLoading}
+            isDarkMode={isDarkMode}
+            t={t}
+          />
+        </div>
       </div>
     </DashboardPageLayout>
   );
@@ -151,22 +222,35 @@ function LeaderboardTable({
   isDarkMode: boolean;
   t: Translator;
 }) {
+  // Color utility functions for the table component
+  const getTextColor = () => {
+    return isDarkMode ? "text-white" : "text-slate-900";
+  };
+
+  const getMutedTextColor = () => {
+    return isDarkMode ? "text-white/70" : "text-slate-600";
+  };
+
+  const getBorderColor = () => {
+    return isDarkMode ? "border-white/10" : "border-slate-200";
+  };
+
+  const getCardBg = () => {
+    return isDarkMode ? "bg-white/5" : "bg-white";
+  };
+
+  const getHeaderBg = () => {
+    return isDarkMode ? "bg-white/10" : "bg-slate-50";
+  };
+
   if (isLoading) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className={`rounded-2xl p-8 text-center backdrop-blur-sm ${
-          isDarkMode
-            ? "border border-white/10 bg-white/5 text-white"
-            : "border border-neutral-200 bg-white text-neutral-900"
-        }`}
+        className={`rounded-2xl p-8 text-center backdrop-blur-sm border ${getBorderColor()} ${getCardBg()}`}
       >
-        <div
-          className={`flex items-center justify-center gap-3 ${
-            isDarkMode ? "text-white/60" : "text-neutral-800"
-          }`}
-        >
+        <div className={`flex items-center justify-center gap-3 ${getMutedTextColor()}`}>
           <div className="w-2 h-2 rounded-full bg-lime-400 animate-pulse" />
           <p>{t("leaderboard.loading")}</p>
         </div>
@@ -179,69 +263,60 @@ function LeaderboardTable({
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className={`rounded-2xl p-8 text-center backdrop-blur-sm ${
-          isDarkMode
-            ? "border border-white/10 bg-white/5 text-white"
-            : "border border-neutral-200 bg-white text-neutral-900"
-        }`}
+        className={`rounded-2xl p-8 text-center backdrop-blur-sm border ${getBorderColor()} ${getCardBg()}`}
       >
         <Trophy
-          className={`w-12 h-12 mx-auto mb-4 ${
-            isDarkMode ? "text-white/30" : "text-neutral-500"
-          }`}
+          className={`w-12 h-12 mx-auto mb-4 ${getMutedTextColor()}`}
         />
-        <p className={`${isDarkMode ? "text-white/60" : "text-neutral-700"}`}>
+        <p className={getMutedTextColor()}>
           {t("leaderboard.empty.title")}
         </p>
-        <p
-          className={`${
-            isDarkMode
-              ? "text-white/40 text-sm mt-2"
-              : "text-neutral-600 text-sm mt-2"
-          }`}
-        >
+        <p className={`${getMutedTextColor()} text-sm mt-2`}>
           {t("leaderboard.empty.subtitle")}
         </p>
       </motion.div>
     );
   }
 
-  const getRankStyle = (rank: number, dark: boolean) => {
-    // Return styles adapted for dark or light mode
+  const getRankStyle = (rank: number) => {
     switch (rank) {
       case 1:
         return {
-          background: dark
-            ? "bg-gradient-to-r from-yellow-500/5 to-amber-500/2"
-            : "bg-gradient-to-r from-yellow-50/50 to-amber-50/50",
-          iconColor: dark ? "text-yellow-400/70" : "text-yellow-600",
-          pointsColor: dark ? "text-yellow-300/80" : "text-yellow-600",
-          rankColor: dark ? "text-yellow-400/70" : "text-yellow-600",
+          background: isDarkMode
+            ? "bg-gradient-to-r from-yellow-500/10 to-amber-500/5"
+            : "bg-gradient-to-r from-yellow-50 to-amber-50",
+          iconColor: isDarkMode ? "text-yellow-400" : "text-yellow-600",
+          pointsColor: isDarkMode ? "text-yellow-300" : "text-yellow-600",
+          rankColor: isDarkMode ? "text-yellow-400" : "text-yellow-600",
+          border: isDarkMode ? "border-yellow-500/20" : "border-yellow-200",
         };
       case 2:
         return {
-          background: dark
-            ? "bg-gradient-to-r from-gray-400/5 to-gray-300/2"
-            : "bg-gradient-to-r from-gray-50/40 to-gray-50/20",
-          iconColor: dark ? "text-gray-300/70" : "text-gray-600",
-          pointsColor: dark ? "text-gray-200/80" : "text-gray-600",
-          rankColor: dark ? "text-gray-300/70" : "text-gray-600",
+          background: isDarkMode
+            ? "bg-gradient-to-r from-gray-400/10 to-gray-300/5"
+            : "bg-gradient-to-r from-gray-50 to-gray-100",
+          iconColor: isDarkMode ? "text-gray-300" : "text-gray-600",
+          pointsColor: isDarkMode ? "text-gray-200" : "text-gray-600",
+          rankColor: isDarkMode ? "text-gray-300" : "text-gray-600",
+          border: isDarkMode ? "border-gray-400/20" : "border-gray-200",
         };
       case 3:
         return {
-          background: dark
-            ? "bg-gradient-to-r from-amber-700/5 to-amber-600/2"
-            : "bg-gradient-to-r from-amber-50/40 to-amber-50/20",
-          iconColor: dark ? "text-amber-600/70" : "text-amber-600",
-          pointsColor: dark ? "text-amber-500/80" : "text-amber-600",
-          rankColor: dark ? "text-amber-600/70" : "text-amber-600",
+          background: isDarkMode
+            ? "bg-gradient-to-r from-amber-700/10 to-amber-600/5"
+            : "bg-gradient-to-r from-amber-50 to-amber-100",
+          iconColor: isDarkMode ? "text-amber-600" : "text-amber-600",
+          pointsColor: isDarkMode ? "text-amber-500" : "text-amber-600",
+          rankColor: isDarkMode ? "text-amber-600" : "text-amber-600",
+          border: isDarkMode ? "border-amber-600/20" : "border-amber-200",
         };
       default:
         return {
-          background: dark ? "hover:bg-white/3" : "hover:bg-neutral-100",
-          iconColor: dark ? "text-white/50" : "text-neutral-700",
-          pointsColor: dark ? "text-lime-300/80" : "text-lime-600",
-          rankColor: dark ? "text-white/60" : "text-neutral-700",
+          background: isDarkMode ? "hover:bg-white/5" : "hover:bg-slate-50",
+          iconColor: isDarkMode ? "text-white/50" : "text-slate-500",
+          pointsColor: isDarkMode ? "text-lime-300" : "text-lime-600",
+          rankColor: isDarkMode ? "text-white/60" : "text-slate-700",
+          border: isDarkMode ? "border-white/5" : "border-slate-100",
         };
     }
   };
@@ -263,36 +338,23 @@ function LeaderboardTable({
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className={`overflow-hidden rounded-2xl backdrop-blur-sm ${
-        isDarkMode
-          ? "border border-white/10 bg-white/5 text-white"
-          : "border border-neutral-200 bg-white text-neutral-900"
-      }`}
+      className={`overflow-hidden rounded-2xl backdrop-blur-sm border ${getBorderColor()} ${getCardBg()}`}
     >
-      {/* Header */}
-      <div
-        className={`${
-          isDarkMode
-            ? "border-b border-white/10 bg-white/10"
-            : "border-b border-neutral-200 bg-white/50"
-        } px-6 py-4`}
-      />
+      {/* Header - Fixed JSX structure */}
+      <div className={`border-b ${getBorderColor()} ${getHeaderBg()} px-6 py-4`}>
         <div className="flex items-center gap-3">
-          <Trophy className="w-5 h-5 text-lime-400/80" />
-          <h3
-            className={`font-semibold ${
-              isDarkMode ? "text-white" : "text-neutral-900"
-            }`}
-          >
+          <Trophy className="w-5 h-5 text-lime-400" />
+          <h3 className={`font-semibold ${getTextColor()}`}>
             {t("leaderboard.table.heading")}
           </h3>
         </div>
-        
+      </div>
+
       {/* Leaderboard List */}
       <div className="max-h-96 overflow-y-auto">
-        <ul className="divide-y divide-white/5">
+        <ul className={`divide-y ${isDarkMode ? "divide-white/5" : "divide-slate-200"}`}>
           {entries.map((entry, index) => {
-            const rankStyle = getRankStyle(entry.rank, isDarkMode);
+            const rankStyle = getRankStyle(entry.rank);
 
             return (
               <motion.li
@@ -300,7 +362,7 @@ function LeaderboardTable({
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className={`px-6 py-4 transition-all ${rankStyle.background}`}
+                className={`px-6 py-4 transition-all border-l-4 ${rankStyle.background} ${rankStyle.border}`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -308,7 +370,7 @@ function LeaderboardTable({
                     <div className="flex items-center gap-2">
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          entry.rank <= 3 ? "bg-white/5" : "bg-white/3"
+                          isDarkMode ? "bg-white/10" : "bg-slate-100"
                         }`}
                       >
                         <span className={rankStyle.iconColor}>
@@ -330,23 +392,15 @@ function LeaderboardTable({
                       <span
                         className={`font-medium ${
                           entry.rank <= 3
-                            ? isDarkMode
-                              ? "text-white"
-                              : "text-neutral-900"
+                            ? getTextColor()
                             : isDarkMode
                             ? "text-white/90"
-                            : "text-neutral-900"
+                            : "text-slate-900"
                         }`}
                       >
                         {entry.name}
                       </span>
-                      <div
-                        className={`${
-                          isDarkMode
-                            ? "text-white/50 text-xs"
-                            : "text-neutral-600 text-xs"
-                        }`}
-                      >
+                      <div className={`${getMutedTextColor()} text-xs`}>
                         {t("leaderboard.idLabel", {
                           id: entry.userId.slice(-6),
                         })}
@@ -361,13 +415,7 @@ function LeaderboardTable({
                     >
                       {entry.points.toLocaleString()}
                     </div>
-                    <div
-                      className={`${
-                        isDarkMode
-                          ? "text-white/50 text-xs"
-                          : "text-neutral-600 text-xs"
-                      }`}
-                    >
+                    <div className={`${getMutedTextColor()} text-xs`}>
                       {t("leaderboard.points")}
                     </div>
                   </div>
@@ -379,18 +427,8 @@ function LeaderboardTable({
       </div>
 
       {/* Footer */}
-      <div
-        className={`${
-          isDarkMode
-            ? "border-t border-white/10 bg-white/5"
-            : "border-t border-neutral-200 bg-white/50"
-        } px-6 py-3`}
-      >
-        <p
-          className={`${
-            isDarkMode ? "text-white/50" : "text-neutral-600"
-          } text-xs text-center`}
-        >
+      <div className={`border-t ${getBorderColor()} ${getHeaderBg()} px-6 py-3`}>
+        <p className={`${getMutedTextColor()} text-xs text-center`}>
           {t("leaderboard.footer", { count: String(entries.length) })}
         </p>
       </div>

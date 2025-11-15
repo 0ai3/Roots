@@ -64,6 +64,86 @@ const formatDate = (value?: string | null, locale?: string) => {
 };
 
 export default function ProfileForm({ initialPoints, initialUserId }: Props = {}) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Theme management
+  useEffect(() => {
+    const updateTheme = () => {
+      try {
+        const saved = localStorage.getItem("theme");
+        if (saved) {
+          const dark = saved === "dark";
+          setIsDarkMode(dark);
+          if (dark) {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
+        } else {
+          const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          setIsDarkMode(systemDark);
+          if (systemDark) {
+            document.documentElement.classList.add("dark");
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    updateTheme();
+
+    const handleThemeChange = (event: CustomEvent) => {
+      setIsDarkMode(event.detail.isDark);
+    };
+
+    window.addEventListener('theme-change', handleThemeChange as EventListener);
+    
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem("theme")) {
+        setIsDarkMode(e.matches);
+        if (e.matches) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+
+    return () => {
+      window.removeEventListener('theme-change', handleThemeChange as EventListener);
+      mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    };
+  }, []);
+
+  // Color utility functions
+  const getBgColor = () => {
+    return isDarkMode ? "bg-black" : "bg-white";
+  };
+
+  const getTextColor = () => {
+    return isDarkMode ? "text-white" : "text-slate-900";
+  };
+
+  const getMutedTextColor = () => {
+    return isDarkMode ? "text-white/70" : "text-slate-600";
+  };
+
+  const getBorderColor = () => {
+    return isDarkMode ? "border-white/10" : "border-slate-200";
+  };
+
+  const getCardBg = () => {
+    return isDarkMode ? "bg-white/5" : "bg-slate-50";
+  };
+
+  const getInputBg = () => {
+    return isDarkMode ? "bg-black/40" : "bg-white";
+  };
+
   const { points } = useExperiencePoints({ initialPoints, initialUserId });
   const { t, locale } = useI18n();
   const [formState, setFormState] = useState<ProfileFields>(EMPTY_FORM);
@@ -271,208 +351,226 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
   const getValidationIcon = () => {
     switch (homeCountryValidation) {
       case "validating":
-        return <Loader2 className="h-5 w-5 animate-spin text-white/40" />;
+        return <Loader2 className="h-5 w-5 animate-spin text-slate-400 dark:text-white/40" />;
       case "valid":
-        return <CheckCircle className="h-5 w-5 text-emerald-400" />;
+        return <CheckCircle className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />;
       case "invalid":
-        return <AlertCircle className="h-5 w-5 text-red-400" />;
+        return <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400" />;
       default:
         return null;
     }
   };
 
   return (
-    <section className="space-y-8">
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-          <p className="text-xs uppercase tracking-wide text-white/50">
-            {t("dashboard.content.pointsLabel")}
-          </p>
-          <p className="text-4xl font-semibold text-white">{formattedPoints}</p>
-          <p className="text-xs text-white/50">{t("profile.pointsHint")}</p>
-        </div>
-
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-          <p className="text-xs uppercase tracking-wide text-white/50">
-            {t("profile.accountLabel")}
-          </p>
-          <p className="text-base font-semibold text-white">{profileMeta?.email || "—"}</p>
-          <dl className="mt-4 space-y-2 text-sm text-white/70">
-            <div className="flex items-center justify-between">
-              <dt className="uppercase tracking-wide text-white/40">
-                {t("dashboard.content.roleLabel")}
-              </dt>
-              <dd className="rounded-full border border-white/15 px-3 py-1 text-xs text-white">
-                {profileRoleLabel}
-              </dd>
-            </div>
-            <div className="flex items-center justify-between">
-              <dt className="uppercase tracking-wide text-white/40">
-                {t("dashboard.content.memberSince")}
-              </dt>
-              <dd>{formattedCreatedAt ?? "—"}</dd>
-            </div>
-            <div className="flex items-center justify-between">
-              <dt className="uppercase tracking-wide text-white/40">
-                {t("common.lastUpdated")}
-              </dt>
-              <dd>{formattedUpdatedAt ?? "—"}</dd>
-            </div>
-          </dl>
-        </div>
-      </div>
-
-      {errorMessage && (
-        <p className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-          {errorMessage}
-        </p>
-      )}
-
-      {statusMessage && !errorMessage && (
-        <p className="rounded-2xl border border-emerald-400/40 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
-          {statusMessage}
-        </p>
-      )}
-
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-5 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur"
-      >
+    <section className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}>
+      <div className="space-y-8 p-6">
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="space-y-2 text-sm font-medium text-white/80">
-          <span>{t("profile.fields.name")}</span>
-          <input
-            type="text"
-            value={formState.name}
-            onChange={handleChange("name")}
-            placeholder={t("profile.fields.namePlaceholder")}
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
-              disabled={isFormDisabled}
-              required
-            />
-          </label>
+          <div className={`rounded-3xl border p-5 ${getBorderColor()} ${getCardBg()}`}>
+            <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+              {t("dashboard.content.pointsLabel")}
+            </p>
+            <p className={`text-4xl font-semibold ${getTextColor()}`}>{formattedPoints}</p>
+            <p className={`text-xs ${getMutedTextColor()}`}>{t("profile.pointsHint")}</p>
+          </div>
 
-          <label className="space-y-2 text-sm font-medium text-white/80">
-          <span>{t("profile.fields.email")}</span>
-          <input
-            type="email"
-            value={formState.email}
-            onChange={handleChange("email")}
-            placeholder={t("profile.fields.emailPlaceholder")}
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
-              disabled={isFormDisabled}
-              required
-            />
-          </label>
+          <div className={`rounded-3xl border p-5 ${getBorderColor()} ${getCardBg()}`}>
+            <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+              {t("profile.accountLabel")}
+            </p>
+            <p className={`text-base font-semibold ${getTextColor()}`}>{profileMeta?.email || "—"}</p>
+            <dl className="mt-4 space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <dt className={`uppercase tracking-wide ${getMutedTextColor()}`}>
+                  {t("dashboard.content.roleLabel")}
+                </dt>
+                <dd className={`rounded-full border px-3 py-1 text-xs ${
+                  isDarkMode 
+                    ? "border-white/15 text-white" 
+                    : "border-slate-300 text-slate-700"
+                }`}>
+                  {profileRoleLabel}
+                </dd>
+              </div>
+              <div className="flex items-center justify-between">
+                <dt className={`uppercase tracking-wide ${getMutedTextColor()}`}>
+                  {t("dashboard.content.memberSince")}
+                </dt>
+                <dd className={getMutedTextColor()}>{formattedCreatedAt ?? "—"}</dd>
+              </div>
+              <div className="flex items-center justify-between">
+                <dt className={`uppercase tracking-wide ${getMutedTextColor()}`}>
+                  {t("common.lastUpdated")}
+                </dt>
+                <dd className={getMutedTextColor()}>{formattedUpdatedAt ?? "—"}</dd>
+              </div>
+            </dl>
+          </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="space-y-2 text-sm font-medium text-white/80">
-            <span>{t("profile.fields.location")}</span>
-            <input
-              type="text"
-              value={formState.location}
-              onChange={handleChange("location")}
-              placeholder={t("profile.fields.locationPlaceholder")}
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
-              disabled={isFormDisabled}
-            />
-          </label>
+        {errorMessage && (
+          <div className={`rounded-2xl border px-4 py-3 text-sm ${
+            isDarkMode 
+              ? "border-red-500/40 bg-red-500/10 text-red-200" 
+              : "border-red-400/40 bg-red-400/10 text-red-700"
+          }`}>
+            {errorMessage}
+          </div>
+        )}
 
-          <label className="space-y-2 text-sm font-medium text-white/80">
-            <span>{t("profile.fields.homeCountry")}</span>
-            <div className="relative">
+        {statusMessage && !errorMessage && (
+          <div className={`rounded-2xl border px-4 py-3 text-sm ${
+            isDarkMode 
+              ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-200" 
+              : "border-emerald-500/40 bg-emerald-500/10 text-emerald-700"
+          }`}>
+            {statusMessage}
+          </div>
+        )}
+
+        <form
+          onSubmit={handleSubmit}
+          className={`space-y-5 rounded-3xl border p-6 backdrop-blur ${getBorderColor()} ${getCardBg()}`}
+        >
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+              <span>{t("profile.fields.name")}</span>
               <input
                 type="text"
-                value={formState.homeCountry}
-                onChange={handleChange("homeCountry")}
-                placeholder={t("profile.fields.homeCountryPlaceholder")}
-                className={`w-full rounded-2xl border px-4 py-3 pr-12 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${
-                  homeCountryValidation === "invalid"
-                    ? "border-red-400/50 bg-red-950/20"
-                    : homeCountryValidation === "valid"
-                    ? "border-emerald-400/50 bg-emerald-950/20"
-                    : "border-white/10 bg-slate-950/40"
-                }`}
+                value={formState.name}
+                onChange={handleChange("name")}
+                placeholder={t("profile.fields.namePlaceholder")}
+                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+                disabled={isFormDisabled}
+                required
+              />
+            </label>
+
+            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+              <span>{t("profile.fields.email")}</span>
+              <input
+                type="email"
+                value={formState.email}
+                onChange={handleChange("email")}
+                placeholder={t("profile.fields.emailPlaceholder")}
+                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+                disabled={isFormDisabled}
+                required
+              />
+            </label>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+              <span>{t("profile.fields.location")}</span>
+              <input
+                type="text"
+                value={formState.location}
+                onChange={handleChange("location")}
+                placeholder={t("profile.fields.locationPlaceholder")}
+                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
                 disabled={isFormDisabled}
               />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                {getValidationIcon()}
+            </label>
+
+            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+              <span>{t("profile.fields.homeCountry")}</span>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={formState.homeCountry}
+                  onChange={handleChange("homeCountry")}
+                  placeholder={t("profile.fields.homeCountryPlaceholder")}
+                  className={`w-full rounded-2xl border px-4 py-3 pr-12 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${
+                    homeCountryValidation === "invalid"
+                      ? isDarkMode
+                        ? "border-red-400/50 bg-red-950/20"
+                        : "border-red-400/50 bg-red-50 text-red-900"
+                      : homeCountryValidation === "valid"
+                      ? isDarkMode
+                        ? "border-emerald-400/50 bg-emerald-950/20"
+                        : "border-emerald-400/50 bg-emerald-50 text-emerald-900"
+                      : `${getBorderColor()} ${getInputBg()} ${getTextColor()}`
+                  }`}
+                  disabled={isFormDisabled}
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {getValidationIcon()}
+                </div>
               </div>
-            </div>
-            <p className="text-xs text-white/40">
-              {t("profile.fields.homeCountryHelper")}
+              <p className={`text-xs ${getMutedTextColor()}`}>
+                {t("profile.fields.homeCountryHelper")}
+              </p>
+            </label>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+              <span>{t("profile.fields.favoriteMuseums")}</span>
+              <textarea
+                value={formState.favoriteMuseums}
+                onChange={handleChange("favoriteMuseums")}
+                placeholder={t("profile.fields.favoriteMuseumsPlaceholder")}
+                rows={4}
+                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+                disabled={isFormDisabled}
+              />
+            </label>
+
+            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+              <span>{t("profile.fields.favoriteRecipes")}</span>
+              <textarea
+                value={formState.favoriteRecipes}
+                onChange={handleChange("favoriteRecipes")}
+                placeholder={t("profile.fields.favoriteRecipesPlaceholder")}
+                rows={4}
+                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+                disabled={isFormDisabled}
+              />
+            </label>
+          </div>
+
+          <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+            <span>{t("profile.fields.bio")}</span>
+            <textarea
+              value={formState.bio}
+              onChange={handleChange("bio")}
+              placeholder={t("profile.fields.bioPlaceholder")}
+              rows={4}
+              className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+              disabled={isFormDisabled}
+            />
+          </label>
+
+          <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+            <span>{t("profile.fields.socialHandle")}</span>
+            <input
+              type="text"
+              value={formState.socialHandle}
+              onChange={handleChange("socialHandle")}
+              placeholder={t("profile.fields.socialHandlePlaceholder")}
+              className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+              disabled={isFormDisabled}
+            />
+          </label>
+
+          <div className="flex flex-wrap gap-3 pt-2">
+            <button
+              type="submit"
+              disabled={isFormDisabled || (formState.homeCountry !== "" && homeCountryValidation === "invalid")}
+              className="rounded-full bg-emerald-500 px-6 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSaving
+                ? t("profile.status.saving")
+                : isLoading
+                  ? t("profile.status.loading")
+                  : t("profile.actions.save")}
+            </button>
+            <p className={`text-xs ${getMutedTextColor()}`}>
+              {t("profile.actions.helper")}
             </p>
-          </label>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="space-y-2 text-sm font-medium text-white/80">
-            <span>{t("profile.fields.favoriteMuseums")}</span>
-            <textarea
-              value={formState.favoriteMuseums}
-              onChange={handleChange("favoriteMuseums")}
-              placeholder={t("profile.fields.favoriteMuseumsPlaceholder")}
-              rows={4}
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
-              disabled={isFormDisabled}
-            />
-          </label>
-
-          <label className="space-y-2 text-sm font-medium text-white/80">
-            <span>{t("profile.fields.favoriteRecipes")}</span>
-            <textarea
-              value={formState.favoriteRecipes}
-              onChange={handleChange("favoriteRecipes")}
-              placeholder={t("profile.fields.favoriteRecipesPlaceholder")}
-              rows={4}
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
-              disabled={isFormDisabled}
-            />
-          </label>
-        </div>
-
-        <label className="space-y-2 text-sm font-medium text-white/80">
-          <span>{t("profile.fields.bio")}</span>
-          <textarea
-            value={formState.bio}
-            onChange={handleChange("bio")}
-            placeholder={t("profile.fields.bioPlaceholder")}
-            rows={4}
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
-            disabled={isFormDisabled}
-          />
-        </label>
-
-        <label className="space-y-2 text-sm font-medium text-white/80">
-          <span>{t("profile.fields.socialHandle")}</span>
-          <input
-            type="text"
-            value={formState.socialHandle}
-            onChange={handleChange("socialHandle")}
-            placeholder={t("profile.fields.socialHandlePlaceholder")}
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
-            disabled={isFormDisabled}
-          />
-        </label>
-
-        <div className="flex flex-wrap gap-3 pt-2">
-          <button
-            type="submit"
-            disabled={isFormDisabled || (formState.homeCountry !== "" && homeCountryValidation === "invalid")}
-            className="rounded-full bg-emerald-500 px-6 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSaving
-              ? t("profile.status.saving")
-              : isLoading
-                ? t("profile.status.loading")
-                : t("profile.actions.save")}
-          </button>
-          <p className="text-xs text-white/60">
-            {t("profile.actions.helper")}
-          </p>
-        </div>
-      </form>
+          </div>
+        </form>
+      </div>
     </section>
   );
 }

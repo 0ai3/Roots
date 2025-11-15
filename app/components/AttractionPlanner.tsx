@@ -61,11 +61,13 @@ function MessageBubble({
   onLogAttraction,
   visitedAttractions,
   t,
+  isDarkMode,
 }: {
   message: ChatMessage;
   onLogAttraction: (title: string) => void;
   visitedAttractions: VisitedMap;
   t: Translator;
+  isDarkMode: boolean;
 }) {
   if (message.role === "assistant") {
     const parsed = parseAssistantContent(message.content);
@@ -76,6 +78,7 @@ function MessageBubble({
             onLogAttraction={onLogAttraction}
             visitedAttractions={visitedAttractions}
             t={t}
+            isDarkMode={isDarkMode}
           />
         );
       }
@@ -92,11 +95,19 @@ function MessageBubble({
       <div
         className={`max-w-2xl rounded-2xl border px-5 py-4 backdrop-blur-sm shadow-lg ${
           message.role === "user"
-            ? "border-lime-400/30 bg-lime-400/10 text-lime-50"
-            : "border-white/10 bg-white/5 text-white/90"
+            ? "border-lime-400/30 bg-lime-400/10 text-lime-800 dark:text-lime-50"
+            : isDarkMode 
+              ? "border-white/10 bg-white/5 text-white/90"
+              : "border-slate-200 bg-slate-50 text-slate-900"
         }`}
       >
-        <p className="mb-2 text-xs uppercase tracking-wide opacity-60">
+        <p className={`mb-2 text-xs uppercase tracking-wide ${
+          message.role === "user" 
+            ? "text-lime-700 dark:text-lime-300" 
+            : isDarkMode 
+              ? "text-white/60" 
+              : "text-slate-600"
+        }`}>
           {message.role === "user" ? t("planner.roles.you") : t("planner.roles.guide")}
         </p>
         <p className="whitespace-pre-line">{message.content}</p>
@@ -110,11 +121,13 @@ function AssistantCard({
   onLogAttraction,
   visitedAttractions,
   t,
+  isDarkMode,
 }: {
   payload: AssistantPayload;
   onLogAttraction: (title: string) => void;
   visitedAttractions: VisitedMap;
   t: Translator;
+  isDarkMode: boolean;
 }) {
   const tips = payload.tips?.filter(Boolean) ?? [];
   const attractions = payload.attractions ?? [];
@@ -123,10 +136,16 @@ function AssistantCard({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-lime-400/20 bg-neutral-900/50 p-6 backdrop-blur-sm shadow-xl"
+      className={`rounded-2xl border p-6 backdrop-blur-sm shadow-xl ${
+        isDarkMode 
+          ? "border-lime-400/20 bg-black/50" 
+          : "border-lime-400/30 bg-slate-50"
+      }`}
     >
       {payload.intro && (
-        <p className="text-base text-neutral-900/90 dark:text-white/90 leading-relaxed">
+        <p className={`text-base leading-relaxed ${
+          isDarkMode ? "text-white/90" : "text-slate-900"
+        }`}>
           {payload.intro}
         </p>
       )}
@@ -135,7 +154,9 @@ function AssistantCard({
         <div className="mt-6">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-2 h-2 rounded-full bg-lime-400" />
-            <p className="text-xs uppercase tracking-wide text-neutral-700 dark:text-white/60">
+            <p className={`text-xs uppercase tracking-wide ${
+              isDarkMode ? "text-white/60" : "text-slate-600"
+            }`}>
               {t("planner.common.quickTips")}
             </p>
           </div>
@@ -144,7 +165,11 @@ function AssistantCard({
               <motion.span
                 key={tip}
                 whileHover={{ scale: 1.05 }}
-                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-neutral-900/80 dark:text-white/80"
+                className={`rounded-xl border px-3 py-2 text-sm ${
+                  isDarkMode 
+                    ? "border-white/10 bg-white/5 text-white/80" 
+                    : "border-slate-200 bg-white text-slate-700"
+                }`}
               >
                 {tip}
               </motion.span>
@@ -157,7 +182,9 @@ function AssistantCard({
         <div className="mt-8 space-y-4">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-lime-400" />
-            <p className="text-xs uppercase tracking-wide text-neutral-700 dark:text-white/60">
+            <p className={`text-xs uppercase tracking-wide ${
+              isDarkMode ? "text-white/60" : "text-slate-600"
+            }`}>
               {t("planner.attractions.recommendedTitle")}
             </p>
           </div>
@@ -167,17 +194,27 @@ function AssistantCard({
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm"
+              className={`rounded-2xl border p-5 backdrop-blur-sm ${
+                isDarkMode 
+                  ? "border-white/10 bg-white/5" 
+                  : "border-slate-200 bg-white"
+              }`}
             >
               <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
                 <div>
-                  <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">
+                  <h3 className={`text-lg font-semibold ${
+                    isDarkMode ? "text-white" : "text-slate-900"
+                  }`}>
                     {item.title}
                   </h3>
                   {item.neighborhood && (
                     <div className="flex items-center gap-1 mt-1">
-                      <MapPin className="w-3 h-3 text-neutral-400 dark:text-white/40" />
-                      <p className="text-xs text-neutral-500 dark:text-white/40">
+                      <MapPin className={`w-3 h-3 ${
+                        isDarkMode ? "text-white/40" : "text-slate-400"
+                      }`} />
+                      <p className={`text-xs ${
+                        isDarkMode ? "text-white/40" : "text-slate-500"
+                      }`}>
                         {item.neighborhood}
                       </p>
                     </div>
@@ -185,8 +222,12 @@ function AssistantCard({
                 </div>
                 {item.cost && (
                   <div className="flex items-center gap-1">
-                    <DollarSign className="w-3 h-3 text-lime-400/80" />
-                    <span className="rounded-full border border-lime-400/30 bg-lime-400/10 px-3 py-1 text-xs text-lime-300">
+                    <DollarSign className="w-3 h-3 text-lime-500" />
+                    <span className={`rounded-full border px-3 py-1 text-xs ${
+                      isDarkMode 
+                        ? "border-lime-400/30 bg-lime-400/10 text-lime-300"
+                        : "border-lime-500/30 bg-lime-500/10 text-lime-700"
+                    }`}>
                       {item.cost}
                     </span>
                   </div>
@@ -194,7 +235,9 @@ function AssistantCard({
               </div>
 
               {item.description && (
-                <p className="text-sm text-neutral-700/80 dark:text-white/80 leading-relaxed mb-3">
+                <p className={`text-sm leading-relaxed mb-3 ${
+                  isDarkMode ? "text-white/80" : "text-slate-700"
+                }`}>
                   {item.description}
                 </p>
               )}
@@ -205,7 +248,7 @@ function AssistantCard({
                   target="_blank"
                   rel="noreferrer"
                   whileHover={{ scale: 1.05 }}
-                  className="inline-flex items-center gap-2 text-sm font-medium text-lime-400 hover:text-lime-300 transition-colors"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-lime-500 hover:text-lime-600 dark:text-lime-400 dark:hover:text-lime-300 transition-colors"
                 >
                   <Compass className="w-4 h-4" />
                   {t("worldExplorer.attractions.openInMaps")}
@@ -213,10 +256,12 @@ function AssistantCard({
               )}
 
               {Array.isArray(item.notes) && item.notes.length > 0 && (
-                <ul className="mt-4 space-y-2 text-sm text-neutral-700/70 dark:text-white/70">
+                <ul className={`mt-4 space-y-2 text-sm ${
+                  isDarkMode ? "text-white/70" : "text-slate-600"
+                }`}>
                   {item.notes.map((note) => (
                     <li key={note} className="flex gap-2">
-                      <span className="text-lime-400">•</span>
+                      <span className="text-lime-500 dark:text-lime-400">•</span>
                       <span>{note}</span>
                     </li>
                   ))}
@@ -231,8 +276,12 @@ function AssistantCard({
                 whileTap={{ scale: 0.95 }}
                 className={`mt-4 rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-wide transition-all flex items-center gap-2 ${
                   visitedAttractions[item.title]
-                    ? "border border-lime-400/40 text-lime-300 bg-lime-400/10"
-                    : "border border-white/20 text-neutral-900/90 dark:text-white/90 hover:border-lime-400 hover:text-lime-300 hover:bg-lime-400/10"
+                    ? isDarkMode
+                      ? "border border-lime-400/40 text-lime-300 bg-lime-400/10"
+                      : "border border-lime-500/40 text-lime-700 bg-lime-500/10"
+                    : isDarkMode
+                    ? "border border-white/20 text-white/90 hover:border-lime-400 hover:text-lime-300 hover:bg-lime-400/10"
+                    : "border border-slate-300 text-slate-700 hover:border-lime-500 hover:text-lime-700 hover:bg-lime-500/10"
                 }`}
               >
                 <Heart className="w-3 h-3" />
@@ -246,7 +295,9 @@ function AssistantCard({
       )}
 
       {payload.closing && (
-        <p className="mt-6 text-sm text-neutral-700/70 dark:text-white/70 leading-relaxed">
+        <p className={`mt-6 text-sm leading-relaxed ${
+          isDarkMode ? "text-white/70" : "text-slate-600"
+        }`}>
           {payload.closing}
         </p>
       )}
@@ -259,6 +310,86 @@ function createMessageId() {
 }
 
 export default function AttractionPlanner({ initialPoints, initialUserId }: Props = {}) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Theme management
+  useEffect(() => {
+    const updateTheme = () => {
+      try {
+        const saved = localStorage.getItem("theme");
+        if (saved) {
+          const dark = saved === "dark";
+          setIsDarkMode(dark);
+          if (dark) {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
+        } else {
+          const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          setIsDarkMode(systemDark);
+          if (systemDark) {
+            document.documentElement.classList.add("dark");
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    updateTheme();
+
+    const handleThemeChange = (event: CustomEvent) => {
+      setIsDarkMode(event.detail.isDark);
+    };
+
+    window.addEventListener('theme-change', handleThemeChange as EventListener);
+    
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem("theme")) {
+        setIsDarkMode(e.matches);
+        if (e.matches) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+
+    return () => {
+      window.removeEventListener('theme-change', handleThemeChange as EventListener);
+      mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    };
+  }, []);
+
+  // Color utility functions
+  const getBgColor = () => {
+    return isDarkMode ? "bg-black" : "bg-white";
+  };
+
+  const getTextColor = () => {
+    return isDarkMode ? "text-white" : "text-slate-900";
+  };
+
+  const getMutedTextColor = () => {
+    return isDarkMode ? "text-white/70" : "text-slate-600";
+  };
+
+  const getBorderColor = () => {
+    return isDarkMode ? "border-white/10" : "border-slate-200";
+  };
+
+  const getCardBg = () => {
+    return isDarkMode ? "bg-white/5" : "bg-slate-50";
+  };
+
+  const getInputBg = () => {
+    return isDarkMode ? "bg-white/5" : "bg-white";
+  };
+
   const { t } = useI18n();
   const samplePrompts = useMemo(
     () =>
@@ -381,275 +512,297 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
   };
 
   return (
-    <section className="space-y-6">
-      {/* Points Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
-      >
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-2 h-2 rounded-full bg-lime-400" />
-          <p className="text-xs uppercase tracking-wide text-black dark:text-white/60">
-            {t("dashboard.content.pointsLabel")}
-          </p>
-        </div>
-        <p className="text-3xl font-bold text-neutral-900 dark:text-white mb-1">
-          {points}
-        </p>
-        <p className="text-sm text-neutral-700 dark:text-white/60">
-          {t("planner.common.pointsHint")}
-        </p>
-      </motion.div>
+    <section className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}>
+      <div className="space-y-6 p-6">
+        {/* REMOVED THEME TOGGLE BUTTON - Using existing one from DashboardPageLayout */}
 
-      {/* Setup Form */}
-      {showSetupForm && (
-        <motion.form
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          onSubmit={handleSubmit}
-          className="space-y-6 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
+        {/* Points Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`rounded-2xl border p-6 backdrop-blur-sm ${getBorderColor()} ${getCardBg()}`}
         >
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className="space-y-3">
-
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-neutral-500 dark:text-white/60" />
-              <span className="text-sm font-medium text-neutral-900/80 dark:text-white/80">
-                {t("planner.attractions.locationLabel")}
-              </span>
-            </div>
-            <input
-              type="text"
-              value={location}
-              onChange={(event) => setLocation(event.target.value)}
-              placeholder={t("planner.attractions.locationPlaceholder")}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
-            />
-          </label>
-
-          <label className="space-y-3">
-            <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-neutral-500 dark:text-white/60" />
-              <span className="text-sm font-medium text-neutral-900/80 dark:text-white/80">
-                {t("planner.attractions.budgetLabel")}
-              </span>
-            </div>
-            <input
-              type="text"
-              value={budget}
-              onChange={(event) => setBudget(event.target.value)}
-              placeholder={t("planner.attractions.budgetPlaceholder")}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
-            />
-          </label>
-        </div>
-
-        <label className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Heart className="w-4 h-4 text-neutral-500 dark:text-white/60" />
-            <span className="text-sm font-medium text-neutral-900/80 dark:text-white/80">
-              {t("planner.attractions.interestsLabel")}
-            </span>
-          </div>
-          <input
-            type="text"
-            value={interests}
-            onChange={(event) => setInterests(event.target.value)}
-            placeholder={t("planner.attractions.interestsPlaceholder")}
-            className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
-          />
-        </label>
-
-        <label className="space-y-3">
-          <div className="flex items-center gap-2">
-            <MessageCircle className="w-4 h-4 text-white/60" />
-            <span className="text-sm font-medium text-white/80">
-              {t("planner.attractions.notesLabel")}
-            </span>
-          </div>
-          <textarea
-            value={notes}
-            onChange={(event) => setNotes(event.target.value)}
-            placeholder={t("planner.attractions.notesPlaceholder")}
-            rows={3}
-            className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
-          />
-        </label>
-
-        <label className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Compass className="w-4 h-4 text-white/60" />
-            <span className="text-sm font-medium text-white/80">
-              {t("planner.attractions.questionLabel")}
-            </span>
-          </div>
-          <textarea
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            placeholder={t("planner.attractions.questionPlaceholder")}
-            rows={3}
-            className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
-          />
-        </label>
-
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <motion.button
-              type="submit"
-              disabled={!canSubmit}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="rounded-xl bg-lime-500 px-6 py-3 text-sm font-semibold text-neutral-950 transition-all hover:bg-lime-400 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isLoading ? t("planner.attractions.loading") : t("planner.attractions.submit")}
-            </motion.button>
-            <p className="text-xs uppercase tracking-wide text-white/50">
-              {t("common.poweredByGemini")}
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-2 h-2 rounded-full bg-lime-400" />
+            <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+              {t("dashboard.content.pointsLabel")}
             </p>
           </div>
-
-          <div className="flex flex-wrap gap-2">
-            <div className="w-full text-xs uppercase tracking-wide text-white/50">
-              {t("planner.common.sampleLabel")}
-            </div>
-            {samplePrompts.map((prompt) => (
-              <motion.button
-                key={prompt}
-                type="button"
-                onClick={() => setInput(prompt)}
-                whileHover={{ scale: 1.05 }}
-                className="rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-neutral-700/70 dark:text-white/70 transition-all hover:border-lime-400 hover:text-white"
-              >
-                {prompt}
-              </motion.button>
-            ))}
-            <p className="text-xs text-white/50">
-              {t("planner.common.sampleHelp")}
-            </p>
-          </div>
-
-          {error && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-3"
-            >
-              <p className="text-sm text-rose-100">{error}</p>
-            </motion.div>
-          )}
-        </motion.form>
-      )}
-
-      {/* Chat Interface */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={`rounded-2xl border border-white/10 p-6 backdrop-blur-sm ${
-          showSetupForm
-            ? "bg-neutral-900/50"
-            : "bg-linear-to-br from-neutral-900/50 to-lime-500/10"
-        }`}
-      >
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-2 h-2 rounded-full bg-lime-400" />
-              <p className="text-sm font-semibold uppercase tracking-wide text-white">
-                {showSetupForm
-                  ? t("planner.attractions.conversationTitle")
-                  : t("planner.attractions.conciergeTitle")}
-              </p>
-            </div>
-            <p className="text-xs text-white/60">
-              {showSetupForm
-                ? t("planner.attractions.conversationHint")
-                : t("planner.attractions.chatHint")}
-            </p>
-          </div>
-          {hasAssistantReply && (
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="rounded-xl border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/60">
-                {location || t("planner.attractions.locationChip")}
-              </span>
-              <span className="rounded-xl border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/60">
-                {budget || t("planner.attractions.budgetChip")}
-              </span>
-              <motion.button
-                type="button"
-                onClick={handleReset}
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/60 transition-all hover:border-rose-400 hover:text-white"
-              >
-                <RotateCcw className="w-3 h-3" />
-                {t("planner.attractions.reset")}
-              </motion.button>
-            </div>
-          )}
-        </div>
-
-        {messages.length === 0 ? (
-          <p className="text-sm text-neutral-700 dark:text-white/60 text-center py-8">
-            {showSetupForm
-              ? t("planner.attractions.emptyForm")
-              : t("planner.attractions.waiting")}
+          <p className={`text-3xl font-bold mb-1 ${getTextColor()}`}>
+            {points}
           </p>
-        ) : (
-          <div className="space-y-4">
-            {messages.map((message) => (
-              <MessageBubble
-                key={message.id}
-                message={message}
-                onLogAttraction={handleLogAttraction}
-                visitedAttractions={visitedAttractions}
-                t={t}
-              />
-            ))}
-          </div>
-        )}
+          <p className={`text-sm ${getMutedTextColor()}`}>
+            {t("planner.common.pointsHint")}
+          </p>
+        </motion.div>
 
-        {error && !showSetupForm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-4 rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-3"
-          >
-            <p className="text-sm text-rose-100">{error}</p>
-          </motion.div>
-        )}
-
-        {hasAssistantReply && (
+        {/* Setup Form */}
+        {showSetupForm && (
           <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
             onSubmit={handleSubmit}
-            className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm"
+            className={`space-y-6 rounded-2xl border p-6 backdrop-blur-sm ${getBorderColor()} ${getCardBg()}`}
           >
-            <textarea
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder={t("planner.attractions.replyPlaceholder")}
-              rows={3}
-              className="w-full rounded-xl border border-white/10 bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
-            />
-            <div className="flex items-center justify-between mt-3">
-              <p className="text-xs uppercase tracking-wide text-white/50">
-                {t("common.poweredByGemini")}
-              </p>
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <MapPin className={`w-4 h-4 ${getMutedTextColor()}`} />
+                  <span className={`text-sm font-medium ${getTextColor()}`}>
+                    {t("planner.attractions.locationLabel")}
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(event) => setLocation(event.target.value)}
+                  placeholder={t("planner.attractions.locationPlaceholder")}
+                  className={`w-full rounded-xl border px-4 py-3 placeholder:${getMutedTextColor()} focus:border-lime-400 focus:outline-none transition-colors ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+                />
+              </label>
+
+              <label className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <DollarSign className={`w-4 h-4 ${getMutedTextColor()}`} />
+                  <span className={`text-sm font-medium ${getTextColor()}`}>
+                    {t("planner.attractions.budgetLabel")}
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  value={budget}
+                  onChange={(event) => setBudget(event.target.value)}
+                  placeholder={t("planner.attractions.budgetPlaceholder")}
+                  className={`w-full rounded-xl border px-4 py-3 placeholder:${getMutedTextColor()} focus:border-lime-400 focus:outline-none transition-colors ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+                />
+              </label>
+            </div>
+
+            <label className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Heart className={`w-4 h-4 ${getMutedTextColor()}`} />
+                <span className={`text-sm font-medium ${getTextColor()}`}>
+                  {t("planner.attractions.interestsLabel")}
+                </span>
+              </div>
+              <input
+                type="text"
+                value={interests}
+                onChange={(event) => setInterests(event.target.value)}
+                placeholder={t("planner.attractions.interestsPlaceholder")}
+                className={`w-full rounded-xl border px-4 py-3 placeholder:${getMutedTextColor()} focus:border-lime-400 focus:outline-none transition-colors ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+              />
+            </label>
+
+            <label className="space-y-3">
+              <div className="flex items-center gap-2">
+                <MessageCircle className={`w-4 h-4 ${getMutedTextColor()}`} />
+                <span className={`text-sm font-medium ${getTextColor()}`}>
+                  {t("planner.attractions.notesLabel")}
+                </span>
+              </div>
+              <textarea
+                value={notes}
+                onChange={(event) => setNotes(event.target.value)}
+                placeholder={t("planner.attractions.notesPlaceholder")}
+                rows={3}
+                className={`w-full rounded-xl border px-4 py-3 placeholder:${getMutedTextColor()} focus:border-lime-400 focus:outline-none transition-colors ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+              />
+            </label>
+
+            <label className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Compass className={`w-4 h-4 ${getMutedTextColor()}`} />
+                <span className={`text-sm font-medium ${getTextColor()}`}>
+                  {t("planner.attractions.questionLabel")}
+                </span>
+              </div>
+              <textarea
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                placeholder={t("planner.attractions.questionPlaceholder")}
+                rows={3}
+                className={`w-full rounded-xl border px-4 py-3 placeholder:${getMutedTextColor()} focus:border-lime-400 focus:outline-none transition-colors ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+              />
+            </label>
+
+            <div className="flex flex-wrap items-center justify-between gap-4">
               <motion.button
                 type="submit"
                 disabled={!canSubmit}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="rounded-xl bg-lime-500 px-5 py-2 text-sm font-semibold text-neutral-950 transition-all hover:bg-lime-400 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-xl bg-lime-500 px-6 py-3 text-sm font-semibold text-slate-950 transition-all hover:bg-lime-400 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isLoading
-                  ? t("planner.attractions.replyLoading")
-                  : t("planner.attractions.replySubmit")}
+                {isLoading ? t("planner.attractions.loading") : t("planner.attractions.submit")}
               </motion.button>
+              <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+                {t("common.poweredByGemini")}
+              </p>
             </div>
+
+            <div className="flex flex-wrap gap-2">
+              <div className={`w-full text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+                {t("planner.common.sampleLabel")}
+              </div>
+              {samplePrompts.map((prompt) => (
+                <motion.button
+                  key={prompt}
+                  type="button"
+                  onClick={() => setInput(prompt)}
+                  whileHover={{ scale: 1.05 }}
+                  className={`rounded-xl border px-4 py-2 text-sm transition-all hover:border-lime-400 ${
+                    isDarkMode
+                      ? "border-white/20 bg-white/5 text-white/70 hover:text-white"
+                      : "border-slate-300 bg-white text-slate-700 hover:text-slate-900"
+                  }`}
+                >
+                  {prompt}
+                </motion.button>
+              ))}
+              <p className={`text-xs ${getMutedTextColor()}`}>
+                {t("planner.common.sampleHelp")}
+              </p>
+            </div>
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-3"
+              >
+                <p className="text-sm text-rose-700 dark:text-rose-100">{error}</p>
+              </motion.div>
+            )}
           </motion.form>
         )}
-      </motion.div>
+
+        {/* Chat Interface */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`rounded-2xl border p-6 backdrop-blur-sm ${getBorderColor()} ${
+            showSetupForm
+              ? isDarkMode ? "bg-black/50" : "bg-slate-100"
+              : isDarkMode 
+                ? "bg-linear-to-br from-black/50 to-lime-500/10" 
+                : "bg-linear-to-br from-slate-50 to-lime-100/30"
+          }`}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-2 h-2 rounded-full bg-lime-400" />
+                <p className={`text-sm font-semibold uppercase tracking-wide ${getTextColor()}`}>
+                  {showSetupForm
+                    ? t("planner.attractions.conversationTitle")
+                    : t("planner.attractions.conciergeTitle")}
+                </p>
+              </div>
+              <p className={`text-xs ${getMutedTextColor()}`}>
+                {showSetupForm
+                  ? t("planner.attractions.conversationHint")
+                  : t("planner.attractions.chatHint")}
+              </p>
+            </div>
+            {hasAssistantReply && (
+              <div className="flex flex-wrap items-center gap-3">
+                <span className={`rounded-xl border px-3 py-1 text-xs ${
+                  isDarkMode 
+                    ? "border-white/20 bg-white/5 text-white/60" 
+                    : "border-slate-200 bg-slate-100 text-slate-600"
+                }`}>
+                  {location || t("planner.attractions.locationChip")}
+                </span>
+                <span className={`rounded-xl border px-3 py-1 text-xs ${
+                  isDarkMode 
+                    ? "border-white/20 bg-white/5 text-white/60" 
+                    : "border-slate-200 bg-slate-100 text-slate-600"
+                }`}>
+                  {budget || t("planner.attractions.budgetChip")}
+                </span>
+                <motion.button
+                  type="button"
+                  onClick={handleReset}
+                  whileHover={{ scale: 1.05 }}
+                  className={`flex items-center gap-2 rounded-xl border px-3 py-1 text-xs transition-all hover:border-rose-400 ${
+                    isDarkMode
+                      ? "border-white/20 bg-white/5 text-white/60 hover:text-white"
+                      : "border-slate-200 bg-slate-100 text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  {t("planner.attractions.reset")}
+                </motion.button>
+              </div>
+            )}
+          </div>
+
+          {messages.length === 0 ? (
+            <p className={`text-sm text-center py-8 ${getMutedTextColor()}`}>
+              {showSetupForm
+                ? t("planner.attractions.emptyForm")
+                : t("planner.attractions.waiting")}
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {messages.map((message) => (
+                <MessageBubble
+                  key={message.id}
+                  message={message}
+                  onLogAttraction={handleLogAttraction}
+                  visitedAttractions={visitedAttractions}
+                  t={t}
+                  isDarkMode={isDarkMode}
+                />
+              ))}
+            </div>
+          )}
+
+          {error && !showSetupForm && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mt-4 rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-3"
+            >
+              <p className="text-sm text-rose-700 dark:text-rose-100">{error}</p>
+            </motion.div>
+          )}
+
+          {hasAssistantReply && (
+            <motion.form
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              onSubmit={handleSubmit}
+              className={`mt-6 rounded-2xl border p-4 backdrop-blur-sm ${getBorderColor()} ${getCardBg()}`}
+            >
+              <textarea
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                placeholder={t("planner.attractions.replyPlaceholder")}
+                rows={3}
+                className={`w-full rounded-xl border px-4 py-3 placeholder:${getMutedTextColor()} focus:border-lime-400 focus:outline-none transition-colors ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+              />
+              <div className="flex items-center justify-between mt-3">
+                <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+                  {t("common.poweredByGemini")}
+                </p>
+                <motion.button
+                  type="submit"
+                  disabled={!canSubmit}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="rounded-xl bg-lime-500 px-5 py-2 text-sm font-semibold text-slate-950 transition-all hover:bg-lime-400 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isLoading
+                    ? t("planner.attractions.replyLoading")
+                    : t("planner.attractions.replySubmit")}
+                </motion.button>
+              </div>
+            </motion.form>
+          )}
+        </motion.div>
+      </div>
     </section>
   );
 }
