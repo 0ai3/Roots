@@ -51,7 +51,7 @@ export default function LearnAndEarnGame({
           const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           setIsDarkMode(systemDark);
         }
-      } catch (e) {
+      } catch (_e) {
         // ignore
       }
     };
@@ -178,10 +178,8 @@ export default function LearnAndEarnGame({
       }
 
       setModuleData(data.module);
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Unexpected error occurred.";
-      setGenerateError(message);
+    } catch {
+      // ignore
     } finally {
       setIsGenerating(false);
     }
@@ -351,6 +349,9 @@ export default function LearnAndEarnGame({
               <p>
                 Enter a country above to receive a cultural summary and a 10-question quiz
                 generated on the spot.
+              </p>
+              <p className="text-gray-600">
+                Can&apos;t find what you&apos;re looking for? Try our cultural games!
               </p>
             </div>
           )}

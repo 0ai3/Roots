@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 type Props = {
   src: string;
@@ -8,9 +9,23 @@ type Props = {
   height?: number | string;
 };
 
-
 export function ImageWithFallback({ src, alt = "", className }: Props) {
-  return <img src={src} alt={alt} className={className} />;
+  const [currentSrc, setCurrentSrc] = React.useState(src);
+
+  const handleError = () => {
+    // Fallback to a default image or handle the error as needed
+    setCurrentSrc("/path/to/default/image.jpg");
+  };
+
+  return (
+    <Image
+      src={currentSrc}
+      alt={alt}
+      fill
+      className={className}
+      onError={handleError}
+    />
+  );
 }
 
 export default ImageWithFallback;

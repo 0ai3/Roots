@@ -5,6 +5,7 @@ import DashboardPageLayout from "./DashboardPageLayout";
 import { useTheme } from "./ThemeProvider";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { motion } from "framer-motion";
+import { Trophy, Medal, Crown, Star } from "lucide-react";
 import {
   Trophy,
   Medal,
@@ -43,6 +44,29 @@ export default function LeaderboardPage() {
 
   // Theme management
   useEffect(() => {
+    const updateTheme = () => {
+      try {
+        const saved = localStorage.getItem("theme");
+        if (saved) {
+          const dark = saved === "dark";
+          setIsDarkMode(dark);
+          if (dark) {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
+        } else {
+          // Fallback to system preference
+          const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          setIsDarkMode(systemDark);
+          if (systemDark) {
+            document.documentElement.classList.add("dark");
+          }
+        }
+      } catch {
+        setError("Failed to load leaderboard");
+      }
+    };
     setIsDarkMode(theme === "dark");
   }, [theme]);
 

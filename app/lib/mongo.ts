@@ -1,35 +1,32 @@
-import { Db, MongoClient } from "mongodb";
+import { MongoClient, Db } from "mongodb";
+
+const MONGODB_URI = process.env.MONGODB_URI || "";
+const MONGODB_DB = process.env.MONGODB_DB || "roots";
+
+if (!MONGODB_URI) {
+  throw new Error("Please define MONGODB_URI environment variable in .env.local");
+}
 
 let cachedClient: MongoClient | null = null;
 let cachedDb: Db | null = null;
 
-const uri = process.env.MONGODB_URI;
-const dbName = process.env.MONGODB_DB ?? "roots-app";
-
-if (!uri) {
-  throw new Error(
-    "Missing MONGODB_URI. Please set it in your environment variables."
-  );
-}
-
-async function connectToDatabase() {
-  if (cachedClient && cachedDb) {
-    return { client: cachedClient, db: cachedDb };
+export async function getDb(): Promise<Db> {
+  if (cachedDb) {
+    return cachedDb;
   }
 
-  const client = new MongoClient(uri!, {
-    serverSelectionTimeoutMS: 5_000,
-  });
-  await client.connect();
+  if (!cachedClient) {
+    cachedClient = await MongoClient.connect(MONGODB_URI);
+  }
 
-  const db = client.db(dbName);
-  cachedClient = client;
-  cachedDb = db;
-
-  return { client, db };
+  cachedDb = cachedClient.db(MONGODB_DB);
+  return cachedDb;
 }
 
-export async function getDb() {
-  const { db } = await connectToDatabase();
-  return db;
+export async function closeDb(): Promise<void> {
+  if (cachedClient) {
+    await cachedClient.close();
+    cachedClient = null;
+    cachedDb = null;
+  }
 }

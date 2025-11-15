@@ -371,7 +371,7 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
             document.documentElement.classList.add("dark");
           }
         }
-      } catch (e) {
+      } catch {
         // ignore
       }
     };

@@ -65,7 +65,7 @@ const FALLBACK_ATTRACTIONS = [
 ];
 
 // Function to fetch real images from Wikimedia Commons
-async function fetchWikimediaImage(name: string, tags: any): Promise<string> {
+async function fetchWikimediaImage(name: string, tags: Record<string, string | undefined>): Promise<string> {
   try {
     // Try to get image from Wikipedia if available
     if (tags.wikipedia) {
@@ -128,6 +128,29 @@ const getImageForCategory = (cat: string) => {
   return images[cat.toLowerCase()] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&auto=format&fit=crop';
 };
 
+interface Attraction {
+  id: string;
+  title: string;
+  location: string;
+  category: string;
+  rating: number;
+  visitors: string;
+  image: string;
+  description: string;
+  coordinates: {
+    lat: number;
+    lon: number;
+  };
+  distance: number;
+}
+
+interface OSMElement {
+  id: number;
+  lat: number;
+  lon: number;
+  tags?: Record<string, string>;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -172,9 +195,9 @@ export async function GET(request: NextRequest) {
         // Fetch images for all attractions in parallel
         const attractionsWithImages = await Promise.all(
           elements
-            .filter((el: any) => el.tags?.name && el.lat && el.lon)
+            .filter((el: OSMElement) => el.tags?.name && el.lat && el.lon)
             .slice(0, 30)
-            .map(async (el: any) => {
+            .map(async (el: OSMElement) => {
               const tags = el.tags || {};
               const category = 
                 tags.tourism || 
@@ -217,7 +240,7 @@ export async function GET(request: NextRequest) {
         );
 
         const attractions = attractionsWithImages
-          .sort((a: any, b: any) => a.distance - b.distance);
+          .sort((a: Attraction, b: Attraction) => a.distance - b.distance);
 
         if (attractions.length > 0) {
           console.log(`Found ${attractions.length} attractions from OpenStreetMap`);

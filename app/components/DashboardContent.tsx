@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   MapPin,
@@ -12,7 +12,7 @@ import {
   Moon,
 } from "lucide-react";
 import DashboardSidebar from "./DashboardSidebar";
-import { useI18n } from "@/app/hooks/useI18n";
+import { useI18n } from "../../app/hooks/useI18n";
 
 type Role = "client" | "admin";
 
@@ -29,21 +29,19 @@ type Props = {
 };
 
 export default function DashboardContent({ user }: Props) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const { t, locale } = useI18n();
-
-  useEffect(() => {
+  const [isDarkMode, setIsDarkMode] = useState(() => {
     try {
       const saved = localStorage.getItem("theme");
       if (saved) {
-        setIsDarkMode(saved === "dark");
+        return saved === "dark";
       } else {
-        setIsDarkMode(document.documentElement.classList.contains("dark"));
+        return document.documentElement.classList.contains("dark");
       }
-    } catch (e) {
-      // ignore
+    } catch {
+      return false;
     }
-  }, []);
+  });
+  const { t, locale } = useI18n();
 
   const toggleTheme = () => {
     const next = !isDarkMode;
@@ -60,10 +58,10 @@ export default function DashboardContent({ user }: Props) {
         window.dispatchEvent(
           new CustomEvent("theme-change", { detail: { isDark: next } })
         );
-      } catch (e) {
+      } catch {
         // ignore
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
   };
@@ -105,14 +103,13 @@ export default function DashboardContent({ user }: Props) {
 
   const cardBackground = isDarkMode ? "bg-neutral-900/50" : "bg-white/80";
   const cardBorder = isDarkMode ? "border-neutral-800" : "border-white/50";
-  const accentColor = isDarkMode ? "lime" : "emerald";
 
   return (
     <main
       className={`${themeClasses} min-h-screen px-6 py-8 transition-all duration-500`}
     >
       <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:flex-row">
-        <DashboardSidebar borderClassName={cardBorder} />
+        <DashboardSidebar />
 
         <div className="flex-1 space-y-8">
           {/* Header Bar */}

@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import DashboardSidebar from "./DashboardSidebar";
-import { usePrefetchNews } from "@/app/hooks/usePrefetchNews";
+import { usePrefetchNews } from "../../app/hooks/usePrefetchNews";
 
 type Props = {
   children: ReactNode;
@@ -20,28 +20,48 @@ export default function DashboardPageLayout({
   contentClassName,
   isDarkMode: isDarkModeProp,
 }: Props) {
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(isDarkModeProp ?? false);
+  const [mounted, setMounted] = useState(false);
   // Prefetch news in the background for better UX
   usePrefetchNews();
 
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(
-    isDarkModeProp ?? false
-  );
-
+  // This is a legitimate hydration pattern - disable the warning
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Read from localStorage only after mounting on client
+  useEffect(() => {
+    if (!mounted) return;
+
+    if (isDarkModeProp !== undefined) {
+      setIsDarkMode(isDarkModeProp);
+      return;
+    }
     try {
-      if (typeof window === "undefined") return;
       const saved = localStorage.getItem("theme");
       if (saved) {
-        setIsDarkMode(saved === "dark");
+        const dark = saved === "dark";
+        setIsDarkMode(dark);
+        if (dark) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
       }
-    } catch (e) {}
-  }, []);
+    } catch {
+      // Ignore
+    }
+  }, [mounted, isDarkModeProp]);
 
   useEffect(() => {
     try {
       if (isDarkMode) document.documentElement.classList.add("dark");
       else document.documentElement.classList.remove("dark");
-    } catch (e) {}
+    } catch {
+      // Ignore
+    }
   }, [isDarkMode]);
 
   useEffect(() => {
@@ -54,7 +74,9 @@ export default function DashboardPageLayout({
           const saved = localStorage.getItem("theme");
           if (saved) setIsDarkMode(saved === "dark");
         }
-      } catch (e) {}
+      } catch {
+        // Ignore
+      }
     };
 
     window.addEventListener("theme-change", handler as EventListener);
@@ -71,9 +93,12 @@ export default function DashboardPageLayout({
     };
   }, []);
 
-  const sectionTextColor = isDarkMode ? "text-white" : "text-neutral-900";
+  // Use light theme for SSR/initial render to prevent hydration mismatch
+  const effectiveIsDarkMode = mounted ? isDarkMode : false;
+
+  const sectionTextColor = effectiveIsDarkMode ? "text-white" : "text-neutral-900";
   const baseClass = `flex-1 rounded-3xl border p-8 shadow-lg ${
-    isDarkMode
+    effectiveIsDarkMode
       ? "border-neutral-800 bg-neutral-900/30"
       : "border-neutral-200 bg-white/80"
   } ${sectionTextColor}`;
@@ -81,21 +106,39 @@ export default function DashboardPageLayout({
     ? `${baseClass} ${contentClassName}`
     : baseClass;
 
-  const mainClass = isDarkMode
+  const mainClass = effectiveIsDarkMode
     ? "min-h-screen bg-black px-4 py-16 transition-colors duration-300"
     : "min-h-screen bg-gradient-to-br from-amber-50 to-orange-50/30 px-4 py-16 transition-colors duration-300";
-
-  const sidebarBorder = isDarkMode ? "border-neutral-800" : "border-white/50";
 
   return (
     <main
       className={`${mainClass} ${
-        isDarkMode ? "text-white" : "text-neutral-900"
+        effectiveIsDarkMode ? "text-white" : "text-neutral-900"
       }`}
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-8 lg:flex-row">
-        <DashboardSidebar borderClassName={sidebarBorder} />
-        <section className={sectionClass}>{children}</section>
+        <DashboardSidebar />
+        <section className={sectionClass}>
+          {(title || description) && (
+            <header className="mb-6 space-y-2">
+              {title && (
+                <h1 className="text-3xl font-semibold tracking-tight">
+                  {title}
+                </h1>
+              )}
+              {description && (
+                <p
+                  className={`text-sm ${
+                    effectiveIsDarkMode ? "text-white/70" : "text-neutral-600"
+                  }`}
+                >
+                  {description}
+                </p>
+              )}
+            </header>
+          )}
+          {children}
+        </section>
       </div>
     </main>
   );

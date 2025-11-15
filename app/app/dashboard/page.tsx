@@ -20,7 +20,7 @@ import {
   Target,
 } from "lucide-react";
 import DashboardPageLayout from "@/app/components/DashboardPageLayout";
-
+import PageThemeToggle from "@/app/components/PageThemeToggle";
 type DashboardUser = {
   email: string;
   role: "client" | "admin";

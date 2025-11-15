@@ -10,6 +10,7 @@ type NewsItem = {
   category: string;
   date: string;
   source: string;
+  url?: string;
 };
 
 type LawItem = {
@@ -17,6 +18,8 @@ type LawItem = {
   description: string;
   severity: "critical" | "important" | "good-to-know";
   comparison: string;
+  officialSource?: string;
+  sourceUrl?: string;
 };
 
 type NewsData = {
@@ -92,7 +95,7 @@ export default function NewsPage() {
     }
   };
 
-  const getCategoryIcon = (category: string) => {
+  const getCategoryIcon = () => {
     return <Sparkles className="h-5 w-5" />;
   };
   return (
@@ -226,6 +229,19 @@ export default function NewsPage() {
                               <p className="mt-1 text-sm">{law.comparison}</p>
                             </div>
                           )}
+                          {law.officialSource && law.sourceUrl && (
+                            <a
+                              href={law.sourceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-3 inline-flex items-center gap-1 text-xs opacity-70 hover:opacity-100 transition-opacity"
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                              Source: {law.officialSource}
+                            </a>
+                          )}
                         </div>
                         <span className="rounded-full border border-current px-3 py-1 text-xs uppercase tracking-wide">
                           {law.severity.replace("-", " ")}
@@ -252,7 +268,7 @@ export default function NewsPage() {
                     >
                       <div className="flex items-start gap-3">
                         <div className="rounded-full bg-blue-500/20 p-2 text-blue-400">
-                          {getCategoryIcon(item.category)}
+                          {getCategoryIcon()}
                         </div>
                         <div className="flex-1">
                           <span className="text-xs uppercase tracking-wide text-white/40">
@@ -264,6 +280,19 @@ export default function NewsPage() {
                             <span>{item.source}</span>
                             <span>{item.date}</span>
                           </div>
+                          {item.url && (
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-2 inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                              Read more
+                            </a>
+                          )}
                         </div>
                       </div>
                     </article>

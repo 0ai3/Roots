@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DashboardPageLayout from "@/app/components/DashboardPageLayout";
-import PageThemeToggle from "@/app/components/PageThemeToggle";
-import { useTheme } from "@/app/components/ThemeProvider";
+import DashboardPageLayout from "../../../app/components/DashboardPageLayout";
+import PageThemeToggle from "../../../app/components/PageThemeToggle";
 import {
   MapPin,
   Utensils,
@@ -27,8 +26,8 @@ import {
   Book,
   TrendingUp,
 } from "lucide-react";
-import Image from "next/image";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 type LogEntry = {
   _id: string;
@@ -75,16 +74,32 @@ type ValidationState = {
 };
 
 export default function LogsPage() {
-  const { theme } = useTheme();
   const [showBrowse, setShowBrowse] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Theme management
   useEffect(() => {
-    setIsDarkMode(theme === "dark");
-  }, [theme]);
+    try {
+      const saved = localStorage.getItem("theme");
+      if (saved) {
+        setIsDarkMode(saved === "dark");
+      } else {
+        setIsDarkMode(document.documentElement.classList.contains("dark"));
+      }
+    } catch {
+      // ignore
+    }
 
-  // Theme is controlled by the global ThemeToggle provider (via ThemeProvider)
+    const handleThemeChange = (event: CustomEvent<{ isDark: boolean }>) => {
+      setIsDarkMode(event.detail.isDark);
+    };
+
+    window.addEventListener('theme-change', handleThemeChange as EventListener);
+
+    return () => {
+      window.removeEventListener('theme-change', handleThemeChange as EventListener);
+    };
+  }, []);
 
   // Color utility functions
   const getBgColor = (opacity: string = "") => {
@@ -247,10 +262,9 @@ export default function LogsPage() {
 
       if (response.ok) {
         const data = await response.json();
-        const exactMatch = data.some(
-          (c: any) =>
-            c.name.common.toLowerCase() === country.toLowerCase() ||
-            c.name.official.toLowerCase() === country.toLowerCase()
+        const exactMatch = data.some((c: { name: { common: string; official: string } }) =>
+          c.name.common.toLowerCase() === country.toLowerCase() ||
+          c.name.official.toLowerCase() === country.toLowerCase()
         );
 
         if (exactMatch || data.length > 0) {

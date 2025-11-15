@@ -1,8 +1,8 @@
 // app/api/news/route.ts - Fixed Gemini API endpoint
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { cookies } from "next/headers";
-import { getDb } from "@/app/lib/mongo";
+import { getDb } from "../../../app/lib/mongo";
 
 const NEWS_COLLECTION = "cached_news";
 const PROFILE_COLLECTION = "profiles";
@@ -20,55 +20,106 @@ function buildUserFilters(userId: string) {
   return filters;
 }
 
+interface Profile {
+  location?: string;
+  homeCountry?: string;
+}
+
+interface ImportantLaw {
+  title: string;
+  description: string;
+  severity: string;
+  comparison: string;
+  officialSource: string;
+  sourceUrl: string;
+}
+
+interface NewsData {
+  location: string;
+  date: string;
+  culturalNews: Array<{
+    title: string;
+    summary: string;
+    category: string;
+    date: string;
+    source: string;
+    url: string;
+  }>;
+  importantLaws: ImportantLaw[];
+  culturalTips: string[];
+}
+
 async function fetchNewsFromGemini(location: string, homeCountry: string) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error("Gemini API key not configured");
   }
 
-  const prompt = `You are a travel news curator. Generate cultural news and legal information for travelers.
+  const prompt = `Generate cultural news and important laws for travelers visiting ${location}.
 
-CRITICAL: Return ONLY valid JSON. No markdown, no code blocks, no explanatory text.
+You are creating a travel guide. Generate REALISTIC and SPECIFIC information.
 
-Location: ${location}
-Home Country: ${homeCountry}
-Date: ${new Date().toISOString()}
+RESPOND WITH ONLY VALID JSON - NO MARKDOWN, NO CODE BLOCKS, NO EXPLANATIONS.
 
-Return this exact JSON structure:
 {
   "location": "${location}",
   "date": "${new Date().toISOString()}",
   "culturalNews": [
     {
-      "title": "string",
-      "summary": "string (2-3 sentences)",
+      "title": "Specific event or attraction name",
+      "summary": "2-3 sentences about the event or cultural attraction",
       "category": "culture",
       "date": "November 15, 2025",
-      "source": "string"
+      "source": "Local Tourism Board",
+      "url": "https://example.com/article (real news source URL if possible, or official tourism website)"
     }
   ],
   "importantLaws": [
     {
-      "title": "string",
-      "description": "string (what travelers must know)",
+      "title": "Specific law or regulation title",
+      "description": "Clear explanation of the law and what travelers need to know. Be specific about fines, restrictions, or requirements.",
       "severity": "important",
-      "comparison": "string (how it differs from ${homeCountry})"
+      "comparison": "In ${homeCountry}, this is different because... (explain the key difference)",
+      "officialSource": "Government ministry or official source name",
+      "sourceUrl": "https://example.gov (official government or legal source URL)"
     }
   ],
   "culturalTips": [
-    "string (brief cultural etiquette tip)"
+    "Specific cultural etiquette tip or custom to follow"
   ]
 }
 
-Requirements:
-- Include 4-6 culturalNews items about current events, festivals, arts, entertainment
-- Include 3-5 importantLaws about behavior, customs, prohibited items, driving rules
-- Include 2-4 culturalTips
-- Only include laws that SIGNIFICANTLY differ from ${homeCountry}
-- Keep all text concise and factual
-- Ensure all strings are properly escaped for JSON
-- Do NOT use newlines inside string values
-- Return ONLY the JSON object, nothing else`;
+IMPORTANT REQUIREMENTS:
+1. Generate 5-7 culturalNews items about:
+   - Current festivals, exhibitions, or events in ${location}
+   - Popular cultural attractions or museums
+   - Local entertainment and arts scene
+   - Historical sites and their significance
+   - Each news item MUST have a url field with a plausible news source or tourism website
+
+2. Generate 4-6 importantLaws that are REAL and SPECIFIC to ${location}:
+   - Alcohol consumption laws (where, when, age limits)
+   - Dress code requirements (religious sites, public places)
+   - Photography restrictions (government buildings, people, religious sites)
+   - Traffic laws (speed limits, parking, pedestrian rules)
+   - Drug and medication laws (even over-the-counter medicines)
+   - Smoking and vaping regulations
+   - Public behavior laws (PDA, noise, littering)
+   - ONLY include laws that differ significantly from ${homeCountry}
+   - Be SPECIFIC about fines, penalties, and enforcement
+   - Each law MUST have officialSource and sourceUrl fields pointing to government or official legal sources
+
+3. Generate 3-5 culturalTips that are actionable and specific
+
+4. Use real information about ${location}
+5. NO placeholders or generic advice like "research local laws" or "service unavailable"
+6. Generate ONLY real, actionable laws with official sources
+7. Ensure all JSON strings are properly escaped
+8. Do NOT use line breaks inside string values
+9. All URLs should be realistic (use actual domain patterns for that country)
+10. Return ONLY the JSON object`;
+
+
 
 
   try {
@@ -150,11 +201,11 @@ Requirements:
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const cookieStore = await cookies();
     const userId = cookieStore.get("roots_user")?.value?.trim();
-    
+
     if (!userId) {
       return NextResponse.json(
         { error: "Not authenticated." },
@@ -163,17 +214,17 @@ export async function GET(request: NextRequest) {
     }
 
     const db = await getDb();
-    
+
     // Get user's profile using the same filter logic as profile API
     const filters = buildUserFilters(userId);
-    let profile: any = null;
+    let profile: Profile | null = null;
     
     for (const filter of filters) {
       const doc = await db.collection(PROFILE_COLLECTION).findOne(filter, {
         projection: { location: 1, homeCountry: 1 },
       });
       if (doc) {
-        profile = doc;
+        profile = doc as Profile;
         break;
       }
     }
@@ -217,33 +268,64 @@ export async function GET(request: NextRequest) {
     let newsData;
     try {
       newsData = await fetchNewsFromGemini(location, homeCountry);
-    } catch (geminiError) {
-      console.error("Gemini API failed, using fallback news:", geminiError);
       
-      // Fallback news data
+      // Validate that we got real data, not fallback-like content
+      if (!newsData.importantLaws || newsData.importantLaws.length === 0) {
+        throw new Error("No laws returned from API");
+      }
+      
+      // Check if it looks like generic fallback content
+      const hasGenericContent = newsData.importantLaws.some((law: ImportantLaw) => 
+        law.title.includes("Research") || 
+        law.title.includes("API Service") ||
+        law.description.includes("recommend researching") ||
+        law.description.includes("service issue")
+      );
+      
+      if (hasGenericContent) {
+        throw new Error("Received generic fallback content from API");
+      }
+      
+    } catch (geminiError) {
+      console.error("Gemini API failed:", geminiError);
+      
+      // Use a more informative fallback that still provides value
       newsData = {
         location,
         date: new Date().toISOString(),
         culturalNews: [
           {
-            title: "Welcome to " + location,
-            summary: "News service is temporarily unavailable. Please check back later for cultural updates and local events.",
+            title: `Exploring ${location}`,
+            summary: `${location} offers rich cultural experiences. Visit local tourist information centers for current events and exhibitions. Check official tourism websites for the latest festivals and cultural activities.`,
             category: "culture",
             date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-            source: "Roots Travel"
+            source: "Roots Travel",
+            url: `https://www.google.com/search?q=${encodeURIComponent(location + ' tourism official website')}`
+          },
+          {
+            title: "Local Museums and Heritage Sites",
+            summary: `Research ${location}'s museums, galleries, and historical landmarks before your visit. Many offer guided tours and special exhibitions throughout the year.`,
+            category: "culture",
+            date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+            source: "Roots Travel",
+            url: `https://www.google.com/search?q=${encodeURIComponent(location + ' museums')}`
           }
         ],
         importantLaws: [
           {
-            title: "Research Local Laws",
-            description: "We recommend researching local laws and customs before traveling. Check official government travel advisories for the most up-to-date information.",
+            title: "Verify Local Regulations",
+            description: `Laws in ${location} may differ from ${homeCountry}. Common areas to research: alcohol laws, dress codes, photography restrictions, traffic rules, and cultural customs. Contact your embassy or check official government travel advisories for detailed, up-to-date legal information.`,
             severity: "important",
-            comparison: "Laws and customs may differ significantly from " + homeCountry
+            comparison: `Legal systems and enforcement vary between ${location} and ${homeCountry}. What's legal at home may not be abroad.`,
+            officialSource: "Government Travel Advisory",
+            sourceUrl: `https://www.google.com/search?q=${encodeURIComponent(location + ' travel advisory laws')}`
           }
         ],
         culturalTips: [
-          "Always respect local customs and traditions",
-          "Research dress codes and behavioral expectations before visiting religious sites"
+          `Learn basic phrases in the local language of ${location}`,
+          "Research cultural norms and etiquette before visiting",
+          "Respect local customs, especially regarding dress and behavior in religious or formal settings",
+          "Check if tipping is customary and what percentage is appropriate"
         ]
       };
     }
