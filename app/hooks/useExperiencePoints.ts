@@ -128,10 +128,20 @@ export function useExperiencePoints(options?: ExperiencePointsOptions) {
       return;
     }
 
+    const schedulePointSync = (value: number) => {
+      if (typeof window.requestAnimationFrame === "function") {
+        window.requestAnimationFrame(() => {
+          setPoints(value);
+        });
+        return;
+      }
+      setTimeout(() => setPoints(value), 0);
+    };
+
     const handleSync = (event: Event) => {
       const detail = (event as CustomEvent<number>).detail;
       if (typeof detail === "number") {
-        setPoints(detail);
+        schedulePointSync(detail);
       }
     };
 

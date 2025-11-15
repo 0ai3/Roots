@@ -18,6 +18,7 @@ import {
   Trophy,
   LogOut,
   BookOpen,
+  MessageCircle,
 } from "lucide-react";
 
 type Props = {
@@ -28,6 +29,7 @@ const navLinks = [
   { label: "nav.dashboard", href: "/app/dashboard", icon: Home },
   { label: "nav.profile", href: "/app/profile", icon: User },
   { label: "nav.logs", href: "/app/logs", icon: BookOpen },
+  { label: "nav.chat", href: "/app/chat", icon: MessageCircle },
   { label: "nav.map", href: "/app/map", icon: Map },
   { label: "nav.games", href: "/app/games", icon: Gamepad2 },
   { label: "nav.recipes", href: "/app/recipes", icon: Utensils },

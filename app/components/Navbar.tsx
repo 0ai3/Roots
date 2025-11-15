@@ -12,17 +12,20 @@ interface NavbarProps {scrollY?: number;}
 export default function Navbar(e: NavbarProps) {
   const { theme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrollY, setScrollY] = useState(e.scrollY || 0);
+  const [scrollPosition, setScrollPosition] = useState(0);
 
   // Update scrollY on client only
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
+    const handleScroll = () => {
+      setScrollPosition(window.scrollY);
+    };
+
     handleScroll();
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const isScrolled = scrollY > 50;
+  const isScrolled = scrollPosition > 50;
 
   const navLinks = [
     { name: "Traditions", href: "#traditions" },

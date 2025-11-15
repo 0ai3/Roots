@@ -51,6 +51,7 @@ const en: TranslationRecord = {
   "nav.dashboard": "Dashboard",
   "nav.profile": "Profile",
   "nav.logs": "Logs",
+  "nav.chat": "Chat",
   "nav.map": "Map",
   "nav.games": "Games",
   "nav.recipes": "Recipes",
@@ -90,8 +91,11 @@ const en: TranslationRecord = {
   "common.lastUpdated": "Last updated",
   "common.poweredByGemini": "Powered by Google Gemini",
   "games.title": "Games",
-  "games.description": "Content coming soon.",
+  "games.description": "Read cultural snapshots and take 10-question quizzes to earn experience points.",
   "games.body": "Check back soon for playful ways to test your Roots knowledge.",
+  "chat.title": "Messages",
+  "chat.description":
+    "Find friends by their social handle, send messages, and keep your cultural circle connected.",
   "offers.title": "Offers",
   "offers.description": "Special offers will be listed soon.",
   "offers.body":
@@ -266,6 +270,8 @@ const en: TranslationRecord = {
   "planner.recipes.stepsTitle": "How to cook",
   "planner.recipes.listenButton": "Listen",
   "planner.recipes.listening": "Preparing audio...",
+  "planner.recipes.pauseButton": "Pause",
+  "planner.recipes.audioScrubLabel": "Recipe audio position",
   "planner.recipes.audioError": "Unable to generate audio right now.",
   "planner.recipes.servingsLabel": "Servings",
   "planner.recipes.prepTimeLabel": "Prep",
@@ -320,6 +326,7 @@ const zh: TranslationRecord = {
   "nav.dashboard": "仪表盘",
   "nav.profile": "个人资料",
   "nav.logs": "日志",
+  "nav.chat": "聊天",
   "nav.map": "地图",
   "nav.games": "游戏",
   "nav.recipes": "食谱",
@@ -327,6 +334,8 @@ const zh: TranslationRecord = {
   "nav.news": "新闻",
   "nav.attractions": "景点",
   "nav.leaderboard": "排行榜",
+  "chat.title": "消息",
+  "chat.description": "通过社交账号寻找旅伴、发送消息并保持文化圈联系。",
   "dashboard.sidebar.navigation": "导航",
   "dashboard.sidebar.logout": "登出",
   "dashboard.sidebar.signingOut": "正在登出...",
@@ -388,6 +397,8 @@ const zh: TranslationRecord = {
   "profile.errors.save": "无法保存你的资料。",
   "profile.errors.generic": "出现问题，请稍后再试。",
   "profile.errors.homeCountryInvalid": "请输入有效的原籍国。",
+  "planner.recipes.pauseButton": "暂停",
+  "planner.recipes.audioScrubLabel": "菜谱音频位置",
 };
 
 const es: TranslationRecord = {
@@ -438,6 +449,7 @@ const es: TranslationRecord = {
   "nav.dashboard": "Panel",
   "nav.profile": "Perfil",
   "nav.logs": "Registros",
+  "nav.chat": "Chat",
   "nav.map": "Mapa",
   "nav.games": "Juegos",
   "nav.recipes": "Recetas",
@@ -445,6 +457,9 @@ const es: TranslationRecord = {
   "nav.news": "Noticias",
   "nav.attractions": "Atracciones",
   "nav.leaderboard": "Clasificación",
+  "chat.title": "Mensajes",
+  "chat.description":
+    "Encuentra amigos por su usuario social, envía mensajes y mantén conectada tu comunidad cultural.",
   "dashboard.sidebar.navigation": "Navegación",
   "dashboard.sidebar.logout": "Cerrar sesión",
   "dashboard.sidebar.signingOut": "Cerrando sesión...",
@@ -512,6 +527,8 @@ const es: TranslationRecord = {
   "profile.errors.save": "No se pudo guardar tu perfil.",
   "profile.errors.generic": "Algo salió mal. Vuelve a intentarlo.",
   "profile.errors.homeCountryInvalid": "Ingresa un país de origen válido.",
+  "planner.recipes.pauseButton": "Pausar",
+  "planner.recipes.audioScrubLabel": "Posición del audio de la receta",
 };
 
 const hi: TranslationRecord = {
@@ -562,6 +579,7 @@ const hi: TranslationRecord = {
   "nav.dashboard": "डैशबोर्ड",
   "nav.profile": "प्रोफ़ाइल",
   "nav.logs": "लॉग्स",
+  "nav.chat": "चैट",
   "nav.map": "मानचित्र",
   "nav.games": "खेल",
   "nav.recipes": "रेसिपी",
@@ -569,6 +587,8 @@ const hi: TranslationRecord = {
   "nav.news": "समाचार",
   "nav.attractions": "आकर्षण",
   "nav.leaderboard": "लीडरबोर्ड",
+  "chat.title": "संदेश",
+  "chat.description": "सोशल हैंडल से मित्र खोजें, संदेश भेजें और अपनी सांस्कृतिक मंडली जुड़े रखें।",
   "dashboard.sidebar.navigation": "नेविगेशन",
   "dashboard.sidebar.logout": "साइन आउट",
   "dashboard.sidebar.signingOut": "साइन आउट हो रहा है...",
@@ -635,6 +655,8 @@ const hi: TranslationRecord = {
   "profile.errors.save": "आपका प्रोफ़ाइल सहेजा नहीं जा सका।",
   "profile.errors.generic": "कुछ गलत हो गया। कृपया बाद में फिर प्रयास करें।",
   "profile.errors.homeCountryInvalid": "कृपया मान्य मूल देश दर्ज करें।",
+  "planner.recipes.pauseButton": "रोकें",
+  "planner.recipes.audioScrubLabel": "रेसिपी ऑडियो स्थिति",
 };
 
 const ar: TranslationRecord = {
@@ -685,6 +707,7 @@ const ar: TranslationRecord = {
   "nav.dashboard": "لوحة التحكم",
   "nav.profile": "الملف الشخصي",
   "nav.logs": "السجلات",
+  "nav.chat": "الدردشة",
   "nav.map": "الخريطة",
   "nav.games": "الألعاب",
   "nav.recipes": "الوصفات",
@@ -692,6 +715,8 @@ const ar: TranslationRecord = {
   "nav.news": "الأخبار",
   "nav.attractions": "الأنشطة",
   "nav.leaderboard": "لوحة الصدارة",
+  "chat.title": "الرسائل",
+  "chat.description": "ابحث عن الأصدقاء عبر اسمهم الاجتماعي، أرسل الرسائل، وأبقِ دائرتك الثقافية على اتصال.",
   "dashboard.sidebar.navigation": "التنقل",
   "dashboard.sidebar.logout": "تسجيل الخروج",
   "dashboard.sidebar.signingOut": "جارٍ تسجيل الخروج...",
@@ -759,6 +784,8 @@ const ar: TranslationRecord = {
   "profile.errors.save": "تعذّر حفظ ملفك.",
   "profile.errors.generic": "حدث خطأ ما. حاول مرة أخرى.",
   "profile.errors.homeCountryInvalid": "يرجى إدخال بلد منشأ صالحًا.",
+  "planner.recipes.pauseButton": "إيقاف مؤقت",
+  "planner.recipes.audioScrubLabel": "موضع صوت الوصفة",
 };
 
 const pt: TranslationRecord = {
@@ -809,6 +836,7 @@ const pt: TranslationRecord = {
   "nav.dashboard": "Painel",
   "nav.profile": "Perfil",
   "nav.logs": "Registros",
+  "nav.chat": "Chat",
   "nav.map": "Mapa",
   "nav.games": "Jogos",
   "nav.recipes": "Receitas",
@@ -816,6 +844,9 @@ const pt: TranslationRecord = {
   "nav.news": "Notícias",
   "nav.attractions": "Atrações",
   "nav.leaderboard": "Ranking",
+  "chat.title": "Mensagens",
+  "chat.description":
+    "Encontre amigos pelo @, envie mensagens e mantenha sua rede cultural conectada.",
   "dashboard.sidebar.navigation": "Navegação",
   "dashboard.sidebar.logout": "Sair",
   "dashboard.sidebar.signingOut": "Saindo...",
@@ -883,6 +914,8 @@ const pt: TranslationRecord = {
   "profile.errors.save": "Não foi possível salvar seu perfil.",
   "profile.errors.generic": "Algo deu errado. Tente novamente.",
   "profile.errors.homeCountryInvalid": "Informe um país de origem válido.",
+  "planner.recipes.pauseButton": "Pausar",
+  "planner.recipes.audioScrubLabel": "Posição do áudio da receita",
 };
 
 const bn: TranslationRecord = {
@@ -933,6 +966,7 @@ const bn: TranslationRecord = {
   "nav.dashboard": "ড্যাশবোর্ড",
   "nav.profile": "প্রোফাইল",
   "nav.logs": "লগ",
+  "nav.chat": "চ্যাট",
   "nav.map": "মানচিত্র",
   "nav.games": "গেমস",
   "nav.recipes": "রেসিপি",
@@ -940,6 +974,8 @@ const bn: TranslationRecord = {
   "nav.news": "খবর",
   "nav.attractions": "আকর্ষণ",
   "nav.leaderboard": "লিডারবোর্ড",
+  "chat.title": "বার্তা",
+  "chat.description": "সামাজিক হ্যান্ডেলে বন্ধু খুঁজে বার্তা পাঠান এবং আপনার সাংস্কৃতিক পরিসর সংযুক্ত রাখুন।",
   "dashboard.sidebar.navigation": "ন্যাভিগেশন",
   "dashboard.sidebar.logout": "লগ আউট",
   "dashboard.sidebar.signingOut": "লগ আউট হচ্ছে...",
@@ -1007,6 +1043,8 @@ const bn: TranslationRecord = {
   "profile.errors.save": "আপনার প্রোফাইল সংরক্ষণ করা গেল না।",
   "profile.errors.generic": "কিছু ভুল হয়েছে। পরে আবার চেষ্টা করুন।",
   "profile.errors.homeCountryInvalid": "দয়া করে সঠিক নিজ দেশের নাম লিখুন।",
+  "planner.recipes.pauseButton": "বিরতি",
+  "planner.recipes.audioScrubLabel": "রেসিপি অডিওর অবস্থান",
 };
 
 const ru: TranslationRecord = {
@@ -1057,6 +1095,7 @@ const ru: TranslationRecord = {
   "nav.dashboard": "Панель",
   "nav.profile": "Профиль",
   "nav.logs": "Журналы",
+  "nav.chat": "Чат",
   "nav.map": "Карта",
   "nav.games": "Игры",
   "nav.recipes": "Рецепты",
@@ -1064,6 +1103,8 @@ const ru: TranslationRecord = {
   "nav.news": "Новости",
   "nav.attractions": "Достопримечательности",
   "nav.leaderboard": "Таблица лидеров",
+  "chat.title": "Сообщения",
+  "chat.description": "Находите друзей по соцсети, отправляйте сообщения и поддерживайте связь с культурным кругом.",
   "dashboard.sidebar.navigation": "Навигация",
   "dashboard.sidebar.logout": "Выйти",
   "dashboard.sidebar.signingOut": "Выход...",
@@ -1131,6 +1172,8 @@ const ru: TranslationRecord = {
   "profile.errors.save": "Не удалось сохранить профиль.",
   "profile.errors.generic": "Что-то пошло не так. Попробуйте ещё раз.",
   "profile.errors.homeCountryInvalid": "Введите корректную страну происхождения.",
+  "planner.recipes.pauseButton": "Пауза",
+  "planner.recipes.audioScrubLabel": "Позиция аудио рецепта",
 };
 
 const ja: TranslationRecord = {
@@ -1181,6 +1224,7 @@ const ja: TranslationRecord = {
   "nav.dashboard": "ダッシュボード",
   "nav.profile": "プロフィール",
   "nav.logs": "ログ",
+  "nav.chat": "チャット",
   "nav.map": "地図",
   "nav.games": "ゲーム",
   "nav.recipes": "レシピ",
@@ -1188,6 +1232,8 @@ const ja: TranslationRecord = {
   "nav.news": "ニュース",
   "nav.attractions": "スポット",
   "nav.leaderboard": "ランキング",
+  "chat.title": "メッセージ",
+  "chat.description": "ソーシャルハンドルで友人を見つけ、メッセージを送り、カルチャー仲間とつながり続けましょう。",
   "dashboard.sidebar.navigation": "ナビゲーション",
   "dashboard.sidebar.logout": "ログアウト",
   "dashboard.sidebar.signingOut": "ログアウト中...",
@@ -1255,6 +1301,8 @@ const ja: TranslationRecord = {
   "profile.errors.save": "プロフィールを保存できませんでした。",
   "profile.errors.generic": "問題が発生しました。もう一度お試しください。",
   "profile.errors.homeCountryInvalid": "有効な出身国を入力してください。",
+  "planner.recipes.pauseButton": "一時停止",
+  "planner.recipes.audioScrubLabel": "レシピ音声の位置",
 };
 
 const de: TranslationRecord = {
@@ -1305,6 +1353,7 @@ const de: TranslationRecord = {
   "nav.dashboard": "Dashboard",
   "nav.profile": "Profil",
   "nav.logs": "Protokolle",
+  "nav.chat": "Chat",
   "nav.map": "Karte",
   "nav.games": "Spiele",
   "nav.recipes": "Rezepte",
@@ -1312,6 +1361,8 @@ const de: TranslationRecord = {
   "nav.news": "News",
   "nav.attractions": "Attraktionen",
   "nav.leaderboard": "Bestenliste",
+  "chat.title": "Nachrichten",
+  "chat.description": "Finde Freunde über ihren Social Handle, sende Nachrichten und bleib mit deinem kulturellen Netzwerk verbunden.",
   "dashboard.sidebar.navigation": "Navigation",
   "dashboard.sidebar.logout": "Abmelden",
   "dashboard.sidebar.signingOut": "Abmeldung...",
@@ -1379,6 +1430,8 @@ const de: TranslationRecord = {
   "profile.errors.save": "Profil konnte nicht gespeichert werden.",
   "profile.errors.generic": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
   "profile.errors.homeCountryInvalid": "Bitte gib ein gültiges Herkunftsland ein.",
+  "planner.recipes.pauseButton": "Pause",
+  "planner.recipes.audioScrubLabel": "Position des Rezept-Audios",
 };
 
 const fr: TranslationRecord = {
@@ -1429,6 +1482,7 @@ const fr: TranslationRecord = {
   "nav.dashboard": "Tableau de bord",
   "nav.profile": "Profil",
   "nav.logs": "Journaux",
+  "nav.chat": "Chat",
   "nav.map": "Carte",
   "nav.games": "Jeux",
   "nav.recipes": "Recettes",
@@ -1436,6 +1490,8 @@ const fr: TranslationRecord = {
   "nav.news": "Actualités",
   "nav.attractions": "Attractions",
   "nav.leaderboard": "Classement",
+  "chat.title": "Messages",
+  "chat.description": "Trouvez des amis via leur identifiant social, envoyez des messages et gardez votre cercle culturel connecté.",
   "dashboard.sidebar.navigation": "Navigation",
   "dashboard.sidebar.logout": "Se déconnecter",
   "dashboard.sidebar.signingOut": "Déconnexion...",
@@ -1503,6 +1559,8 @@ const fr: TranslationRecord = {
   "profile.errors.save": "Impossible d’enregistrer votre profil.",
   "profile.errors.generic": "Une erreur est survenue. Réessayez plus tard.",
   "profile.errors.homeCountryInvalid": "Indiquez un pays d’origine valide.",
+  "planner.recipes.pauseButton": "Pause",
+  "planner.recipes.audioScrubLabel": "Position de l’audio de la recette",
 };
 
 const ur: TranslationRecord = {
@@ -1553,6 +1611,7 @@ const ur: TranslationRecord = {
   "nav.dashboard": "ڈیش بورڈ",
   "nav.profile": "پروفائل",
   "nav.logs": "لاگز",
+  "nav.chat": "چیٹ",
   "nav.map": "نقشہ",
   "nav.games": "گیمز",
   "nav.recipes": "ترکیبیں",
@@ -1560,6 +1619,8 @@ const ur: TranslationRecord = {
   "nav.news": "خبریں",
   "nav.attractions": "مقامات",
   "nav.leaderboard": "لیڈر بورڈ",
+  "chat.title": "پیغامات",
+  "chat.description": "سوشل ہینڈل کے ذریعے دوست تلاش کریں، پیغامات بھیجیں اور اپنے ثقافتی حلقے کو منسلک رکھیں۔",
   "dashboard.sidebar.navigation": "نیوی گیشن",
   "dashboard.sidebar.logout": "لاگ آؤٹ",
   "dashboard.sidebar.signingOut": "لاگ آؤٹ ہو رہا ہے...",
@@ -1627,6 +1688,8 @@ const ur: TranslationRecord = {
   "profile.errors.save": "پروفائل محفوظ نہیں ہو سکا۔",
   "profile.errors.generic": "کچھ غلط ہو گیا، دوبارہ کوشش کریں۔",
   "profile.errors.homeCountryInvalid": "براہ کرم درست آبائی ملک درج کریں۔",
+  "planner.recipes.pauseButton": "وقفہ",
+  "planner.recipes.audioScrubLabel": "ترکیب آڈیو کی پوزیشن",
 };
 
 const id: TranslationRecord = {
@@ -1677,6 +1740,7 @@ const id: TranslationRecord = {
   "nav.dashboard": "Dasbor",
   "nav.profile": "Profil",
   "nav.logs": "Log",
+  "nav.chat": "Chat",
   "nav.map": "Peta",
   "nav.games": "Game",
   "nav.recipes": "Resep",
@@ -1684,6 +1748,8 @@ const id: TranslationRecord = {
   "nav.news": "Berita",
   "nav.attractions": "Atraksi",
   "nav.leaderboard": "Papan peringkat",
+  "chat.title": "Pesan",
+  "chat.description": "Cari teman lewat akun sosial, kirim pesan, dan jaga koneksi lingkar budaya Anda.",
   "dashboard.sidebar.navigation": "Navigasi",
   "dashboard.sidebar.logout": "Keluar",
   "dashboard.sidebar.signingOut": "Sedang keluar...",
@@ -1751,6 +1817,8 @@ const id: TranslationRecord = {
   "profile.errors.save": "Profil tidak dapat disimpan.",
   "profile.errors.generic": "Terjadi kesalahan. Coba lagi nanti.",
   "profile.errors.homeCountryInvalid": "Masukkan negara asal yang valid.",
+  "planner.recipes.pauseButton": "Jeda",
+  "planner.recipes.audioScrubLabel": "Posisi audio resep",
 };
 
 const it: TranslationRecord = {
@@ -1801,6 +1869,7 @@ const it: TranslationRecord = {
   "nav.dashboard": "Bacheca",
   "nav.profile": "Profilo",
   "nav.logs": "Registri",
+  "nav.chat": "Chat",
   "nav.map": "Mappa",
   "nav.games": "Giochi",
   "nav.recipes": "Ricette",
@@ -1808,6 +1877,8 @@ const it: TranslationRecord = {
   "nav.news": "Notizie",
   "nav.attractions": "Attrazioni",
   "nav.leaderboard": "Classifica",
+  "chat.title": "Messaggi",
+  "chat.description": "Trova amici dal loro handle sociale, invia messaggi e tieni connesso il tuo network culturale.",
   "dashboard.sidebar.navigation": "Navigazione",
   "dashboard.sidebar.logout": "Esci",
   "dashboard.sidebar.signingOut": "Disconnessione...",
@@ -1875,6 +1946,8 @@ const it: TranslationRecord = {
   "profile.errors.save": "Impossibile salvare il profilo.",
   "profile.errors.generic": "Si è verificato un errore. Riprova.",
   "profile.errors.homeCountryInvalid": "Inserisci un paese d’origine valido.",
+  "planner.recipes.pauseButton": "Pausa",
+  "planner.recipes.audioScrubLabel": "Posizione audio della ricetta",
 };
 
 const tr: TranslationRecord = {
@@ -1925,6 +1998,7 @@ const tr: TranslationRecord = {
   "nav.dashboard": "Panel",
   "nav.profile": "Profil",
   "nav.logs": "Kayıtlar",
+  "nav.chat": "Sohbet",
   "nav.map": "Harita",
   "nav.games": "Oyunlar",
   "nav.recipes": "Tarifler",
@@ -1932,6 +2006,8 @@ const tr: TranslationRecord = {
   "nav.news": "Haberler",
   "nav.attractions": "Gezilecek yerler",
   "nav.leaderboard": "Liderlik tablosu",
+  "chat.title": "Mesajlar",
+  "chat.description": "Sosyal kullanıcı adıyla arkadaş bul, mesaj gönder ve kültürel çevreni bağlı tut.",
   "dashboard.sidebar.navigation": "Navigasyon",
   "dashboard.sidebar.logout": "Çıkış yap",
   "dashboard.sidebar.signingOut": "Çıkış yapılıyor...",
@@ -1999,6 +2075,8 @@ const tr: TranslationRecord = {
   "profile.errors.save": "Profil kaydedilemedi.",
   "profile.errors.generic": "Bir hata oluştu. Lütfen tekrar dene.",
   "profile.errors.homeCountryInvalid": "Lütfen geçerli bir ülke adı gir.",
+  "planner.recipes.pauseButton": "Duraklat",
+  "planner.recipes.audioScrubLabel": "Tarif ses konumu",
 };
 
 export const translations: Record<LocaleCode, TranslationRecord> = {

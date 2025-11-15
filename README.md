@@ -33,6 +33,12 @@ MONGODB_DB=<database name>
 GEMINI_API_KEY=AIza...your key...
 # optional override, defaults to gemini-2.5-flash
 GEMINI_MODEL=gemini-2.5-flash
+
+# required for /api/recipes/speak to generate audio with ElevenLabs
+ELEVENLABS_API_KEY=your-elevenlabs-key
+# optional overrides for the selected voice + model
+ELEVENLABS_VOICE_ID=21m00Tcm4TlvDq8ikWAM
+ELEVENLABS_MODEL=eleven_turbo_v2
 ```
 
 `MONGODB_URI` is required by `app/lib/mongo.ts` whenever user data is fetched (for example, the dashboard view), while `GEMINI_API_KEY` is read inside `app/api/attractions/plan/route.ts` to generate activity suggestions for the attractions planner. Without these values the corresponding features will throw a helpful error so you know what needs to be configured.
