@@ -4,7 +4,8 @@ import useSWR from "swr";
 import DashboardPageLayout from "./DashboardPageLayout";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { motion } from "framer-motion";
-import { Trophy, Medal, Crown, Star } from "lucide-react";
+import { Trophy, Medal, Crown, Star, Sun, Moon } from "lucide-react";
+import { useState, useEffect } from "react";
 
 type LeaderboardEntry = {
   userId: string;
@@ -19,6 +20,22 @@ const fetcher = (url: string) =>
     .catch(() => ({ entries: [] }));
 
 export default function LeaderboardPage() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("theme");
+      if (saved) {
+        const dark = saved === "dark";
+        setIsDarkMode(dark);
+        if (dark) document.documentElement.classList.add("dark");
+        else document.documentElement.classList.remove("dark");
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
   const { userId } = useExperiencePoints();
   const { data, isLoading } = useSWR("/api/leaderboard", fetcher, {
     refreshInterval: 30_000,
@@ -33,53 +50,117 @@ export default function LeaderboardPage() {
     <DashboardPageLayout
       title="Leaderboard"
       description="Track the most active Roots explorers and their experience points."
+      isDarkMode={isDarkMode}
     >
       <div className="space-y-6">
+        {/* Theme toggle (dashboard-style) */}
+        <div className="flex justify-end">
+          <motion.button
+            type="button"
+            onClick={() => {
+              const next = !isDarkMode;
+              setIsDarkMode(next);
+              try {
+                if (next) document.documentElement.classList.add("dark");
+                else document.documentElement.classList.remove("dark");
+                localStorage.setItem("theme", next ? "dark" : "light");
+              } catch (e) {
+                // noop
+              }
+            }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-colors ${
+              isDarkMode
+                ? "bg-neutral-800/60 text-white border border-neutral-700"
+                : "bg-white/90 text-neutral-900 border border-neutral-200"
+            }`}
+          >
+            {isDarkMode ? (
+              <Sun className="w-4 h-4 text-amber-300" />
+            ) : (
+              <Moon className="w-4 h-4 text-neutral-700" />
+            )}
+            <span>{isDarkMode ? "Light" : "Dark"}</span>
+          </motion.button>
+        </div>
         {/* Current User Status */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
+          className={
+            `rounded-2xl p-6 backdrop-blur-sm ` +
+            (isDarkMode
+              ? "border border-white/10 bg-white/5 text-white"
+              : "border border-neutral-200 bg-white text-neutral-900 shadow-sm")
+          }
         >
           {userId ? (
             current ? (
               <div className="flex items-center gap-4">
                 <div className="w-2 h-2 rounded-full bg-lime-400" />
                 <p className="text-white/80">
-                  You're currently <strong className="text-lime-300">#{current.rank}</strong> with{" "}
-                  <strong className="text-lime-300">{current.points}</strong> points. Keep cooking and exploring!
+                  You're currently{" "}
+                  <strong className="text-lime-300">#{current.rank}</strong>{" "}
+                  with{" "}
+                  <strong className="text-lime-300">{current.points}</strong>{" "}
+                  points. Keep cooking and exploring!
                 </p>
               </div>
             ) : (
               <div className="flex items-center gap-4">
                 <div className="w-2 h-2 rounded-full bg-amber-400" />
-                <p className="text-white/80">Earn points to join the leaderboard.</p>
+                <p className="text-white/80">
+                  Earn points to join the leaderboard.
+                </p>
               </div>
             )
           ) : (
             <div className="flex items-center gap-4">
               <div className="w-2 h-2 rounded-full bg-blue-400" />
-              <p className="text-white/80">Sign in to see your rank on the leaderboard.</p>
+              <p className={isDarkMode ? "text-white/80" : "text-neutral-800"}>
+                Sign in to see your rank on the leaderboard.
+              </p>
             </div>
           )}
         </motion.div>
 
         {/* Leaderboard */}
-        <LeaderboardTable entries={entries} isLoading={isLoading} />
+        <LeaderboardTable
+          entries={entries}
+          isLoading={isLoading}
+          isDarkMode={isDarkMode}
+        />
       </div>
     </DashboardPageLayout>
   );
 }
 
-function LeaderboardTable({ entries, isLoading }: { entries: LeaderboardEntry[]; isLoading: boolean }) {
+function LeaderboardTable({
+  entries,
+  isLoading,
+  isDarkMode,
+}: {
+  entries: LeaderboardEntry[];
+  isLoading: boolean;
+  isDarkMode: boolean;
+}) {
   if (isLoading) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur-sm"
+        className={`rounded-2xl p-8 text-center backdrop-blur-sm ${
+          isDarkMode
+            ? "border border-white/10 bg-white/5 text-white"
+            : "border border-neutral-200 bg-white text-neutral-900"
+        }`}
       >
-        <div className="flex items-center justify-center gap-3 text-white/60">
+        <div
+          className={`flex items-center justify-center gap-3 ${
+            isDarkMode ? "text-white/60" : "text-neutral-800"
+          }`}
+        >
           <div className="w-2 h-2 rounded-full bg-lime-400 animate-pulse" />
           <p>Loading leaderboard…</p>
         </div>
@@ -92,44 +173,69 @@ function LeaderboardTable({ entries, isLoading }: { entries: LeaderboardEntry[];
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur-sm"
+        className={`rounded-2xl p-8 text-center backdrop-blur-sm ${
+          isDarkMode
+            ? "border border-white/10 bg-white/5 text-white"
+            : "border border-neutral-200 bg-white text-neutral-900"
+        }`}
       >
-        <Trophy className="w-12 h-12 text-white/30 mx-auto mb-4" />
-        <p className="text-white/60">No explorers have logged points yet.</p>
-        <p className="text-white/40 text-sm mt-2">Be the first to earn experience points!</p>
+        <Trophy
+          className={`w-12 h-12 mx-auto mb-4 ${
+            isDarkMode ? "text-white/30" : "text-neutral-500"
+          }`}
+        />
+        <p className={`${isDarkMode ? "text-white/60" : "text-neutral-700"}`}>
+          No explorers have logged points yet.
+        </p>
+        <p
+          className={`${
+            isDarkMode
+              ? "text-white/40 text-sm mt-2"
+              : "text-neutral-600 text-sm mt-2"
+          }`}
+        >
+          Be the first to earn experience points!
+        </p>
       </motion.div>
     );
   }
 
-  const getRankStyle = (rank: number) => {
+  const getRankStyle = (rank: number, dark: boolean) => {
+    // Return styles adapted for dark or light mode
     switch (rank) {
       case 1:
         return {
-          background: "bg-gradient-to-r from-yellow-500/5 to-amber-500/2",
-          iconColor: "text-yellow-400/70",
-          pointsColor: "text-yellow-300/80",
-          rankColor: "text-yellow-400/70"
+          background: dark
+            ? "bg-gradient-to-r from-yellow-500/5 to-amber-500/2"
+            : "bg-gradient-to-r from-yellow-50/50 to-amber-50/50",
+          iconColor: dark ? "text-yellow-400/70" : "text-yellow-600",
+          pointsColor: dark ? "text-yellow-300/80" : "text-yellow-600",
+          rankColor: dark ? "text-yellow-400/70" : "text-yellow-600",
         };
       case 2:
         return {
-          background: "bg-gradient-to-r from-gray-400/5 to-gray-300/2",
-          iconColor: "text-gray-300/70",
-          pointsColor: "text-gray-200/80",
-          rankColor: "text-gray-300/70"
+          background: dark
+            ? "bg-gradient-to-r from-gray-400/5 to-gray-300/2"
+            : "bg-gradient-to-r from-gray-50/40 to-gray-50/20",
+          iconColor: dark ? "text-gray-300/70" : "text-gray-600",
+          pointsColor: dark ? "text-gray-200/80" : "text-gray-600",
+          rankColor: dark ? "text-gray-300/70" : "text-gray-600",
         };
       case 3:
         return {
-          background: "bg-gradient-to-r from-amber-700/5 to-amber-600/2",
-          iconColor: "text-amber-600/70",
-          pointsColor: "text-amber-500/80",
-          rankColor: "text-amber-600/70"
+          background: dark
+            ? "bg-gradient-to-r from-amber-700/5 to-amber-600/2"
+            : "bg-gradient-to-r from-amber-50/40 to-amber-50/20",
+          iconColor: dark ? "text-amber-600/70" : "text-amber-600",
+          pointsColor: dark ? "text-amber-500/80" : "text-amber-600",
+          rankColor: dark ? "text-amber-600/70" : "text-amber-600",
         };
       default:
         return {
-          background: "hover:bg-white/3",
-          iconColor: "text-white/50",
-          pointsColor: "text-lime-300/80",
-          rankColor: "text-white/60"
+          background: dark ? "hover:bg-white/3" : "hover:bg-neutral-100",
+          iconColor: dark ? "text-white/50" : "text-neutral-700",
+          pointsColor: dark ? "text-lime-300/80" : "text-lime-600",
+          rankColor: dark ? "text-white/60" : "text-neutral-700",
         };
     }
   };
@@ -151,13 +257,29 @@ function LeaderboardTable({ entries, isLoading }: { entries: LeaderboardEntry[];
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm"
+      className={`overflow-hidden rounded-2xl backdrop-blur-sm ${
+        isDarkMode
+          ? "border border-white/10 bg-white/5 text-white"
+          : "border border-neutral-200 bg-white text-neutral-900"
+      }`}
     >
       {/* Header */}
-      <div className="border-b border-white/10 bg-white/10 px-6 py-4">
+      <div
+        className={`${
+          isDarkMode
+            ? "border-b border-white/10 bg-white/10"
+            : "border-b border-neutral-200 bg-white/50"
+        } px-6 py-4`}
+      >
         <div className="flex items-center gap-3">
           <Trophy className="w-5 h-5 text-lime-400/80" />
-          <h3 className="font-semibold text-white">Top Explorers</h3>
+          <h3
+            className={`font-semibold ${
+              isDarkMode ? "text-white" : "text-neutral-900"
+            }`}
+          >
+            Top Explorers
+          </h3>
         </div>
       </div>
 
@@ -165,8 +287,8 @@ function LeaderboardTable({ entries, isLoading }: { entries: LeaderboardEntry[];
       <div className="max-h-96 overflow-y-auto">
         <ul className="divide-y divide-white/5">
           {entries.map((entry, index) => {
-            const rankStyle = getRankStyle(entry.rank);
-            
+            const rankStyle = getRankStyle(entry.rank, isDarkMode);
+
             return (
               <motion.li
                 key={entry.userId}
@@ -179,16 +301,18 @@ function LeaderboardTable({ entries, isLoading }: { entries: LeaderboardEntry[];
                   <div className="flex items-center gap-4">
                     {/* Rank */}
                     <div className="flex items-center gap-2">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        entry.rank <= 3 
-                          ? "bg-white/5" 
-                          : "bg-white/3"
-                      }`}>
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          entry.rank <= 3 ? "bg-white/5" : "bg-white/3"
+                        }`}
+                      >
                         <span className={rankStyle.iconColor}>
                           {entry.rank <= 3 ? (
                             getRankIcon(entry.rank)
                           ) : (
-                            <span className={`text-sm font-semibold ${rankStyle.rankColor}`}>
+                            <span
+                              className={`text-sm font-semibold ${rankStyle.rankColor}`}
+                            >
                               {entry.rank}
                             </span>
                           )}
@@ -198,12 +322,26 @@ function LeaderboardTable({ entries, isLoading }: { entries: LeaderboardEntry[];
 
                     {/* Name */}
                     <div>
-                      <span className={`font-medium ${
-                        entry.rank <= 3 ? "text-white" : "text-white/90"
-                      }`}>
+                      <span
+                        className={`font-medium ${
+                          entry.rank <= 3
+                            ? isDarkMode
+                              ? "text-white"
+                              : "text-neutral-900"
+                            : isDarkMode
+                            ? "text-white/90"
+                            : "text-neutral-900"
+                        }`}
+                      >
                         {entry.name}
                       </span>
-                      <div className="text-xs text-white/50">
+                      <div
+                        className={`${
+                          isDarkMode
+                            ? "text-white/50 text-xs"
+                            : "text-neutral-600 text-xs"
+                        }`}
+                      >
                         ID: {entry.userId.slice(-6)}
                       </div>
                     </div>
@@ -211,10 +349,20 @@ function LeaderboardTable({ entries, isLoading }: { entries: LeaderboardEntry[];
 
                   {/* Points */}
                   <div className="text-right">
-                    <div className={`text-lg font-semibold ${rankStyle.pointsColor}`}>
+                    <div
+                      className={`text-lg font-semibold ${rankStyle.pointsColor}`}
+                    >
                       {entry.points.toLocaleString()}
                     </div>
-                    <div className="text-xs text-white/50">points</div>
+                    <div
+                      className={`${
+                        isDarkMode
+                          ? "text-white/50 text-xs"
+                          : "text-neutral-600 text-xs"
+                      }`}
+                    >
+                      points
+                    </div>
                   </div>
                 </div>
               </motion.li>
@@ -224,8 +372,18 @@ function LeaderboardTable({ entries, isLoading }: { entries: LeaderboardEntry[];
       </div>
 
       {/* Footer */}
-      <div className="border-t border-white/10 bg-white/5 px-6 py-3">
-        <p className="text-xs text-white/50 text-center">
+      <div
+        className={`${
+          isDarkMode
+            ? "border-t border-white/10 bg-white/5"
+            : "border-t border-neutral-200 bg-white/50"
+        } px-6 py-3`}
+      >
+        <p
+          className={`${
+            isDarkMode ? "text-white/50" : "text-neutral-600"
+          } text-xs text-center`}
+        >
           Updated every 30 seconds • {entries.length} explorers
         </p>
       </div>

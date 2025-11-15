@@ -1,9 +1,16 @@
 import DashboardPageLayout from "../../components/DashboardPageLayout";
 import WorldExplorerMap from "../../components/WorldExplorerMap";
+import PageThemeToggle from "../../components/PageThemeToggle";
 
 export default function MapPage() {
   return (
-    <DashboardPageLayout contentClassName="border-none bg-transparent p-0 shadow-none">
+    <DashboardPageLayout
+      contentClassName="border-none bg-transparent p-0 shadow-none"
+      isDarkMode={false}
+    >
+      <div className="flex justify-end">
+        <PageThemeToggle />
+      </div>
       <WorldExplorerMap />
     </DashboardPageLayout>
   );

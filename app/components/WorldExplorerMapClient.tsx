@@ -546,7 +546,7 @@ export default function WorldExplorerMap() {
   };
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-neutral-950 to-neutral-900 px-6 py-10 text-white">
+    <section className="min-h-screen bg-linear-to-br from-neutral-950 to-neutral-900 px-6 py-10 text-white">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:flex-row">
         {/* Map Container */}
         <motion.div

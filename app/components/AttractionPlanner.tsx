@@ -3,7 +3,14 @@
 import { FormEvent, useState } from "react";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { motion } from "framer-motion";
-import { Compass, MapPin, DollarSign, Heart, MessageCircle, RotateCcw } from "lucide-react";
+import {
+  Compass,
+  MapPin,
+  DollarSign,
+  Heart,
+  MessageCircle,
+  RotateCcw,
+} from "lucide-react";
 
 type ChatMessage = {
   id: string;
@@ -111,14 +118,16 @@ function AssistantCard({
       className="rounded-2xl border border-lime-400/20 bg-neutral-900/50 p-6 backdrop-blur-sm shadow-xl"
     >
       {payload.intro && (
-        <p className="text-base text-white/90 leading-relaxed">{payload.intro}</p>
+        <p className="text-base text-neutral-900/90 dark:text-white/90 leading-relaxed">
+          {payload.intro}
+        </p>
       )}
 
       {tips.length > 0 && (
         <div className="mt-6">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-2 h-2 rounded-full bg-lime-400" />
-            <p className="text-xs uppercase tracking-wide text-white/60">
+            <p className="text-xs uppercase tracking-wide text-neutral-700 dark:text-white/60">
               Quick Tips
             </p>
           </div>
@@ -127,7 +136,7 @@ function AssistantCard({
               <motion.span
                 key={tip}
                 whileHover={{ scale: 1.05 }}
-                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/80"
+                className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-neutral-900/80 dark:text-white/80"
               >
                 {tip}
               </motion.span>
@@ -140,7 +149,7 @@ function AssistantCard({
         <div className="mt-8 space-y-4">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-lime-400" />
-            <p className="text-xs uppercase tracking-wide text-white/60">
+            <p className="text-xs uppercase tracking-wide text-neutral-700 dark:text-white/60">
               Recommended Attractions
             </p>
           </div>
@@ -154,11 +163,15 @@ function AssistantCard({
             >
               <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
                 <div>
-                  <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+                  <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">
+                    {item.title}
+                  </h3>
                   {item.neighborhood && (
                     <div className="flex items-center gap-1 mt-1">
-                      <MapPin className="w-3 h-3 text-white/40" />
-                      <p className="text-xs text-white/40">{item.neighborhood}</p>
+                      <MapPin className="w-3 h-3 text-neutral-400 dark:text-white/40" />
+                      <p className="text-xs text-neutral-500 dark:text-white/40">
+                        {item.neighborhood}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -173,7 +186,9 @@ function AssistantCard({
               </div>
 
               {item.description && (
-                <p className="text-sm text-white/80 leading-relaxed mb-3">{item.description}</p>
+                <p className="text-sm text-neutral-700/80 dark:text-white/80 leading-relaxed mb-3">
+                  {item.description}
+                </p>
               )}
 
               {item.mapLink && (
@@ -190,7 +205,7 @@ function AssistantCard({
               )}
 
               {Array.isArray(item.notes) && item.notes.length > 0 && (
-                <ul className="mt-4 space-y-2 text-sm text-white/70">
+                <ul className="mt-4 space-y-2 text-sm text-neutral-700/70 dark:text-white/70">
                   {item.notes.map((note) => (
                     <li key={note} className="flex gap-2">
                       <span className="text-lime-400">•</span>
@@ -199,7 +214,7 @@ function AssistantCard({
                   ))}
                 </ul>
               )}
-              
+
               <motion.button
                 type="button"
                 onClick={() => onLogAttraction(item.title)}
@@ -209,11 +224,13 @@ function AssistantCard({
                 className={`mt-4 rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-wide transition-all flex items-center gap-2 ${
                   visitedAttractions[item.title]
                     ? "border border-lime-400/40 text-lime-300 bg-lime-400/10"
-                    : "border border-white/20 text-white/90 hover:border-lime-400 hover:text-lime-300 hover:bg-lime-400/10"
+                    : "border border-white/20 text-neutral-900/90 dark:text-white/90 hover:border-lime-400 hover:text-lime-300 hover:bg-lime-400/10"
                 }`}
               >
                 <Heart className="w-3 h-3" />
-                {visitedAttractions[item.title] ? "Logged (+2 pts)" : "I visited (+2 pts)"}
+                {visitedAttractions[item.title]
+                  ? "Logged (+2 pts)"
+                  : "I visited (+2 pts)"}
               </motion.button>
             </motion.article>
           ))}
@@ -221,7 +238,9 @@ function AssistantCard({
       )}
 
       {payload.closing && (
-        <p className="mt-6 text-sm text-white/70 leading-relaxed">{payload.closing}</p>
+        <p className="mt-6 text-sm text-neutral-700/70 dark:text-white/70 leading-relaxed">
+          {payload.closing}
+        </p>
       )}
     </motion.div>
   );
@@ -238,7 +257,10 @@ function createMessageId() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-export default function AttractionPlanner({ initialPoints, initialUserId }: Props = {}) {
+export default function AttractionPlanner({
+  initialPoints,
+  initialUserId,
+}: Props = {}) {
   const [location, setLocation] = useState("");
   const [budget, setBudget] = useState("");
   const [interests, setInterests] = useState("");
@@ -250,8 +272,13 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [visitedAttractions, setVisitedAttractions] = useState<VisitedMap>({});
-  const { points, addPoints } = useExperiencePoints({ initialPoints, initialUserId });
-  const hasAssistantReply = messages.some((message) => message.role === "assistant");
+  const { points, addPoints } = useExperiencePoints({
+    initialPoints,
+    initialUserId,
+  });
+  const hasAssistantReply = messages.some(
+    (message) => message.role === "assistant"
+  );
   const showSetupForm = !hasAssistantReply;
 
   const canSubmit =
@@ -298,14 +325,19 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
           budget,
           interests,
           notes,
-          messages: nextMessages.map(({ role, content }) => ({ role, content })),
+          messages: nextMessages.map(({ role, content }) => ({
+            role,
+            content,
+          })),
         }),
       });
 
       const data = (await response.json().catch(() => null)) ?? {};
 
       if (!response.ok) {
-        throw new Error(data?.error ?? "Unable to reach the Roots travel guide.");
+        throw new Error(
+          data?.error ?? "Unable to reach the Roots travel guide."
+        );
       }
 
       if (!data?.reply) {
@@ -318,7 +350,9 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
       ]);
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Unexpected error. Please try again.";
+        err instanceof Error
+          ? err.message
+          : "Unexpected error. Please try again.";
       setError(message);
     } finally {
       setIsLoading(false);
@@ -347,10 +381,14 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
       >
         <div className="flex items-center gap-3 mb-2">
           <div className="w-2 h-2 rounded-full bg-lime-400" />
-          <p className="text-xs uppercase tracking-wide text-white/60">Experience Points</p>
+          <p className="text-xs uppercase tracking-wide text-black dark:text-white/60">
+            Experience Points
+          </p>
         </div>
-        <p className="text-3xl font-bold text-white mb-1">{points}</p>
-        <p className="text-sm text-white/60">
+        <p className="text-3xl font-bold text-neutral-900 dark:text-white mb-1">
+          {points}
+        </p>
+        <p className="text-sm text-neutral-700 dark:text-white/60">
           Log any museum or attraction visit to earn +2 points
         </p>
       </motion.div>
@@ -366,72 +404,82 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-3">
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-white/60" />
-                <span className="text-sm font-medium text-white/80">City or Region</span>
+                <MapPin className="w-4 h-4 text-neutral-500 dark:text-white/60" />
+                <span className="text-sm font-medium text-neutral-900/80 dark:text-white/80">
+                  City or Region
+                </span>
               </div>
               <input
                 type="text"
                 value={location}
                 onChange={(event) => setLocation(event.target.value)}
                 placeholder="e.g., Mexico City historic center"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
               />
             </label>
 
             <label className="space-y-3">
               <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-white/60" />
-                <span className="text-sm font-medium text-white/80">Budget</span>
+                <DollarSign className="w-4 h-4 text-neutral-500 dark:text-white/60" />
+                <span className="text-sm font-medium text-neutral-900/80 dark:text-white/80">
+                  Budget
+                </span>
               </div>
               <input
                 type="text"
                 value={budget}
                 onChange={(event) => setBudget(event.target.value)}
                 placeholder="e.g., $120 per day"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
               />
             </label>
           </div>
 
           <label className="space-y-3">
             <div className="flex items-center gap-2">
-              <Heart className="w-4 h-4 text-white/60" />
-              <span className="text-sm font-medium text-white/80">Interests or Vibe</span>
+              <Heart className="w-4 h-4 text-neutral-500 dark:text-white/60" />
+              <span className="text-sm font-medium text-neutral-900/80 dark:text-white/80">
+                Interests or Vibe
+              </span>
             </div>
             <input
               type="text"
               value={interests}
               onChange={(event) => setInterests(event.target.value)}
               placeholder="Night markets, architecture, coffee shops…"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
             />
           </label>
 
           <label className="space-y-3">
             <div className="flex items-center gap-2">
-              <MessageCircle className="w-4 h-4 text-white/60" />
-              <span className="text-sm font-medium text-white/80">Extra Notes</span>
+              <MessageCircle className="w-4 h-4 text-neutral-500 dark:text-white/60" />
+              <span className="text-sm font-medium text-neutral-900/80 dark:text-white/80">
+                Extra Notes
+              </span>
             </div>
             <textarea
               value={notes}
               onChange={(event) => setNotes(event.target.value)}
               placeholder="Travel dates, accessibility needs, people traveling with you…"
               rows={3}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
             />
           </label>
 
           <label className="space-y-3">
             <div className="flex items-center gap-2">
-              <Compass className="w-4 h-4 text-white/60" />
-              <span className="text-sm font-medium text-white/80">What would you like to ask?</span>
+              <Compass className="w-4 h-4 text-neutral-500 dark:text-white/60" />
+              <span className="text-sm font-medium text-neutral-900/80 dark:text-white/80">
+                What would you like to ask?
+              </span>
             </div>
             <textarea
               value={input}
               onChange={(event) => setInput(event.target.value)}
               placeholder="Ask for a themed itinerary or request specific suggestions…"
               rows={3}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
             />
           </label>
 
@@ -457,7 +505,7 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
                 type="button"
                 onClick={() => setInput(prompt)}
                 whileHover={{ scale: 1.05 }}
-                className="rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-white/70 transition-all hover:border-lime-400 hover:text-white"
+                className="rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-neutral-700/70 dark:text-white/70 transition-all hover:border-lime-400 hover:text-white"
               >
                 {prompt}
               </motion.button>
@@ -483,7 +531,7 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
         className={`rounded-2xl border border-white/10 p-6 backdrop-blur-sm ${
           showSetupForm
             ? "bg-neutral-900/50"
-            : "bg-gradient-to-br from-neutral-900/50 to-lime-500/10"
+            : "bg-linear-to-br from-neutral-900/50 to-lime-500/10"
         }`}
       >
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -522,7 +570,7 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
         </div>
 
         {messages.length === 0 ? (
-          <p className="text-sm text-white/60 text-center py-8">
+          <p className="text-sm text-neutral-700 dark:text-white/60 text-center py-8">
             {showSetupForm
               ? "Fill out the form and ask a question to start discovering curated attractions"
               : "Waiting for the Roots guide to respond..."}
