@@ -7,7 +7,7 @@ export default function MapPage() {
       contentClassName="border-none bg-transparent p-0 shadow-none"
     >
       <div className="flex justify-end">
-        <PageThemeToggle />
+
       </div>
 
       <div className="space-y-6">
