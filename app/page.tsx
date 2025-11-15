@@ -1,5 +1,4 @@
 "use client";
-"use client";
 
 import { useState, useEffect, useMemo } from "react";
 
@@ -1118,8 +1117,8 @@ type ImageWithFallbackProps = {
   src: string;
   alt?: string;
   className?: string;
-  width?: number | string;
-  height?: number | string;
+  width?: number;
+  height?: number;
 };
 
 function ImageWithFallback({
@@ -1129,13 +1128,25 @@ function ImageWithFallback({
   width,
   height,
 }: ImageWithFallbackProps) {
+  // If width/height not provided, use fill layout
+  if (!width || !height) {
+    return (
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        className={className}
+      />
+    );
+  }
+
   return (
     <Image
       src={src}
       alt={alt}
+      width={width}
+      height={height}
       className={className}
-      width={width as number}
-      height={height as number}
     />
   );
 }
