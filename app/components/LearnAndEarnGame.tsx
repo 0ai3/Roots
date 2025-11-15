@@ -275,7 +275,7 @@ export default function LearnAndEarnGame({
                 Generate a Learn & Earn module
               </p>
               <h2 className="text-2xl font-semibold">
-                Ask for any country's traditions and earn points
+                Ask for any country&apos;s traditions and earn points
               </h2>
             </div>
             {lastAward !== null && (
