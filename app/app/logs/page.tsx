@@ -586,25 +586,25 @@ export default function LogsPage() {
             </button>
           </div>
 
-          {activeTab === "logs" ? (
-            <>
-              {/* Stats Grid */}
-              <div className="grid gap-4 md:grid-cols-4">
-                <div className={`rounded-3xl border ${getBorderColor()} bg-gradient-to-br ${accent.from500_20} to-teal-500/20 p-6 backdrop-blur`}>
-                  <div className="flex items-center gap-3">
-                      <Globe2 className={`h-8 w-8 ${accent.text400}`} />
-                    <div>
-                      <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>World Explored</p>
-                      <p className="text-3xl font-bold">{(stats.worldPercentage || 0).toFixed(1)}%</p>
-                    </div>
-                  </div>
-                  <div className={`mt-3 h-2 overflow-hidden rounded-full ${isDarkMode ? 'bg-white/10' : 'bg-slate-200'}`}>
-                    <div
-                        className={`h-full bg-gradient-to-r ${accent.from400} to-teal-400 transition-all duration-500`}
-                        style={{ width: `${stats.worldPercentage || 0}%` }}
-                    />
+        {activeTab === "logs" ? (
+          <>
+            {/* Stats Grid */}
+            <div className="grid gap-4 md:grid-cols-4">
+              <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 p-6 backdrop-blur">
+                <div className="flex items-center gap-3">
+                  <Globe2 className="h-8 w-8 text-emerald-400" />
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-white/60">World Explored</p>
+                    <p className="text-3xl font-bold text-white">{stats.worldPercentage}%</p>
                   </div>
                 </div>
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 transition-all duration-500"
+                    style={{ width: `${stats.worldPercentage}%` }}
+                  />
+                </div>
+              </div>
 
                 <div className={`rounded-3xl border ${getBorderColor()} ${getCardBg()} p-6 backdrop-blur`}>
                   <div className="flex items-center gap-3">
@@ -946,41 +946,41 @@ export default function LogsPage() {
                           </div>
                         )}
 
-                        <p className={`mt-4 text-xs ${getMutedTextColor()}`}>
-                          {new Date(log.visitedAt).toLocaleDateString(undefined, {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </p>
-                      </div>
+                      <p className="mt-4 text-xs text-white/40">
+                        {new Date(log.visitedAt).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </p>
                     </div>
-                  ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {/* Tasks Tab Content */}
+            <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-purple-500/20 to-pink-500/20 p-6 backdrop-blur">
+              <h2 className="flex items-center gap-2 text-xl font-bold text-white">
+                <Award className="h-6 w-6 text-purple-400" />
+                Photo Verification Challenges
+              </h2>
+              <p className="mt-2 text-sm text-white/70">
+                Upload before/after photos of recipes you cooked or photos from locations you visited. Our AI will verify them and award you bonus points!
+              </p>
+              <div className="mt-4 flex gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <Utensils className="h-5 w-5 text-orange-400" />
+                  <span className="text-white/80">Recipe: +10 pts</span>
                 </div>
-              )}
-            </>
-          ) : (
-            <>
-              {/* Tasks Tab Content */}
-              <div className={`rounded-3xl border ${getBorderColor()} bg-gradient-to-br from-purple-500/20 to-pink-500/20 p-6 backdrop-blur`}>
-                <h2 className="flex items-center gap-2 text-xl font-bold">
-                  <Award className="h-6 w-6 text-purple-400" />
-                  Photo Verification Challenges
-                </h2>
-                <p className={`mt-2 text-sm ${getMutedTextColor()}`}>
-                  Upload before/after photos of recipes you cooked or photos from locations you visited. Our AI will verify them and award you bonus points!
-                </p>
-                <div className="mt-4 flex gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Utensils className="h-5 w-5 text-orange-400" />
-                    <span className={getMutedTextColor()}>Recipe: +10 pts</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-blue-400" />
-                    <span className={getMutedTextColor()}>Location: +15 pts</span>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-blue-400" />
+                  <span className="text-white/80">Location: +15 pts</span>
                 </div>
               </div>
+            </div>
 
               {/* Task Form */}
               {showTaskForm && (

@@ -205,7 +205,7 @@ export default function OffertsPage() {
           </div>
           <div className={`flex items-center gap-3 rounded-full border px-6 py-3 backdrop-blur ${
             isDarkMode 
-              ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border-emerald-400/30" 
+              ? "bg-linear-to-r from-emerald-500/20 to-teal-500/20 border-emerald-400/30" 
               : "bg-white border-emerald-200 shadow-sm"
           }`}>
             <Sparkles className={`h-6 w-6 ${isDarkMode ? "text-emerald-400" : "text-emerald-600"}`} />
@@ -240,8 +240,8 @@ export default function OffertsPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     className={`relative overflow-hidden rounded-2xl border p-6 backdrop-blur ${
                       isDarkMode
-                        ? "border-emerald-400/50 bg-gradient-to-br from-emerald-500/20 to-teal-500/20"
-                        : "border-emerald-300 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-lg"
+                        ? "border-emerald-400/50 bg-linear-to-br from-emerald-500/20 to-teal-500/20"
+                        : "border-emerald-300 bg-linear-to-br from-emerald-50 to-teal-50 shadow-lg"
                     }`}
                   >
                     <div className="flex items-start justify-between mb-4">
@@ -289,7 +289,7 @@ export default function OffertsPage() {
                           Scan at checkout
                         </p>
                       </div>
-                      <div className="flex items-center justify-center gap-[2px] py-4">
+                      <div className="flex items-center justify-center gap-0.5 py-4">
                         {coupon.barcode.split('').map((digit, i) => (
                           <div
                             key={i}
@@ -384,7 +384,7 @@ export default function OffertsPage() {
                         ? "border-white/10 bg-white/5 hover:border-emerald-400/50"
                         : "border-neutral-200 bg-white hover:border-emerald-300 shadow-sm hover:shadow-md"
                       : isDarkMode
-                        ? "border-white/5 bg-white/[0.02] opacity-60"
+                        ? "border-white/5 bg-white/200 opacity-60"
                         : "border-neutral-100 bg-neutral-50 opacity-60"
                   }`}
                 >
