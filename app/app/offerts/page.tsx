@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from "react";
 import DashboardPageLayout from "../../components/DashboardPageLayout";
-import { Ticket, Clock, Sparkles, Gift, Coffee, Utensils, Building2, Loader2, CheckCircle, X, Sun, Moon } from "lucide-react";
+import PageThemeToggle from "../../components/PageThemeToggle";
+import { useTheme } from "../../components/ThemeProvider";
+import { Ticket, Clock, Sparkles, Gift, Coffee, Utensils, Building2, Loader2, CheckCircle, X, Sun, Moon, ArrowRight, Tag, TrendingUp, Users } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 type Coupon = {
   _id: string;
@@ -30,7 +33,9 @@ type RedeemedCoupon = {
 };
 
 export default function OffertsPage() {
+  const { theme } = useTheme();
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showBrowse, setShowBrowse] = useState(true);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [redeemedCoupons, setRedeemedCoupons] = useState<RedeemedCoupon[]>([]);
   const [userPoints, setUserPoints] = useState(0);
@@ -42,58 +47,8 @@ export default function OffertsPage() {
 
   // Theme management
   useEffect(() => {
-    const updateTheme = () => {
-      try {
-        const saved = localStorage.getItem("theme");
-        if (saved) {
-          const dark = saved === "dark";
-          setIsDarkMode(dark);
-          if (dark) {
-            document.documentElement.classList.add("dark");
-          } else {
-            document.documentElement.classList.remove("dark");
-          }
-        } else {
-          const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          setIsDarkMode(systemDark);
-          if (systemDark) {
-            document.documentElement.classList.add("dark");
-          }
-        }
-      } catch (e) {
-        // ignore
-      }
-    };
-
-    updateTheme();
-
-    const handleThemeChange = (event: CustomEvent) => {
-      setIsDarkMode(event.detail.isDark);
-    };
-
-    window.addEventListener('theme-change', handleThemeChange as EventListener);
-    
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem("theme")) {
-        setIsDarkMode(e.matches);
-        if (e.matches) {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-        }
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
-
-    return () => {
-      window.removeEventListener('theme-change', handleThemeChange as EventListener);
-      mediaQuery.removeEventListener('change', handleSystemThemeChange);
-    };
-  }, []);
-
-  // Theme is controlled by the global ThemeToggle provider
+    setIsDarkMode(theme === "dark");
+  }, [theme]);
 
   // Color utility functions
   const getBgColor = () => {
@@ -222,12 +177,207 @@ export default function OffertsPage() {
 
   return (
     <DashboardPageLayout isDarkMode={isDarkMode}>
-      <div className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}>
-        <div className="space-y-6 p-6">
-          {/* Theme is controlled by the global ThemeToggle component */}
+      <PageThemeToggle />
+      {showBrowse ? (
+        <div className={`min-h-screen ${getBgColor()}`}>
+          {/* Hero Section */}
+          <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
+            <div className="absolute inset-0">
+              <Image
+                src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=2070"
+                alt="Exclusive offers"
+                fill
+                className="object-cover"
+                priority
+              />
+              <div className={`absolute inset-0 ${
+                isDarkMode 
+                  ? "bg-linear-to-br from-black/80 via-black/70 to-black/80" 
+                  : "bg-linear-to-br from-black/60 via-black/50 to-black/60"
+              }`} />
+            </div>
 
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="relative z-10 max-w-5xl mx-auto px-6 text-center text-white">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6"
+              >
+                <Sparkles className="w-4 h-4 text-lime-400" />
+                <span className="text-sm font-medium">Exclusive Rewards</span>
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
+              >
+                Special{" "}
+                <span className={isDarkMode ? "text-lime-400" : "text-lime-300"}>
+                  Offers
+                </span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-xl mb-8 max-w-2xl mx-auto text-white/90"
+              >
+                Redeem your points for exclusive discounts on museums, restaurants, and cafes
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="flex flex-wrap gap-4 justify-center"
+              >
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowBrowse(false)}
+                  className={`px-8 py-4 rounded-xl font-semibold flex items-center gap-2 transition-colors ${
+                    isDarkMode
+                      ? "bg-lime-400 text-black hover:bg-lime-300"
+                      : "bg-lime-500 text-white hover:bg-lime-600"
+                  }`}
+                >
+                  <Ticket className="w-5 h-5" />
+                  Browse Offers
+                  <ArrowRight className="w-5 h-5" />
+                </motion.button>
+              </motion.div>
+            </div>
+          </section>
+
+          {/* Stats Section */}
+          <section className="relative z-20 -mt-20 mb-20">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  {
+                    icon: Tag,
+                    label: "Active Offers",
+                    value: coupons.length,
+                    color: "lime",
+                    desc: "Available deals",
+                  },
+                  {
+                    icon: Users,
+                    label: "Redeemed",
+                    value: redeemedCoupons.length,
+                    color: "emerald",
+                    desc: "By community",
+                  },
+                  {
+                    icon: Sparkles,
+                    label: "Your Points",
+                    value: userPoints,
+                    color: "yellow",
+                    desc: "Ready to spend",
+                  },
+                  {
+                    icon: TrendingUp,
+                    label: "Best Value",
+                    value: "50%",
+                    color: "blue",
+                    desc: "Maximum discount",
+                  },
+                ].map((stat, i) => (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: i * 0.1 }}
+                    className={`rounded-2xl p-6 backdrop-blur-sm border ${
+                      isDarkMode
+                        ? "bg-neutral-900/90 border-white/10"
+                        : "bg-white border-neutral-200 shadow-lg"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div
+                        className={`p-3 rounded-xl ${
+                          stat.color === "lime"
+                            ? isDarkMode
+                              ? "bg-lime-400/20"
+                              : "bg-lime-100"
+                            : stat.color === "emerald"
+                            ? isDarkMode
+                              ? "bg-emerald-400/20"
+                              : "bg-emerald-100"
+                            : stat.color === "yellow"
+                            ? isDarkMode
+                              ? "bg-yellow-400/20"
+                              : "bg-yellow-100"
+                            : isDarkMode
+                            ? "bg-blue-400/20"
+                            : "bg-blue-100"
+                        }`}
+                      >
+                        <stat.icon
+                          className={`w-6 h-6 ${
+                            stat.color === "lime"
+                              ? isDarkMode
+                                ? "text-lime-400"
+                                : "text-lime-600"
+                              : stat.color === "emerald"
+                              ? isDarkMode
+                                ? "text-emerald-400"
+                                : "text-emerald-600"
+                              : stat.color === "yellow"
+                              ? isDarkMode
+                                ? "text-yellow-400"
+                                : "text-yellow-600"
+                              : isDarkMode
+                              ? "text-blue-400"
+                              : "text-blue-600"
+                          }`}
+                        />
+                      </div>
+                      <div className="text-right">
+                        <p
+                          className={`text-3xl font-bold ${
+                            isDarkMode ? "text-white" : "text-neutral-900"
+                          }`}
+                        >
+                          {stat.value}
+                        </p>
+                      </div>
+                    </div>
+                    <p
+                      className={`text-xs ${
+                        isDarkMode ? "text-neutral-500" : "text-neutral-500"
+                      }`}
+                    >
+                      {stat.desc}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+      ) : (
+        <div className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}>
+          <div className="flex justify-between items-center mb-6 px-6 pt-6">
+            <button
+              onClick={() => setShowBrowse(true)}
+              className={`px-6 py-3 rounded-xl font-semibold transition-colors ${
+                isDarkMode
+                  ? "bg-neutral-800 text-white hover:bg-neutral-700"
+                  : "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
+              }`}
+            >
+              ← Back to Overview
+            </button>
+          </div>
+          <div className="space-y-6 p-6">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold">
                 Coupon Marketplace
@@ -538,8 +688,9 @@ export default function OffertsPage() {
               })}
             </div>
           )}
+          </div>
         </div>
-      </div>
+      )}
     </DashboardPageLayout>
   );
 }
