@@ -90,6 +90,9 @@ Return a JSON document with the following structure:
       "cost": "Free, $, $$, $$$",
       "description": "2-3 sentence highlight",
       "mapLink": "https://www.google.com/maps/search/?api=1&query=encoded location",
+      "category": "museum | gallery | park | food | nightlife | shopping | landmark | event | other",
+      "latitude": 40.7128,
+      "longitude": -74.006,
       "notes": ["bullet point tip 1", "bullet point tip 2"]
     }
   ],
@@ -99,6 +102,8 @@ Return a JSON document with the following structure:
 REQUIREMENTS:
 - Always include at least three attractions.
 - Each attraction must include a valid Google Maps link.
+- Latitude and longitude must be decimal degrees that fall near ${payload.location}.
+- Category must be one of: museum, gallery, park, food, nightlife, shopping, landmark, event, other.
 - Keep the response friendly and concise so the client can render styled cards.
 - Do not include any markdown or backticks, just the JSON string.`;
 
