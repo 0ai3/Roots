@@ -30,7 +30,7 @@ type Props = {
 
 export default function DashboardContent({ user }: Props) {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   useEffect(() => {
     try {
@@ -74,6 +74,31 @@ export default function DashboardContent({ user }: Props) {
       : t("dashboard.content.userFallback");
   }, [user.name, t]);
 
+  const memberSince = useMemo(() => {
+    const date = new Date(user.createdAt);
+    if (Number.isNaN(date.getTime())) {
+      return user.createdAt;
+    }
+    return date.toLocaleDateString(locale, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  }, [locale, user.createdAt]);
+
+  const formattedPoints = useMemo(
+    () => user.points.toLocaleString(locale),
+    [locale, user.points]
+  );
+
+  const roleLabel = useMemo(
+    () =>
+      user.role === "admin"
+        ? t("dashboard.roles.admin")
+        : t("dashboard.roles.client"),
+    [t, user.role]
+  );
+
   const themeClasses = isDarkMode
     ? "bg-gradient-to-br from-neutral-950 to-neutral-900 text-white"
     : "bg-gradient-to-br from-amber-50 to-orange-50/30 text-neutral-900";
@@ -81,8 +106,6 @@ export default function DashboardContent({ user }: Props) {
   const cardBackground = isDarkMode ? "bg-neutral-900/50" : "bg-white/80";
   const cardBorder = isDarkMode ? "border-neutral-800" : "border-white/50";
   const accentColor = isDarkMode ? "lime" : "emerald";
-
-  console.log(user);
 
   return (
     <main
@@ -185,11 +208,7 @@ export default function DashboardContent({ user }: Props) {
                         {t("dashboard.content.memberSince")}
                       </dt>
                       <dd className="text-lg font-semibold">
-                        {new Date(user.createdAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
+                        {memberSince}
                       </dd>
                     </motion.div>
 
@@ -224,7 +243,7 @@ export default function DashboardContent({ user }: Props) {
                               : "bg-emerald-600"
                           }`}
                         />
-                        {user.role}
+                        {roleLabel}
                       </dd>
                     </motion.div>
 
@@ -238,7 +257,7 @@ export default function DashboardContent({ user }: Props) {
                         {t("dashboard.content.pointsLabel")}
                       </dt>
                       <dd className="text-2xl font-bold mb-1">
-                        {user.points.toLocaleString()}
+                        {formattedPoints}
                       </dd>
                       <p className="text-xs opacity-60">
                         {t("dashboard.content.pointsSubtitle")}

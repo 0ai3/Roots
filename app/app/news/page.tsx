@@ -1,5 +1,4 @@
 "use client";
-import DashboardPageLayout from "@/app/components/DashboardPageLayout";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
