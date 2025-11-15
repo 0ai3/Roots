@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTheme } from "./ThemeProvider";
 import { motion } from "framer-motion";
 import { Menu as MenuIcon, X as XIcon } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
@@ -8,7 +9,7 @@ import Link from "next/link";
 
 interface NavbarProps {scrollY?: number;}
 
-export default function Navbar(e: NavbarProps) {
+export default function Navbar({ scrollY }: NavbarProps) {
   const { theme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(e.scrollY || 0);

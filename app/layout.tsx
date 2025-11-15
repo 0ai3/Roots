@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./components/ThemeProvider";
 import ThemeToggle from "./components/ThemeToggle";
+import { ThemeProvider } from "./components/ThemeProvider";
+import ThemeToggle from "./components/ThemeToggle";
 import { I18nProvider } from "./components/I18nProvider";
 import LanguageSwitcher from "./components/LanguageSwitcher";
 import { getRequestLocale } from "@/app/lib/i18n/server";
@@ -36,6 +38,10 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
         suppressHydrationWarning
       >
+        <ThemeProvider>
+          <ThemeToggle />
+          {children}
+        </ThemeProvider>
         <I18nProvider initialLocale={initialLocale}>
           <ThemeProvider>
             <ThemeToggle />
