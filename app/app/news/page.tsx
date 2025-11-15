@@ -1,5 +1,4 @@
 "use client";
-import DashboardPageLayout from "@/app/components/DashboardPageLayout";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Newspaper, AlertTriangle, Info, Sparkles, Calendar, RefreshCw, Settings } from "lucide-react";
