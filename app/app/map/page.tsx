@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import DashboardPageLayout from "../../components/DashboardPageLayout";
-import PageThemeToggle from "../../components/PageThemeToggle";
 import { useTheme } from "../../components/ThemeProvider";
 import WorldExplorerMap from "../../components/WorldExplorerMap";
 import { motion } from "framer-motion";
@@ -33,7 +32,7 @@ export default function MapPage() {
       }
       isDarkMode={isDarkMode}
     >
-      <PageThemeToggle />
+      {/* PageThemeToggle removed per request */}
       {showBrowse ? (
         <div className={`min-h-screen ${getBgColor()}`}>
           {/* Hero Section */}

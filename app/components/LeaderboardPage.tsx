@@ -2,7 +2,6 @@
 
 import useSWR from "swr";
 import DashboardPageLayout from "./DashboardPageLayout";
-import PageThemeToggle from "./PageThemeToggle";
 import { useTheme } from "./ThemeProvider";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { motion } from "framer-motion";
@@ -85,7 +84,7 @@ export default function LeaderboardPage() {
       description={t("leaderboard.description")}
       isDarkMode={isDarkMode}
     >
-      <PageThemeToggle />
+      {/* PageThemeToggle removed per request */}
       {showBrowse ? (
         <div className={`min-h-screen ${getBgColor()}`}>
           {/* Hero Section */}

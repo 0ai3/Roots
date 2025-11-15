@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
 
-export default function PageThemeToggle() {
+export default function PageThemeToggle({ showText = true }: { showText?: boolean }) {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export default function PageThemeToggle() {
       ) : (
         <Moon className="w-4 h-4 text-neutral-700" />
       )}
-      <span>{isDark ? "Light" : "Dark"}</span>
+      {showText && <span>{isDark ? "Light" : "Dark"}</span>}
     </motion.button>
   );
 }

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import DashboardPageLayout from "../../components/DashboardPageLayout";
-import PageThemeToggle from "../../components/PageThemeToggle";
 import { useTheme } from "../../components/ThemeProvider";
 import {
   Ticket,
@@ -198,7 +197,7 @@ export default function OffertsPage() {
 
   return (
     <DashboardPageLayout isDarkMode={isDarkMode}>
-      <PageThemeToggle />
+      {/* PageThemeToggle removed per request */}
       {showBrowse ? (
         <div className={`min-h-screen ${getBgColor()}`}>
           {/* Hero Section */}

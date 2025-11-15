@@ -13,12 +13,12 @@ import {
   Building2,
   Palette,
   MapPin,
-  Play,
 } from "lucide-react";
 import Navbar from "./components/Navbar";
 import { useTheme } from "./components/ThemeProvider";
 import ThemeToggle from "./components/ThemeToggle";
 import Image from "next/image";
+import Link from "next/link";
 
 interface HeroSectionProps {
   scrollY: number;
@@ -101,31 +101,20 @@ function HeroSection({ scrollY }: HeroSectionProps) {
               </p>
 
               <div className="flex flex-wrap gap-4">
-                <motion.button
-                  className={`px-8 py-4 rounded-full flex items-center gap-2 transition-colors ${
-                    theme === "dark"
-                      ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
-                      : "bg-emerald-600 text-white hover:bg-emerald-700"
-                  }`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Start Exploring
-                  <ArrowRight className="w-5 h-5" />
-                </motion.button>
+                  <Link
+                    href="/login"
+                    aria-label="Start exploring - login"
+                    className={`px-8 py-4 rounded-full flex items-center gap-2 transition-colors ${
+                      theme === "dark"
+                        ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
+                        : "bg-emerald-600 text-white hover:bg-emerald-700"
+                    }`}
+                  >
+                    Start Exploring
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
 
-                <motion.button
-                  className={`px-8 py-4 rounded-full backdrop-blur-sm border transition-colors flex items-center gap-2 ${
-                    theme === "dark"
-                      ? "bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50"
-                      : "bg-white/70 text-neutral-900 border-neutral-300 hover:bg-white"
-                  }`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Play className="w-5 h-5" />
-                  Watch Video
-                </motion.button>
+                {/* Watch Video button removed */}
               </div>
 
               <div className="grid grid-cols-3 gap-6 mt-12">
@@ -323,8 +312,9 @@ function FeaturesSection() {
               whileHover={{ y: -8 }}
               className="group"
             >
-              <div
-                className={`relative overflow-hidden rounded-3xl border transition-all ${
+              <Link
+                href="/login"
+                className={`relative overflow-hidden rounded-3xl border transition-all block ${
                   theme === "dark"
                     ? "bg-neutral-900 border-neutral-800 hover:border-lime-400/30"
                     : "bg-white border-neutral-200 hover:border-emerald-400/50 shadow-lg hover:shadow-xl"
@@ -388,7 +378,7 @@ function FeaturesSection() {
                     </motion.span>
                   </div>
                 </div>
-              </div>
+              </Link>
             </motion.div>
           ))}
         </div>
@@ -472,12 +462,13 @@ function ExploreSection() {
               whileHover={{ y: -5 }}
               className="group cursor-pointer"
             >
-              <div
+              <Link
+                href="/login"
                 className={`relative overflow-hidden rounded-2xl border ${
                   theme === "dark"
                     ? "bg-neutral-800 border-neutral-700 hover:border-lime-400/50"
                     : "bg-white border-neutral-200 hover:border-emerald-400/50 shadow-md hover:shadow-xl"
-                } transition-all`}
+                } transition-all block`}
               >
                 <div className="relative h-48 overflow-hidden">
                   <ImageWithFallback
@@ -509,7 +500,7 @@ function ExploreSection() {
                     {region.traditions} traditions
                   </p>
                 </div>
-              </div>
+              </Link>
             </motion.div>
           ))}
         </div>
@@ -909,28 +900,28 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
           className="relative z-20 mt-auto"
         >
           <div className="flex flex-col sm:flex-row gap-4 items-center">
-            <motion.button
-              className={`px-8 py-4 rounded-full transition-colors ${
+            <Link
+              href="/login"
+              aria-label="Login to join community"
+              className={`px-8 py-4 rounded-full transition-colors inline-flex items-center justify-center ${
                 theme === "dark"
                   ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
                   : "bg-lime-600 text-white hover:bg-lime-700"
               }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
             >
               Join Community
-            </motion.button>
-            <motion.button
-              className={`px-8 py-4 rounded-full backdrop-blur-sm border transition-colors ${
+            </Link>
+            <Link
+              href="/app/contact"
+              aria-label="Learn more about Roots - contact"
+              className={`px-8 py-4 rounded-full backdrop-blur-sm border transition-colors inline-flex items-center justify-center ${
                 theme === "dark"
                   ? "bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50"
                   : "bg-white/50 text-neutral-900 border-neutral-300 hover:bg-neutral-100/50"
               }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
             >
               Learn More
-            </motion.button>
+            </Link>
           </div>
         </motion.div>
       </div>
