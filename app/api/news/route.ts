@@ -3,21 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { cookies } from "next/headers";
 import { getDb } from "@/app/lib/mongo";
-import { jsonrepair } from "jsonrepair";
 
 const NEWS_COLLECTION = "cached_news";
 const PROFILE_COLLECTION = "profiles";
 
 // Cache news for 24 hours
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
-
-type ProfileDoc = {
-  _id?: ObjectId;
-  userId?: string;
-  profileId?: string;
-  location?: string;
-  homeCountry?: string;
-};
 
 function buildUserFilters(userId: string) {
   const filters: Record<string, unknown>[] = [];
@@ -27,42 +18,6 @@ function buildUserFilters(userId: string) {
   filters.push({ userId });
   filters.push({ profileId: userId });
   return filters;
-}
-
-function extractGeminiJson(raw: string) {
-  let jsonText = raw.trim();
-  const jsonMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  if (jsonMatch) {
-    jsonText = jsonMatch[1].trim();
-  }
-
-  const jsonStart = jsonText.indexOf("{");
-  const jsonEnd = jsonText.lastIndexOf("}");
-  if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-    jsonText = jsonText.substring(jsonStart, jsonEnd + 1);
-  }
-
-  return jsonText;
-}
-
-function parseGeminiJson(raw: string) {
-  const jsonText = extractGeminiJson(raw);
-
-  try {
-    return JSON.parse(jsonText);
-  } catch (initialError) {
-    try {
-      const repaired = jsonrepair(jsonText);
-      return JSON.parse(repaired);
-    } catch (repairError) {
-      console.error("Gemini JSON parse failed", {
-        initialError,
-        repairError,
-        snippet: jsonText.slice(0, 2000),
-      });
-      throw new Error("Gemini returned malformed JSON");
-    }
-  }
 }
 
 async function fetchNewsFromGemini(location: string, homeCountry: string) {
@@ -150,7 +105,22 @@ Return ONLY the JSON object, no other text.`;
       throw new Error("Empty response from Gemini");
     }
 
-    return parseGeminiJson(text);
+    // Extract JSON from markdown code blocks if present
+    let jsonText = text.trim();
+    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) {
+      jsonText = jsonMatch[1].trim();
+    }
+    
+    // Remove any leading/trailing non-JSON characters
+    const jsonStart = jsonText.indexOf('{');
+    const jsonEnd = jsonText.lastIndexOf('}');
+    if (jsonStart !== -1 && jsonEnd !== -1) {
+      jsonText = jsonText.substring(jsonStart, jsonEnd + 1);
+    }
+    
+    const parsed = JSON.parse(jsonText);
+    return parsed;
   } catch (error) {
     console.error("Error fetching from Gemini:", error);
     throw error;
@@ -173,7 +143,7 @@ export async function GET(request: NextRequest) {
     
     // Get user's profile using the same filter logic as profile API
     const filters = buildUserFilters(userId);
-    let profile: ProfileDoc | null = null;
+    let profile: any = null;
     
     for (const filter of filters) {
       const doc = await db.collection(PROFILE_COLLECTION).findOne(filter, {
