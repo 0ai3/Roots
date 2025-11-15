@@ -1,5 +1,5 @@
 "use client";
-
+import Footer from "@/app/components/Footer";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
@@ -601,7 +601,9 @@ export default function AttractionsPage() {
           </button>
           <AttractionPlanner initialPoints={0} initialUserId={null} />
         </div>
-      )}
+      )} 
+       
     </DashboardPageLayout>
+
   );
 }
