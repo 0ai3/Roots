@@ -84,7 +84,7 @@ export default function LogsPage() {
     setIsDarkMode(theme === "dark");
   }, [theme]);
 
-  // Theme is controlled by the global ThemeToggle provider
+  // Theme is controlled by the global ThemeToggle provider (via ThemeProvider)
 
   // Color utility functions
   const getBgColor = (opacity: string = "") => {
