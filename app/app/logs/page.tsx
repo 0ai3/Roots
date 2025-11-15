@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTheme } from "@/app/components/ThemeProvider";
 import DashboardPageLayout from "@/app/components/DashboardPageLayout";
 import PageThemeToggle from "@/app/components/PageThemeToggle";
 import { useTheme } from "@/app/components/ThemeProvider";

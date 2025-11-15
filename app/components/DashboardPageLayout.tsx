@@ -19,7 +19,6 @@ export default function DashboardPageLayout({
   contentClassName,
   isDarkMode: isDarkModeProp,
 }: Props) {
-
   const [isDarkMode, setIsDarkMode] = useState<boolean>(
     isDarkModeProp ?? false
   );
@@ -31,16 +30,14 @@ export default function DashboardPageLayout({
       if (saved) {
         setIsDarkMode(saved === "dark");
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }, []);
 
   useEffect(() => {
     try {
       if (isDarkMode) document.documentElement.classList.add("dark");
       else document.documentElement.classList.remove("dark");
-    } catch (e) {
-    }
+    } catch (e) {}
   }, [isDarkMode]);
 
   useEffect(() => {
@@ -53,8 +50,7 @@ export default function DashboardPageLayout({
           const saved = localStorage.getItem("theme");
           if (saved) setIsDarkMode(saved === "dark");
         }
-      } catch (e) {
-      }
+      } catch (e) {}
     };
 
     window.addEventListener("theme-change", handler as EventListener);
@@ -95,9 +91,7 @@ export default function DashboardPageLayout({
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-8 lg:flex-row">
         <DashboardSidebar borderClassName={sidebarBorder} />
-        <section className={sectionClass}>
-          {children}
-        </section>
+        <section className={sectionClass}>{children}</section>
       </div>
     </main>
   );
