@@ -19,6 +19,8 @@ import {
   LogOut,
   BookOpen,
   MessageCircle,
+  Menu as MenuIcon,
+  X as XIcon,
 } from "lucide-react";
 
 type Props = {
@@ -43,13 +45,23 @@ export default function DashboardSidebar({ borderClassName }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
   const { t } = useI18n();
-  const borderClass = borderClassName ?? "border-white/10";
 
-  // Local theme sync so sidebar can adapt to per-page theme toggles without
-  // reading browser-only APIs during SSR. Start false to avoid hydration
-  // mismatches, then sync after mount.
   const [isDarkLocal, setIsDarkLocal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollPosition(window.scrollY);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const isScrolled = scrollPosition > 50;
 
   useEffect(() => {
     try {
@@ -109,105 +121,245 @@ export default function DashboardSidebar({ borderClassName }: Props) {
     }
   };
 
-  const darkBg =
-    "linear-gradient(135deg, #050505 0%, #0b0b0b 60%, #0f0f0f 100%)";
-  const lightBg =
-    "linear-gradient(135deg, rgba(16,185,129,0.9) 0%, rgba(5,150,105,0.85) 60%, rgba(6,95,70,0.8) 100%)";
-
   return (
-    <motion.aside
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      className={`flex w-full flex-col gap-6 rounded-2xl border ${borderClass} p-6 shadow-xl backdrop-blur-sm lg:w-64 text-white`}
-      style={{
-        background: isDarkLocal ? darkBg : lightBg,
-      }}
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? isDarkLocal
+            ? "bg-neutral-950/90 backdrop-blur-lg border-b border-neutral-800"
+            : "bg-white/90 backdrop-blur-lg border-b border-neutral-200 shadow-sm"
+          : isDarkLocal
+          ? "bg-neutral-950/50 backdrop-blur-sm border-b border-neutral-800/50"
+          : "bg-white/50 backdrop-blur-sm border-b border-neutral-200/50"
+      }`}
     >
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-2"
-      >
-        <div className="flex items-center gap-2">
-          <div
-            className={`w-2 h-2 rounded-full ${
-              isDarkLocal ? "bg-lime-300" : "bg-lime-300"
-            }`}
-          />
-          <p className="text-xs uppercase tracking-[0.3em] font-medium text-white/90">
-            Roots
-          </p>
-        </div>
-        <h2 className="text-2xl font-bold tracking-tight text-white">
-          {t("dashboard.sidebar.navigation")}
-        </h2>
-      </motion.div>
-
-      {/* Navigation Links */}
-      <nav className="space-y-2">
-        {navLinks.map((link, index) => {
-          const isActive =
-            pathname === link.href || pathname?.startsWith(`${link.href}/`);
-          const Icon = link.icon;
-
-          return (
-            <motion.div
-              key={link.href}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <motion.div
+            className="flex items-center gap-2"
+            whileHover={{ scale: 1.02 }}
+          >
+            <div
+              className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                isDarkLocal ? "bg-lime-400" : "bg-emerald-600"
+              }`}
             >
-              <Link
-                href={link.href}
-                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium tracking-wide transition-all duration-300 group ${
-                  isActive
-                    ? "bg-white/20 text-white border border-white/30 shadow-lg"
-                    : "bg-white/5 text-white/90 hover:bg-white/10 hover:border-white/20 border border-transparent"
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className={isDarkLocal ? "text-neutral-950" : "text-white"}
+              >
+                <path
+                  d="M12 2C12 2 9 6 9 10C9 12.2091 10.7909 14 13 14C15.2091 14 17 12.2091 17 10C17 6 14 2 14 2H12Z"
+                  fill="currentColor"
+                />
+                <path
+                  d="M8 22C8 22 6 18 6 15C6 13.3431 7.34315 12 9 12C10.6569 12 12 13.3431 12 15C12 18 10 22 10 22H8Z"
+                  fill="currentColor"
+                  opacity="0.7"
+                />
+                <path
+                  d="M16 22C16 22 14 18 14 15C14 13.3431 15.3431 12 17 12C18.6569 12 20 13.3431 20 15C20 18 18 22 18 22H16Z"
+                  fill="currentColor"
+                  opacity="0.7"
+                />
+              </svg>
+            </div>
+            <Link
+              href="/app/dashboard"
+              className={`text-xl font-semibold ${
+                isDarkLocal ? "text-white" : "text-neutral-900"
+              }`}
+            >
+              Roots
+            </Link>
+          </motion.div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center gap-6">
+            {navLinks.slice(0, 6).map((link) => {
+              const isActive =
+                pathname === link.href || pathname?.startsWith(`${link.href}/`);
+              const Icon = link.icon;
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                    isActive
+                      ? isDarkLocal
+                        ? "text-lime-400"
+                        : "text-emerald-600"
+                      : isDarkLocal
+                      ? "text-neutral-300 hover:text-lime-400"
+                      : "text-neutral-700 hover:text-emerald-600"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {t(link.label)}
+                </Link>
+              );
+            })}
+
+            {/* Dropdown for More Items */}
+            <div className="relative group">
+              <button
+                className={`flex items-center gap-1 text-sm font-medium transition-colors ${
+                  isDarkLocal
+                    ? "text-neutral-300 hover:text-lime-400"
+                    : "text-neutral-700 hover:text-emerald-600"
                 }`}
               >
-                <Icon
-                  className={`w-5 h-5 transition-transform duration-300 ${
-                    isActive
-                      ? "text-lime-300"
-                      : "text-white/80 group-hover:text-lime-200"
-                  }`}
-                />
-                <span className="flex-1">{t(link.label)}</span>
-                {isActive && (
-                  <motion.div
-                    layoutId="activeIndicator"
-                    className="w-1.5 h-1.5 rounded-full bg-lime-300"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                More
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
                   />
-                )}
-              </Link>
-            </motion.div>
-          );
-        })}
-      </nav>
+                </svg>
+              </button>
 
-      {/* Logout Button */}
-      <motion.button
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        type="button"
-        onClick={handleLogout}
-        disabled={isLoggingOut}
-        className={`mt-auto flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-70 group text-white border border-white/30 hover:bg-white/10 hover:border-white/40`}
-      >
-        <LogOut
-          className={`w-5 h-5 transition-transform duration-300 ${
-            isLoggingOut ? "animate-pulse" : "group-hover:translate-x-0.5"
-          } text-white`}
-        />
-        <span>
-          {isLoggingOut
-            ? t("dashboard.sidebar.signingOut")
-            : t("dashboard.sidebar.logout")}
-        </span>
-      </motion.button>
-    </motion.aside>
+              <div
+                className={`absolute right-0 mt-2 w-56 rounded-2xl border shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ${
+                  isDarkLocal
+                    ? "bg-neutral-900 border-neutral-800"
+                    : "bg-white border-neutral-200"
+                }`}
+              >
+                <div className="py-2">
+                  {navLinks.slice(6).map((link) => {
+                    const isActive =
+                      pathname === link.href ||
+                      pathname?.startsWith(`${link.href}/`);
+                    const Icon = link.icon;
+
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                          isActive
+                            ? isDarkLocal
+                              ? "text-lime-400 bg-lime-400/10"
+                              : "text-emerald-600 bg-emerald-50"
+                            : isDarkLocal
+                            ? "text-neutral-300 hover:bg-neutral-800"
+                            : "text-neutral-700 hover:bg-slate-50"
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        {t(link.label)}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Logout Button */}
+            <motion.button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-colors ${
+                isDarkLocal
+                  ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
+                  : "bg-emerald-600 text-white hover:bg-emerald-700"
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              <LogOut className="w-4 h-4" />
+              {isLoggingOut
+                ? t("dashboard.sidebar.signingOut")
+                : t("dashboard.sidebar.logout")}
+            </motion.button>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className={`lg:hidden p-2 ${
+              isDarkLocal ? "text-white" : "text-neutral-900"
+            }`}
+          >
+            {isMenuOpen ? (
+              <XIcon className="w-6 h-6" />
+            ) : (
+              <MenuIcon className="w-6 h-6" />
+            )}
+          </button>
+        </div>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`lg:hidden py-4 border-t ${
+              isDarkLocal ? "border-neutral-800" : "border-neutral-200"
+            }`}
+          >
+            <div className="space-y-1">
+              {navLinks.map((link) => {
+                const isActive =
+                  pathname === link.href ||
+                  pathname?.startsWith(`${link.href}/`);
+                const Icon = link.icon;
+
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
+                      isActive
+                        ? isDarkLocal
+                          ? "text-lime-400 bg-lime-400/10"
+                          : "text-emerald-600 bg-emerald-50"
+                        : isDarkLocal
+                        ? "text-neutral-300 hover:bg-neutral-800"
+                        : "text-neutral-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    {t(link.label)}
+                  </Link>
+                );
+              })}
+            </div>
+
+            <button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className={`w-full mt-4 flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-colors ${
+                isDarkLocal
+                  ? "bg-lime-400 text-neutral-950"
+                  : "bg-emerald-600 text-white"
+              } disabled:opacity-50`}
+            >
+              <LogOut className="w-4 h-4" />
+              {isLoggingOut
+                ? t("dashboard.sidebar.signingOut")
+                : t("dashboard.sidebar.logout")}
+            </button>
+          </motion.div>
+        )}
+      </div>
+    </motion.nav>
   );
 }
