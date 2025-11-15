@@ -20,8 +20,6 @@ import {
   Target,
 } from "lucide-react";
 import DashboardPageLayout from "@/app/components/DashboardPageLayout";
-import PageThemeToggle from "@/app/components/PageThemeToggle";
-import { useTheme } from "@/app/components/ThemeProvider";
 
 type DashboardUser = {
   email: string;
@@ -33,7 +31,6 @@ type DashboardUser = {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { theme } = useTheme();
   const [user, setUser] = useState<DashboardUser | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -75,12 +72,7 @@ export default function DashboardPage() {
 
   return (
     <DashboardPageLayout>
-      <div className="relative min-h-screen">
-        {/* Page Theme Toggle */}
-        <div className="fixed top-6 right-6 z-50">
-          <PageThemeToggle />
-        </div>
-
+      <div className="relative min-h-screen bg-white dark:bg-neutral-950">
         {/* Hero Section */}
         <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
@@ -101,8 +93,8 @@ export default function DashboardPage() {
               transition={{ duration: 0.6 }}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-lime-400/10 dark:bg-lime-400/20 border border-lime-400/20 dark:border-lime-400/30 mb-6"
             >
-              <Sparkles className="w-4 h-4 text-lime-400" />
-              <span className="text-sm font-medium text-lime-400">
+              <Sparkles className="w-4 h-4 text-lime-400 dark:text-lime-400" />
+              <span className="text-sm font-medium text-lime-400 dark:text-lime-400">
                 Your Cultural Journey Hub
               </span>
             </motion.div>
@@ -123,7 +115,7 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-xl text-white/90 mb-8 max-w-2xl mx-auto"
+              className="text-xl text-white/90 dark:text-white/80 mb-8 max-w-2xl mx-auto"
             >
               Continue your exploration of world cultures, traditions, and
               connections. Your next adventure awaits.
@@ -139,7 +131,7 @@ export default function DashboardPage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => router.push("/app/map")}
-                className="px-8 py-4 bg-lime-400 dark:bg-lime-400 text-black rounded-xl font-semibold flex items-center gap-2 hover:bg-lime-300 dark:hover:bg-lime-300 transition-colors"
+                className="px-8 py-4 bg-lime-400 dark:bg-lime-400 text-black dark:text-black rounded-xl font-semibold flex items-center gap-2 hover:bg-lime-300 dark:hover:bg-lime-300 transition-colors"
               >
                 <Compass className="w-5 h-5" />
                 Explore Map
@@ -149,7 +141,7 @@ export default function DashboardPage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => router.push("/app/attractions")}
-                className="px-8 py-4 bg-white/10 dark:bg-white/10 text-white backdrop-blur-sm border border-white/20 rounded-xl font-semibold flex items-center gap-2 hover:bg-white/20 dark:hover:bg-white/20 transition-colors"
+                className="px-8 py-4 bg-white/10 dark:bg-white/10 text-white dark:text-white backdrop-blur-sm border border-white/20 dark:border-white/20 rounded-xl font-semibold flex items-center gap-2 hover:bg-white/20 dark:hover:bg-white/20 transition-colors"
               >
                 <MapPin className="w-5 h-5" />
                 View Attractions
@@ -365,7 +357,7 @@ export default function DashboardPage() {
         </section>
 
         {/* Achievement Highlights */}
-        <section className="py-20">
+        <section className="py-20 bg-white dark:bg-neutral-950">
           <div className="max-w-7xl mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -447,7 +439,7 @@ export default function DashboardPage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => router.push("/app/map")}
-                className="px-10 py-5 bg-white text-lime-600 dark:text-lime-600 rounded-xl font-bold text-lg flex items-center gap-3 mx-auto hover:bg-neutral-100 transition-colors"
+                className="px-10 py-5 bg-white text-lime-600 dark:text-lime-600 rounded-xl font-bold text-lg flex items-center gap-3 mx-auto hover:bg-neutral-100 dark:hover:bg-neutral-200 transition-colors"
               >
                 Start Exploring
                 <ArrowRight className="w-6 h-6" />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTheme } from "@/app/components/ThemeProvider";
 import DashboardPageLayout from "@/app/components/DashboardPageLayout";
 import { MapPin, Utensils, Star, Trash2, Plus, Globe2, Upload, X, Image as ImageIcon, AlertCircle, CheckCircle, FileText, Camera, Award, Loader2, Sun, Moon } from "lucide-react";
 import Image from "next/image";
@@ -51,23 +52,10 @@ type ValidationState = {
 };
 
 export default function LogsPage() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { theme } = useTheme();
+  const isDarkMode = theme === "dark";
 
-  // Theme management
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("theme");
-      if (saved) {
-        setIsDarkMode(saved === "dark");
-      } else {
-        setIsDarkMode(document.documentElement.classList.contains("dark"));
-      }
-    } catch (e) {
-      // ignore
-    }
-  }, []);
-
-  // Theme is controlled by the global ThemeToggle provider
+  // Theme is controlled by the global ThemeToggle provider (via ThemeProvider)
 
   // Color utility functions
   const getBgColor = (opacity: string = "") => {
