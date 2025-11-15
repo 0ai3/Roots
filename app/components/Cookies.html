@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Policy - Roots</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --dark-bg: #111;
+            --dark-text: #eee;
+            --dark-secondary: #222;
+            --primary-color: #70AD47;
+            /* Inspirat din logo-ul "Roots" */
+            --strict-color: #d4edda;
+            --functional-color: #cce5ff;
+            --analytics-color: #e2d9ff;
+            --strict-bg: #1c352d;
+            --functional-bg: #1a2a40;
+            --analytics-bg: #302045;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+            padding-top: 60px;
+            /* Spațiu pentru bara fixă */
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .cta-button {
+            background-color: var(--primary-color);
+            color: var(--dark-bg);
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .cta-button:hover {
+            background-color: #558a38;
+        }
+
+        /* Stiluri pentru conținutul paginii de Cookies */
+        .cookie-page-container {
+            max-width: 950px;
+  margin: 40px auto;
+  padding: 35px;
+  background: rgb(41, 39, 35);
+  border: 2px solid rgb(6, 82, 25);
+  border-radius: 40px; /* schimbat */
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        /* Stiluri pentru secțiunile de cookies */
+        .what-are-cookies h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--dark-text);
+        }
+
+        .cookie-types h2 {
+            font-size: 2rem;
+            margin: 40px 0 20px 0;
+            color: var(--dark-text);
+        }
+
+        .cookie-category {
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid;
+            /* Bară de culoare pe stânga */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .category-header i {
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .category-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .cookie-list {
+            list-style: none;
+            /* Elimină punctele standard */
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        .cookie-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        .cookie-list li::before {
+            content: '•';
+            /* Punct mic ca listă */
+            color: var(--dark-text);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        .note,
+        .note-consent {
+            margin-top: 15px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        /* Culoarea secțiunii Strict Necessary */
+        .strict-necessary {
+            border-left-color: var(--primary-color);
+            /* Bară verde */
+            background-color: var(--strict-bg);
+        }
+
+        .strict-necessary .category-header i {
+            color: var(--primary-color);
+        }
+
+        .note {
+            background-color: #3b281f;
+            /* Culoare warning subtilă */
+            color: #ffcc00;
+            /* Galben pentru warning */
+        }
+
+
+        /* Culoarea secțiunii Functional */
+        .functional {
+            border-left-color: #007bff;
+            /* Bară albastră */
+            background-color: var(--functional-bg);
+        }
+
+        .functional .category-header i {
+            color: #007bff;
+        }
+
+        /* Culoarea secțiunii Analytics */
+        .analytics {
+            border-left-color: #9370db;
+            /* Bară mov */
+            background-color: var(--analytics-bg);
+        }
+
+        .analytics .category-header i {
+            color: #9370db;
+        }
+
+        .note-consent {
+            background-color: #1a301d;
+            /* Fundal verde închis pentru bifă */
+            color: #38a169;
+            /* Verde pentru bifă */
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="cookie-page-container">
+        <h1 class="page-title">Cookie Policy</h1>
+
+        <section class="what-are-cookies">
+            <h2>What Are Cookies?</h2>
+            <p>Cookies are small text files that websites store on your device to remember information about your visit,
+                like login details,
+                shopping cart contents, and site preferences. They are used to personalize your experience, keep you
+                logged in, and help websites
+                function properly. Essentially, they act as a digital memory for a website to recognize you and your
+                activity when you return. </p>
+        </section>
+
+        <section class="cookie-types">
+            <h2>Types of Cookies Used</h2>
+
+            <div class="cookie-category strict-necessary">
+                <div class="category-header">
+                    <i class="fa-solid fa-key"></i>
+                    <h3>Strictly Necessary Cookies</h3>
+                </div>
+                <ul class="cookie-list">
+                    <li>Session cookies - maintains an active session.</li>
+                    <li>Security cookies - CSRF protection.</li>
+                    <li>Load balancing - distributing traffic.</li>
+                </ul>
+                <p class="note">⚠ Consent is NOT required under Art. 5 para. (3) of Directive 2002/58/CE.</p>
+            </div>
+
+            <div class="cookie-category functional">
+                <div class="category-header">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <h3>Functional Cookies</h3>
+                </div>
+                <p>Enhances user experience by storing preference memory.</p>
+                <ul class="cookie-list">
+                    <li>Preferred language</li>
+                    <li>Display settings</li>
+                    <li>Shopping cart</li>
+                </ul>
+                <p class="note-consent">✓ Requires consent</p>
+            </div>
+
+            <div class="cookie-category analytics">
+                <div class="category-header">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <h3>Analytics Cookies</h3>
+                </div>
+                <p>Collects information on how the site is used.</p>
+                <ul class="cookie-list">
+                    <li>Google Analytics</li>
+                    <li>Visitor statistics</li>
+                    <li>User behavior</li>
+                </ul>
+                <p class="note-consent">✓ Requires consent</p>
+            </div>
+
+        </section>
+
+        <section class="footer-note">
+            <p>For more detailed information, please read our <a href="#">Full Privacy Statement.</a></p>
+        </section>
+    </main>
+
+</body>
+
+</html>

@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useState, useEffect, useMemo } from "react";
 
 import { motion } from "framer-motion";
@@ -20,8 +19,6 @@ import Navbar from "./components/Navbar";
 import { useTheme } from "./components/ThemeProvider";
 import ThemeToggle from "./components/ThemeToggle";
 import Image from "next/image";
-
-
 
 interface HeroSectionProps {
   scrollY: number;
@@ -1089,11 +1086,11 @@ function CTASection() {
           }`}
         >
           <div className="flex flex-wrap justify-center gap-8 mb-6">
-            {["About", "Features", "Community", "Privacy", "Terms"].map(
+            {["About", "Features", "Community", "Cookies", "Terms"].map(
               (link) => (
                 <a
                   key={link}
-                  href="#"
+                  href="/Cookies.html"
                   className={`text-sm transition-colors ${
                     theme === "dark"
                       ? "hover:text-lime-400"
@@ -1131,14 +1128,7 @@ function ImageWithFallback({
 }: ImageWithFallbackProps) {
   // If width/height not provided, use fill layout
   if (!width || !height) {
-    return (
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        className={className}
-      />
-    );
+    return <Image src={src} alt={alt} fill className={className} />;
   }
 
   return (
@@ -1151,8 +1141,6 @@ function ImageWithFallback({
     />
   );
 }
-
-
 
 export default function App() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -1185,15 +1173,15 @@ export default function App() {
 
   return (
     // <ThemeProvider>
-      <div className="relative">
-        <Navbar scrollY={scrollY} />
-        <ThemeToggle />
-        <HeroSection scrollY={scrollY} />
-        <FeaturesSection />
-        <ExploreSection />
-        {mounted && <InteractiveGarden mousePosition={mousePosition} />}
-        <CTASection />
-      </div>
+    <div className="relative">
+      <Navbar scrollY={scrollY} />
+      <ThemeToggle />
+      <HeroSection scrollY={scrollY} />
+      <FeaturesSection />
+      <ExploreSection />
+      {mounted && <InteractiveGarden mousePosition={mousePosition} />}
+      <CTASection />
+    </div>
     // </ThemeProvider>
   );
 }

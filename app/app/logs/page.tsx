@@ -590,7 +590,7 @@ export default function LogsPage() {
           <>
             {/* Stats Grid */}
             <div className="grid gap-4 md:grid-cols-4">
-              <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 p-6 backdrop-blur">
+              <div className="rounded-3xl border border-white/10 bg-linear-to-br from-emerald-500/20 to-teal-500/20 p-6 backdrop-blur">
                 <div className="flex items-center gap-3">
                   <Globe2 className="h-8 w-8 text-emerald-400" />
                   <div>
@@ -600,7 +600,7 @@ export default function LogsPage() {
                 </div>
                 <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
                   <div
-                    className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 transition-all duration-500"
+                    className="h-full bg-linear-to-r from-emerald-400 to-teal-400 transition-all duration-500"
                     style={{ width: `${stats.worldPercentage}%` }}
                   />
                 </div>
@@ -962,7 +962,7 @@ export default function LogsPage() {
         ) : (
           <>
             {/* Tasks Tab Content */}
-            <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-purple-500/20 to-pink-500/20 p-6 backdrop-blur">
+            <div className="rounded-3xl border border-white/10 bg-linear-to-br from-purple-500/20 to-pink-500/20 p-6 backdrop-blur">
               <h2 className="flex items-center gap-2 text-xl font-bold text-white">
                 <Award className="h-6 w-6 text-purple-400" />
                 Photo Verification Challenges
