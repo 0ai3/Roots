@@ -112,7 +112,7 @@ export default function NewsPage() {
 
         {/* Location Info */}
         {location && !error && (
-          <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 p-6 backdrop-blur">
+          <div className="rounded-3xl border border-white/10 bg-linear-to-br from-emerald-500/20 to-teal-500/20 p-6 backdrop-blur">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-wide text-white/60">Your Location</p>
@@ -186,7 +186,7 @@ export default function NewsPage() {
                   {newsData.culturalTips.map((tip, index) => (
                     <div
                       key={index}
-                      className="rounded-2xl border border-white/10 bg-gradient-to-br from-emerald-500/10 to-transparent p-4"
+                      className="rounded-2xl border border-white/10 bg-linear-to-br from-emerald-500/10 to-transparent p-4"
                     >
                       <p className="text-sm text-white/80">{tip}</p>
                     </div>
@@ -242,7 +242,7 @@ export default function NewsPage() {
                   {newsData.culturalNews.map((item, index) => (
                     <article
                       key={index}
-                      className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-transparent p-5 transition hover:bg-white/10"
+                      className="rounded-2xl border border-white/10 bg-linear-to-br from-white/5 to-transparent p-5 transition hover:bg-white/10"
                     >
                       <div className="flex items-start gap-3">
                         <div className="rounded-full bg-blue-500/20 p-2 text-blue-400">

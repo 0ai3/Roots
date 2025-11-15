@@ -22,6 +22,8 @@ export default function ThemeToggle() {
     "games",
     "map",
     "profile",
+    "dashboard",
+    "logs",
   ];
   if (typeof pathname === "string") {
     for (const p of hiddenPaths) {

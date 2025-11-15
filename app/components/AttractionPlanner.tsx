@@ -601,6 +601,7 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
                 message={message}
                 onLogAttraction={handleLogAttraction}
                 visitedAttractions={visitedAttractions}
+                t={t}
               />
             ))}
           </div>

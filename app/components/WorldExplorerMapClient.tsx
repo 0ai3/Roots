@@ -869,7 +869,7 @@ export default function WorldExplorerMap() {
   };
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-neutral-950 to-neutral-900 px-4 py-8 text-white sm:px-6">
+    <section className="min-h-screen bg-linear-to-br from-neutral-950 to-neutral-900 px-4 py-8 text-white sm:px-6">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 lg:flex-row">
         {/* Map Container */}
         <motion.div
@@ -901,7 +901,7 @@ export default function WorldExplorerMap() {
                 mapsLabel={t("worldExplorer.attractions.openInMaps")}
               />
             </MapContainer>
-            <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center z-[100]">
+            <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center z-100">
               <button
                 type="button"
                 onClick={handleLookForAttractions}
@@ -923,7 +923,7 @@ export default function WorldExplorerMap() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
-          className="w-full flex-shrink-0 rounded-2xl border border-white/10 bg-neutral-900/50 p-6 backdrop-blur-sm lg:w-[360px] xl:w-[390px]"
+          className="w-full shrink-0 rounded-2xl border border-white/10 bg-neutral-900/50 p-6 backdrop-blur-sm lg:w-[360px] xl:w-[390px]"
         >
           {/* Header */}
           <div className="flex items-center justify-between">

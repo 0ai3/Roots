@@ -276,7 +276,7 @@ function LeaderboardTable({
             ? "border-b border-white/10 bg-white/10"
             : "border-b border-neutral-200 bg-white/50"
         } px-6 py-4`}
-      >
+      />
         <div className="flex items-center gap-3">
           <Trophy className="w-5 h-5 text-lime-400/80" />
           <h3
