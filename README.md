@@ -39,9 +39,18 @@ ELEVENLABS_API_KEY=your-elevenlabs-key
 # optional overrides for the selected voice + model
 ELEVENLABS_VOICE_ID=21m00Tcm4TlvDq8ikWAM
 ELEVENLABS_MODEL=eleven_turbo_v2
+
+# public token for LiveLocationMap routing (Mapbox Directions API)
+NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your-mapbox-public-token
 ```
 
-`MONGODB_URI` is required by `app/lib/mongo.ts` whenever user data is fetched (for example, the dashboard view), while `GEMINI_API_KEY` is read inside `app/api/attractions/plan/route.ts` to generate activity suggestions for the attractions planner. Without these values the corresponding features will throw a helpful error so you know what needs to be configured.
+`MONGODB_URI` is required by `app/lib/mongo.ts` whenever user data is fetched (for example, the dashboard view), while `GEMINI_API_KEY` is read inside `app/api/attractions/plan/route.ts` to generate activity suggestions for the attractions planner. `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` is consumed on the client when `LiveLocationMap` fetches directions from Mapbox—use a public token and restart the dev server after editing `.env.local`. Without these values the corresponding features will throw a helpful error so you know what needs to be configured.
+
+### Live location map tips
+
+- The map now stores saved attractions per profile via `POST /api/profile/attractions`, so make sure you are authenticated (the `roots_user` cookie) and MongoDB is reachable.
+- Tap anywhere on the map to drop a pin, give it a label, and persist it. Saved entries appear in the "Saved attractions" dropdown and can be routed to again at any time.
+- Directions use Mapbox Directions API—if calls fail double-check the `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` value.
 
 ## Learn More
 
