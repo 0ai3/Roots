@@ -27,6 +27,13 @@ type ProfileResponse = Partial<ProfileFields> & {
   updatedAt?: string;
 };
 
+type ProfileMeta = {
+  role: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  email: string;
+};
+
 const EMPTY_FORM: ProfileFields = {
   name: "",
   email: "",
@@ -55,9 +62,7 @@ const formatDate = (value?: string | null) => {
 export default function ProfileForm({ initialPoints, initialUserId }: Props = {}) {
   const { points } = useExperiencePoints({ initialPoints, initialUserId });
   const [formState, setFormState] = useState<ProfileFields>(EMPTY_FORM);
-  const [profileMeta, setProfileMeta] = useState<
-    Pick<ProfileResponse, "role" | "createdAt" | "updatedAt" | "email">
-  >({
+  const [profileMeta, setProfileMeta] = useState<ProfileMeta>({
     role: null,
     createdAt: null,
     updatedAt: null,

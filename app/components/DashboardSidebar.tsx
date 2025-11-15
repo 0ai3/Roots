@@ -15,7 +15,8 @@ import {
   Newspaper, 
   Landmark, 
   Trophy,
-  LogOut
+  LogOut,
+  BookOpen
 } from "lucide-react";
 
 type Props = {
@@ -25,6 +26,7 @@ type Props = {
 const navLinks = [
   { label: "Dashboard", href: "/app/dashboard", icon: Home },
   { label: "Profile", href: "/app/profile", icon: User },
+  { label: "Logs", href: "/app/logs", icon: BookOpen },
   { label: "Map", href: "/app/map", icon: Map },
   { label: "Games", href: "/app/games", icon: Gamepad2 },
   { label: "Recipes", href: "/app/recipes", icon: Utensils },
