@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { useI18n } from "@/app/hooks/useI18n";
 import { Loader2 } from "lucide-react";
@@ -45,6 +45,10 @@ type RecipeDetailState = {
   error?: string | null;
   isSpeaking?: boolean;
   speechError?: string | null;
+  audioUrl?: string | null;
+  audioDuration?: number;
+  audioCurrentTime?: number;
+  isAudioPlaying?: boolean;
 };
 type RecipeDetailMap = Record<string, RecipeDetailState>;
 
@@ -304,20 +308,6 @@ function AssistantCard({
                   >
                     {selectLabel}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => onLogRecipe(recipe.name)}
-                    disabled={Boolean(cookedRecipes[recipe.name])}
-                    className={`rounded-full px-4 py-2 transition ${
-                      cookedRecipes[recipe.name]
-                        ? "border border-amber-200/40 text-amber-100"
-                        : "border border-white/20 text-white hover:border-amber-200 hover:text-amber-100 disabled:opacity-60"
-                    }`}
-                  >
-                    {cookedRecipes[recipe.name]
-                      ? t("planner.recipes.logged")
-                      : t("planner.recipes.cookedButton")}
-                  </button>
                 </div>
 
                 {detailState.status === "error" && detailState.error && (
@@ -330,7 +320,17 @@ function AssistantCard({
                   <RecipeDetailPanel
                     detail={detailState.detail}
                     onListen={() => onListenToRecipe(recipe.name)}
-                    isSpeaking={Boolean(detailState.isSpeaking)}
+                    onPause={() => handlePauseRecipeAudio(recipe.name)}
+                    onSeek={(value) => handleSeekRecipeAudio(recipe.name, value)}
+                    audioState={{
+                      isGenerating: Boolean(detailState.isSpeaking),
+                      isPlaying: Boolean(detailState.isAudioPlaying),
+                      duration: detailState.audioDuration ?? 0,
+                      currentTime: detailState.audioCurrentTime ?? 0,
+                      hasAudio: Boolean(detailState.audioUrl),
+                    }}
+                    onLogRecipe={() => onLogRecipe(recipe.name)}
+                    isCooked={Boolean(cookedRecipes[recipe.name])}
                     speechError={detailState.speechError}
                     t={t}
                   />
@@ -348,21 +348,38 @@ function AssistantCard({
   );
 }
 
+type RecipeAudioState = {
+  isGenerating: boolean;
+  isPlaying: boolean;
+  duration: number;
+  currentTime: number;
+  hasAudio: boolean;
+};
+
 function RecipeDetailPanel({
   detail,
   onListen,
-  isSpeaking,
+  onPause,
+  onSeek,
+  audioState,
   speechError,
   t,
+  onLogRecipe,
+  isCooked,
 }: {
   detail: RecipeDetail;
   onListen: () => void;
-  isSpeaking: boolean;
+  onPause: () => void;
+  onSeek: (value: number) => void;
+  audioState: RecipeAudioState;
   speechError?: string | null;
   t: Translator;
+  onLogRecipe: () => void;
+  isCooked: boolean;
 }) {
   const ingredients = detail.ingredients?.filter(Boolean) ?? [];
   const steps = detail.steps?.filter(Boolean) ?? [];
+  const scrubberId = `audio-scrubber-${detail.name.replace(/\s+/g, "-").toLowerCase()}`;
   const metaChips = [
     detail.servings ? `${t("planner.recipes.servingsLabel")}: ${detail.servings}` : null,
     detail.prepTime ? `${t("planner.recipes.prepTimeLabel")}: ${detail.prepTime}` : null,
@@ -386,15 +403,51 @@ function RecipeDetailPanel({
             </div>
           )}
         </div>
-        <button
-          type="button"
-          onClick={onListen}
-          disabled={isSpeaking}
-          className="rounded-full border border-amber-300/60 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-amber-100 transition hover:border-amber-200 hover:text-white disabled:opacity-60"
-        >
-          {isSpeaking ? t("planner.recipes.listening") : t("planner.recipes.listenButton")}
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={onListen}
+            disabled={audioState.isGenerating}
+            className="rounded-full border border-amber-300/60 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-amber-100 transition hover:border-amber-200 hover:text-white disabled:opacity-60"
+          >
+            {audioState.isGenerating
+              ? t("planner.recipes.listening")
+              : t("planner.recipes.listenButton")}
+          </button>
+          <button
+            type="button"
+            onClick={onPause}
+            disabled={!audioState.hasAudio || !audioState.isPlaying}
+            className="rounded-full border border-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white/80 transition hover:border-amber-200 hover:text-amber-100 disabled:opacity-50"
+          >
+            {t("planner.recipes.pauseButton")}
+          </button>
+        </div>
       </div>
+
+      {audioState.hasAudio && (
+        <div className="space-y-2">
+          <label className="sr-only" htmlFor={scrubberId}>
+            {t("planner.recipes.audioScrubLabel")}
+          </label>
+          <input
+            id={scrubberId}
+            type="range"
+            min={0}
+            max={audioState.duration || 0}
+            step={0.1}
+            value={
+              Number.isFinite(audioState.currentTime) ? audioState.currentTime : 0
+            }
+            onChange={(event) => onSeek(Number(event.target.value))}
+            className="w-full accent-amber-300"
+          />
+          <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-white/50">
+            <span>{formatTime(audioState.currentTime)}</span>
+            <span>{formatTime(audioState.duration)}</span>
+          </div>
+        </div>
+      )}
 
       {ingredients.length > 0 && (
         <div>
@@ -431,6 +484,21 @@ function RecipeDetailPanel({
         </p>
       )}
 
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
+        <button
+          type="button"
+          onClick={onLogRecipe}
+          disabled={isCooked}
+          className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wide transition ${
+            isCooked
+              ? "border border-emerald-300/40 text-emerald-100"
+              : "border border-white/20 text-white hover:border-amber-200 hover:text-amber-100 disabled:opacity-60"
+          }`}
+        >
+          {isCooked ? t("planner.recipes.logged") : t("planner.recipes.cookedButton")}
+        </button>
+      </div>
+
       {speechError && (
         <p className="rounded-2xl border border-rose-400/40 bg-rose-400/10 px-4 py-3 text-xs text-rose-100">
           {speechError}
@@ -461,6 +529,10 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
   const [error, setError] = useState<string | null>(null);
   const [cookedRecipes, setCookedRecipes] = useState<CookedMap>({});
   const [recipeDetails, setRecipeDetails] = useState<RecipeDetailMap>({});
+  const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
+  const audioCleanupRefs = useRef<Record<string, (() => void) | undefined>>({});
+  const audioUrlRefs = useRef<Record<string, string | null>>({});
+  const isUnmountedRef = useRef(false);
   const { points, addPoints } = useExperiencePoints({ initialPoints, initialUserId });
   const updateRecipeDetailState = (
     name: string,
@@ -493,6 +565,72 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
     }
     setCookedRecipes((prev) => ({ ...prev, [name]: true }));
     addPoints(2);
+  };
+
+  const destroyAudio = (name: string) => {
+    const cleanup = audioCleanupRefs.current[name];
+    if (cleanup) {
+      cleanup();
+      delete audioCleanupRefs.current[name];
+    }
+    const storedUrl = audioUrlRefs.current[name];
+    if (storedUrl) {
+      URL.revokeObjectURL(storedUrl);
+      delete audioUrlRefs.current[name];
+    }
+    audioRefs.current[name] = null;
+    if (!isUnmountedRef.current) {
+      updateRecipeDetailState(name, (prev) => ({
+        ...(prev ?? { status: "idle" as const }),
+        audioUrl: null,
+        audioDuration: undefined,
+        audioCurrentTime: undefined,
+        isAudioPlaying: false,
+      }));
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      isUnmountedRef.current = true;
+      Object.keys(audioRefs.current).forEach((name) => {
+        destroyAudio(name);
+      });
+    };
+  }, []);
+
+  const attachAudioListeners = (name: string, audio: HTMLAudioElement) => {
+    const handleSync = () => {
+      updateRecipeDetailState(name, (prev) => ({
+        ...(prev ?? { status: "idle" as const }),
+        audioCurrentTime: audio.currentTime,
+        audioDuration: Number.isFinite(audio.duration)
+          ? audio.duration
+          : prev?.audioDuration ?? 0,
+        isAudioPlaying: !audio.paused,
+      }));
+    };
+    const handleEnded = () => {
+      updateRecipeDetailState(name, (prev) => ({
+        ...(prev ?? { status: "idle" as const }),
+        isAudioPlaying: false,
+        audioCurrentTime: audio.duration || prev?.audioDuration || 0,
+      }));
+    };
+    audio.addEventListener("timeupdate", handleSync);
+    audio.addEventListener("play", handleSync);
+    audio.addEventListener("pause", handleSync);
+    audio.addEventListener("loadedmetadata", handleSync);
+    audio.addEventListener("ended", handleEnded);
+    audioCleanupRefs.current[name] = () => {
+      audio.removeEventListener("timeupdate", handleSync);
+      audio.removeEventListener("play", handleSync);
+      audio.removeEventListener("pause", handleSync);
+      audio.removeEventListener("loadedmetadata", handleSync);
+      audio.removeEventListener("ended", handleEnded);
+      audio.pause();
+      audio.src = "";
+    };
   };
 
   const handleSelectRecipeDetail = async (recipe: RecipeSuggestion) => {
@@ -559,6 +697,9 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
     if (!detail) {
       return;
     }
+    if (detailState?.isSpeaking) {
+      return;
+    }
     const script = buildSpeechScript(detail).trim();
     if (!script) {
       return;
@@ -570,7 +711,28 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
       speechError: null,
     }));
 
-    let cleanup: (() => void) | null = null;
+    const existingAudio = audioRefs.current[recipeName];
+    if (existingAudio && detailState?.audioUrl) {
+      try {
+        await existingAudio.play();
+        updateRecipeDetailState(recipeName, (prev) => ({
+          ...(prev ?? { status: "idle" as const }),
+          isSpeaking: false,
+          speechError: null,
+          isAudioPlaying: true,
+        }));
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : t("planner.recipes.audioError");
+        updateRecipeDetailState(recipeName, (prev) => ({
+          ...(prev ?? { status: "idle" as const }),
+          speechError: message,
+          isAudioPlaying: false,
+        }));
+      }
+      return;
+    }
+
     try {
       const response = await fetch("/api/recipes/speak", {
         method: "POST",
@@ -593,40 +755,56 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
       const blob = await response.blob();
       const audioUrl = URL.createObjectURL(blob);
       const audio = new Audio(audioUrl);
-      let cleaned = false;
-      const cleanupHandler = () => {
-        if (cleaned) {
-          return;
-        }
-        cleaned = true;
-        URL.revokeObjectURL(audioUrl);
-        audio.removeEventListener("ended", cleanupHandler);
-        audio.removeEventListener("error", cleanupHandler);
-        audio.removeEventListener("pause", cleanupHandler);
-      };
-      cleanup = cleanupHandler;
-      audio.addEventListener("ended", cleanupHandler);
-      audio.addEventListener("error", cleanupHandler);
-      audio.addEventListener("pause", cleanupHandler);
+      audioRefs.current[recipeName] = audio;
+      audioUrlRefs.current[recipeName] = audioUrl;
+      attachAudioListeners(recipeName, audio);
+
       await audio.play();
 
       updateRecipeDetailState(recipeName, (prev) => ({
         ...(prev ?? { status: "idle" as const }),
         isSpeaking: false,
         speechError: null,
+        audioUrl: audioUrl,
+        isAudioPlaying: true,
+        audioCurrentTime: 0,
+        audioDuration: 0,
       }));
     } catch (err) {
-      if (cleanup) {
-        cleanup();
-      }
+      destroyAudio(recipeName);
       const message =
         err instanceof Error ? err.message : t("planner.recipes.audioError");
       updateRecipeDetailState(recipeName, (prev) => ({
         ...(prev ?? { status: "idle" as const }),
         isSpeaking: false,
         speechError: message,
+        isAudioPlaying: false,
       }));
     }
+  };
+
+  const handlePauseRecipeAudio = (recipeName: string) => {
+    const audio = audioRefs.current[recipeName];
+    if (!audio) {
+      return;
+    }
+    audio.pause();
+  };
+
+  const handleSeekRecipeAudio = (recipeName: string, value: number) => {
+    const audio = audioRefs.current[recipeName];
+    if (!audio) {
+      updateRecipeDetailState(recipeName, (prev) => ({
+        ...(prev ?? { status: "idle" as const }),
+        audioCurrentTime: value,
+      }));
+      return;
+    }
+    audio.currentTime = value;
+    updateRecipeDetailState(recipeName, (prev) => ({
+      ...(prev ?? { status: "idle" as const }),
+      audioCurrentTime: value,
+    }));
   };
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -911,4 +1089,15 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
       </div>
     </section>
   );
+}
+function formatTime(seconds: number | undefined) {
+  if (!Number.isFinite(seconds) || seconds === undefined) {
+    return "0:00";
+  }
+  const clamped = Math.max(0, seconds);
+  const mins = Math.floor(clamped / 60);
+  const secs = Math.floor(clamped % 60)
+    .toString()
+    .padStart(2, "0");
+  return `${mins}:${secs}`;
 }

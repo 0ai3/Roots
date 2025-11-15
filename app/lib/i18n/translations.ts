@@ -90,7 +90,7 @@ const en: TranslationRecord = {
   "common.lastUpdated": "Last updated",
   "common.poweredByGemini": "Powered by Google Gemini",
   "games.title": "Games",
-  "games.description": "Content coming soon.",
+  "games.description": "Read cultural snapshots and take 10-question quizzes to earn experience points.",
   "games.body": "Check back soon for playful ways to test your Roots knowledge.",
   "offers.title": "Offers",
   "offers.description": "Special offers will be listed soon.",
@@ -266,6 +266,8 @@ const en: TranslationRecord = {
   "planner.recipes.stepsTitle": "How to cook",
   "planner.recipes.listenButton": "Listen",
   "planner.recipes.listening": "Preparing audio...",
+  "planner.recipes.pauseButton": "Pause",
+  "planner.recipes.audioScrubLabel": "Recipe audio position",
   "planner.recipes.audioError": "Unable to generate audio right now.",
   "planner.recipes.servingsLabel": "Servings",
   "planner.recipes.prepTimeLabel": "Prep",
@@ -388,6 +390,8 @@ const zh: TranslationRecord = {
   "profile.errors.save": "无法保存你的资料。",
   "profile.errors.generic": "出现问题，请稍后再试。",
   "profile.errors.homeCountryInvalid": "请输入有效的原籍国。",
+  "planner.recipes.pauseButton": "暂停",
+  "planner.recipes.audioScrubLabel": "菜谱音频位置",
 };
 
 const es: TranslationRecord = {
@@ -512,6 +516,8 @@ const es: TranslationRecord = {
   "profile.errors.save": "No se pudo guardar tu perfil.",
   "profile.errors.generic": "Algo salió mal. Vuelve a intentarlo.",
   "profile.errors.homeCountryInvalid": "Ingresa un país de origen válido.",
+  "planner.recipes.pauseButton": "Pausar",
+  "planner.recipes.audioScrubLabel": "Posición del audio de la receta",
 };
 
 const hi: TranslationRecord = {
@@ -635,6 +641,8 @@ const hi: TranslationRecord = {
   "profile.errors.save": "आपका प्रोफ़ाइल सहेजा नहीं जा सका।",
   "profile.errors.generic": "कुछ गलत हो गया। कृपया बाद में फिर प्रयास करें।",
   "profile.errors.homeCountryInvalid": "कृपया मान्य मूल देश दर्ज करें।",
+  "planner.recipes.pauseButton": "रोकें",
+  "planner.recipes.audioScrubLabel": "रेसिपी ऑडियो स्थिति",
 };
 
 const ar: TranslationRecord = {
@@ -759,6 +767,8 @@ const ar: TranslationRecord = {
   "profile.errors.save": "تعذّر حفظ ملفك.",
   "profile.errors.generic": "حدث خطأ ما. حاول مرة أخرى.",
   "profile.errors.homeCountryInvalid": "يرجى إدخال بلد منشأ صالحًا.",
+  "planner.recipes.pauseButton": "إيقاف مؤقت",
+  "planner.recipes.audioScrubLabel": "موضع صوت الوصفة",
 };
 
 const pt: TranslationRecord = {
@@ -883,6 +893,8 @@ const pt: TranslationRecord = {
   "profile.errors.save": "Não foi possível salvar seu perfil.",
   "profile.errors.generic": "Algo deu errado. Tente novamente.",
   "profile.errors.homeCountryInvalid": "Informe um país de origem válido.",
+  "planner.recipes.pauseButton": "Pausar",
+  "planner.recipes.audioScrubLabel": "Posição do áudio da receita",
 };
 
 const bn: TranslationRecord = {
@@ -1007,6 +1019,8 @@ const bn: TranslationRecord = {
   "profile.errors.save": "আপনার প্রোফাইল সংরক্ষণ করা গেল না।",
   "profile.errors.generic": "কিছু ভুল হয়েছে। পরে আবার চেষ্টা করুন।",
   "profile.errors.homeCountryInvalid": "দয়া করে সঠিক নিজ দেশের নাম লিখুন।",
+  "planner.recipes.pauseButton": "বিরতি",
+  "planner.recipes.audioScrubLabel": "রেসিপি অডিওর অবস্থান",
 };
 
 const ru: TranslationRecord = {
@@ -1131,6 +1145,8 @@ const ru: TranslationRecord = {
   "profile.errors.save": "Не удалось сохранить профиль.",
   "profile.errors.generic": "Что-то пошло не так. Попробуйте ещё раз.",
   "profile.errors.homeCountryInvalid": "Введите корректную страну происхождения.",
+  "planner.recipes.pauseButton": "Пауза",
+  "planner.recipes.audioScrubLabel": "Позиция аудио рецепта",
 };
 
 const ja: TranslationRecord = {
@@ -1255,6 +1271,8 @@ const ja: TranslationRecord = {
   "profile.errors.save": "プロフィールを保存できませんでした。",
   "profile.errors.generic": "問題が発生しました。もう一度お試しください。",
   "profile.errors.homeCountryInvalid": "有効な出身国を入力してください。",
+  "planner.recipes.pauseButton": "一時停止",
+  "planner.recipes.audioScrubLabel": "レシピ音声の位置",
 };
 
 const de: TranslationRecord = {
@@ -1379,6 +1397,8 @@ const de: TranslationRecord = {
   "profile.errors.save": "Profil konnte nicht gespeichert werden.",
   "profile.errors.generic": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
   "profile.errors.homeCountryInvalid": "Bitte gib ein gültiges Herkunftsland ein.",
+  "planner.recipes.pauseButton": "Pause",
+  "planner.recipes.audioScrubLabel": "Position des Rezept-Audios",
 };
 
 const fr: TranslationRecord = {
@@ -1503,6 +1523,8 @@ const fr: TranslationRecord = {
   "profile.errors.save": "Impossible d’enregistrer votre profil.",
   "profile.errors.generic": "Une erreur est survenue. Réessayez plus tard.",
   "profile.errors.homeCountryInvalid": "Indiquez un pays d’origine valide.",
+  "planner.recipes.pauseButton": "Pause",
+  "planner.recipes.audioScrubLabel": "Position de l’audio de la recette",
 };
 
 const ur: TranslationRecord = {
@@ -1627,6 +1649,8 @@ const ur: TranslationRecord = {
   "profile.errors.save": "پروفائل محفوظ نہیں ہو سکا۔",
   "profile.errors.generic": "کچھ غلط ہو گیا، دوبارہ کوشش کریں۔",
   "profile.errors.homeCountryInvalid": "براہ کرم درست آبائی ملک درج کریں۔",
+  "planner.recipes.pauseButton": "وقفہ",
+  "planner.recipes.audioScrubLabel": "ترکیب آڈیو کی پوزیشن",
 };
 
 const id: TranslationRecord = {
@@ -1751,6 +1775,8 @@ const id: TranslationRecord = {
   "profile.errors.save": "Profil tidak dapat disimpan.",
   "profile.errors.generic": "Terjadi kesalahan. Coba lagi nanti.",
   "profile.errors.homeCountryInvalid": "Masukkan negara asal yang valid.",
+  "planner.recipes.pauseButton": "Jeda",
+  "planner.recipes.audioScrubLabel": "Posisi audio resep",
 };
 
 const it: TranslationRecord = {
@@ -1875,6 +1901,8 @@ const it: TranslationRecord = {
   "profile.errors.save": "Impossibile salvare il profilo.",
   "profile.errors.generic": "Si è verificato un errore. Riprova.",
   "profile.errors.homeCountryInvalid": "Inserisci un paese d’origine valido.",
+  "planner.recipes.pauseButton": "Pausa",
+  "planner.recipes.audioScrubLabel": "Posizione audio della ricetta",
 };
 
 const tr: TranslationRecord = {
@@ -1999,6 +2027,8 @@ const tr: TranslationRecord = {
   "profile.errors.save": "Profil kaydedilemedi.",
   "profile.errors.generic": "Bir hata oluştu. Lütfen tekrar dene.",
   "profile.errors.homeCountryInvalid": "Lütfen geçerli bir ülke adı gir.",
+  "planner.recipes.pauseButton": "Duraklat",
+  "planner.recipes.audioScrubLabel": "Tarif ses konumu",
 };
 
 export const translations: Record<LocaleCode, TranslationRecord> = {
