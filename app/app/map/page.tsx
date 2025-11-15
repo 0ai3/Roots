@@ -1,60 +1,264 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import DashboardPageLayout from "../../components/DashboardPageLayout";
+import PageThemeToggle from "../../components/PageThemeToggle";
+import { useTheme } from "../../components/ThemeProvider";
 import WorldExplorerMap from "../../components/WorldExplorerMap";
+import { motion } from "framer-motion";
+import { MapPin, ArrowRight, Navigation, Route } from "lucide-react";
+import Image from "next/image";
 
 export default function MapPage() {
+  const { theme } = useTheme();
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showBrowse, setShowBrowse] = useState(true);
+
+  useEffect(() => {
+    setIsDarkMode(theme === "dark");
+  }, [theme]);
+
+  const getBgColor = () => {
+    return isDarkMode ? "bg-black" : "bg-white";
+  };
+
+  const getTextColor = () => {
+    return isDarkMode ? "text-white" : "text-slate-900";
+  };
+
   return (
     <DashboardPageLayout
-      contentClassName="border-none bg-transparent p-0 shadow-none"
+      contentClassName={
+        showBrowse ? "border-none bg-transparent p-0 shadow-none" : undefined
+      }
+      isDarkMode={isDarkMode}
     >
-      <div className="flex justify-end">
+      <PageThemeToggle />
+      {showBrowse ? (
+        <div className={`min-h-screen ${getBgColor()}`}>
+          {/* Hero Section */}
+          <section className="relative min-h-[500px] flex items-center justify-center overflow-hidden">
+            <div className="absolute inset-0">
+              <Image
+                src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2074"
+                alt="World map"
+                fill
+                className="object-cover"
+                priority
+              />
+              <div
+                className={`absolute inset-0 ${
+                  isDarkMode
+                    ? "bg-linear-to-br from-black/80 via-black/70 to-black/80"
+                    : "bg-linear-to-br from-black/60 via-black/50 to-black/60"
+                }`}
+              />
+            </div>
 
-      </div>
+            <div className="relative z-10 max-w-4xl mx-auto px-6 text-center text-white">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6"
+              >
+                <MapPin className="w-4 h-4 text-lime-400" />
+                <span className="text-sm font-medium">Live Explorer</span>
+              </motion.div>
 
-      <div className="space-y-6">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-          <p className="text-xs uppercase tracking-wide text-white/40">
-            Live explorer
-          </p>
-          <h1 className="text-2xl font-semibold text-white">Track, follow, and route in real-time</h1>
-          <p className="mt-3 text-sm text-white/70">
-            Share your current position, follow yourself on the map, and request turn-by-turn routes to any saved
-            attraction in your Roots profile. Tap anywhere to drop a pin, save it with a label, then route back to it
-            whenever you like.
-          </p>
-          <ul className="mt-4 grid gap-3 text-sm text-white/80 md:grid-cols-3">
-            <li className="rounded-2xl border border-white/10 bg-slate-950/40 p-3">
-              ✅ Continuous geolocation tracking with follow-mode toggle
-            </li>
-            <li className="rounded-2xl border border-white/10 bg-slate-950/40 p-3">
-              📍 Attraction Planner picks are saved automatically, and you can drop extra pins anytime
-            </li>
-            <li className="rounded-2xl border border-white/10 bg-slate-950/40 p-3">
-              🚶‍♀️🚴‍♂️🚗 Walking, cycling, and driving profiles powered by Mapbox Directions
-            </li>
-          </ul>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="text-5xl md:text-6xl font-bold mb-6 leading-tight"
+              >
+                Interactive{" "}
+                <span
+                  className={isDarkMode ? "text-lime-400" : "text-lime-300"}
+                >
+                  Map
+                </span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-lg mb-8 max-w-2xl mx-auto text-white/90"
+              >
+                Track your position, navigate to attractions, and explore the
+                world in real-time
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowBrowse(false)}
+                  className={`px-8 py-4 rounded-xl font-semibold flex items-center gap-2 mx-auto transition-colors ${
+                    isDarkMode
+                      ? "bg-lime-400 text-black hover:bg-lime-300"
+                      : "bg-lime-500 text-white hover:bg-lime-600"
+                  }`}
+                >
+                  <Navigation className="w-5 h-5" />
+                  Open Map
+                  <ArrowRight className="w-5 h-5" />
+                </motion.button>
+              </motion.div>
+            </div>
+          </section>
+
+          {/* Features Section */}
+          <section className="py-16 px-6">
+            <div className="max-w-5xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                  {
+                    icon: Navigation,
+                    title: "Live Tracking",
+                    description:
+                      "Continuous geolocation with follow-mode toggle",
+                  },
+                  {
+                    icon: MapPin,
+                    title: "Pin Locations",
+                    description: "Drop pins anywhere and save them with labels",
+                  },
+                  {
+                    icon: Route,
+                    title: "Smart Routing",
+                    description: "Walking, cycling, and driving directions",
+                  },
+                ].map((feature, i) => (
+                  <motion.div
+                    key={feature.title}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className={`rounded-2xl p-6 border backdrop-blur-sm ${
+                      isDarkMode
+                        ? "bg-neutral-900/50 border-white/10"
+                        : "bg-white border-neutral-200 shadow-lg"
+                    }`}
+                  >
+                    <div
+                      className={`p-3 rounded-xl w-fit mb-4 ${
+                        isDarkMode ? "bg-lime-400/20" : "bg-lime-100"
+                      }`}
+                    >
+                      <feature.icon
+                        className={`w-6 h-6 ${
+                          isDarkMode ? "text-lime-400" : "text-lime-600"
+                        }`}
+                      />
+                    </div>
+                    <h3
+                      className={`font-bold text-lg mb-2 ${
+                        isDarkMode ? "text-white" : "text-neutral-900"
+                      }`}
+                    >
+                      {feature.title}
+                    </h3>
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? "text-neutral-400" : "text-neutral-600"
+                      }`}
+                    >
+                      {feature.description}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
         </div>
+      ) : (
+        <div
+          className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}
+        >
+          <div className="flex justify-between items-center mb-6 px-6 pt-6">
+            <button
+              onClick={() => setShowBrowse(true)}
+              className={`px-6 py-3 rounded-xl font-semibold transition-colors ${
+                isDarkMode
+                  ? "bg-neutral-800 text-white hover:bg-neutral-700"
+                  : "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
+              }`}
+            >
+              ← Back to Overview
+            </button>
+          </div>
+          <div className="space-y-6 px-6">
+            <div
+              className={`rounded-3xl border p-6 ${
+                isDarkMode
+                  ? "border-white/10 bg-white/5"
+                  : "border-neutral-200 bg-neutral-50"
+              }`}
+            >
+              <p
+                className={`text-xs uppercase tracking-wide ${
+                  isDarkMode ? "text-white/40" : "text-neutral-500"
+                }`}
+              >
+                Live explorer
+              </p>
+              <h1 className={`text-2xl font-semibold ${getTextColor()}`}>
+                Track, follow, and route in real-time
+              </h1>
+              <p
+                className={`mt-3 text-sm ${
+                  isDarkMode ? "text-white/70" : "text-neutral-600"
+                }`}
+              >
+                Share your current position, follow yourself on the map, and
+                request turn-by-turn routes to any saved attraction in your
+                Roots profile. Tap anywhere to drop a pin, save it with a label,
+                then route back to it whenever you like.
+              </p>
+              <ul className="mt-4 grid gap-3 text-sm md:grid-cols-3">
+                <li
+                  className={`rounded-2xl border p-3 ${
+                    isDarkMode
+                      ? "border-white/10 bg-slate-950/40 text-white/80"
+                      : "border-neutral-200 bg-white text-neutral-700"
+                  }`}
+                >
+                  ✅ Continuous geolocation tracking with follow-mode toggle
+                </li>
+                <li
+                  className={`rounded-2xl border p-3 ${
+                    isDarkMode
+                      ? "border-white/10 bg-slate-950/40 text-white/80"
+                      : "border-neutral-200 bg-white text-neutral-700"
+                  }`}
+                >
+                  📍 Attraction Planner picks are saved automatically, and you
+                  can drop extra pins anytime
+                </li>
+                <li
+                  className={`rounded-2xl border p-3 ${
+                    isDarkMode
+                      ? "border-white/10 bg-slate-950/40 text-white/80"
+                      : "border-neutral-200 bg-white text-neutral-700"
+                  }`}
+                >
+                  🚶‍♀️🚴‍♂️🚗 Walking, cycling, and driving profiles powered by
+                  Mapbox Directions
+                </li>
+              </ul>
+            </div>
 
-        <WorldExplorerMap height="70vh" />
-
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-white/70">
-          <h2 className="text-lg font-semibold text-white">Setup</h2>
-          <ol className="mt-3 list-decimal space-y-2 pl-5">
-            <li>
-              Create <code className="rounded bg-white/10 px-2 py-0.5 text-xs">.env.local</code> (if you do not have
-              one yet) and add:
-              <pre className="mt-2 rounded-2xl bg-slate-950/60 p-3 text-xs text-white/80">
-{`NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.xxxxxx-your-token`}
-              </pre>
-            </li>
-            <li>Restart the dev server so the API key is injected into the client bundle.</li>
-            <li>Sign in so the profile API can store your saved attractions.</li>
-            <li>
-              Grant location permissions in the browser when prompted. If unavailable, the map still renders but
-              routing requires a starting coordinate.
-            </li>
-          </ol>
+            <WorldExplorerMap height="70vh" />
+          </div>
         </div>
-      </div>
+      )}
     </DashboardPageLayout>
   );
 }
