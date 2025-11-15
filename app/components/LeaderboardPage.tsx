@@ -6,6 +6,7 @@ import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { motion } from "framer-motion";
 import { Trophy, Medal, Crown, Star, Sun, Moon } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useI18n } from "@/app/hooks/useI18n";
 
 type LeaderboardEntry = {
   userId: string;
@@ -18,6 +19,8 @@ const fetcher = (url: string) =>
   fetch(url)
     .then((res) => res.json())
     .catch(() => ({ entries: [] }));
+
+type Translator = ReturnType<typeof useI18n>["t"];
 
 export default function LeaderboardPage() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -40,6 +43,7 @@ export default function LeaderboardPage() {
   const { data, isLoading } = useSWR("/api/leaderboard", fetcher, {
     refreshInterval: 30_000,
   });
+  const { t } = useI18n();
 
   const entries: LeaderboardEntry[] = data?.entries ?? [];
   const current = userId
@@ -48,8 +52,8 @@ export default function LeaderboardPage() {
 
   return (
     <DashboardPageLayout
-      title="Leaderboard"
-      description="Track the most active Roots explorers and their experience points."
+      title={t("leaderboard.title")}
+      description={t("leaderboard.description")}
       isDarkMode={isDarkMode}
     >
       <div className="space-y-6">
@@ -100,18 +104,17 @@ export default function LeaderboardPage() {
               <div className="flex items-center gap-4">
                 <div className="w-2 h-2 rounded-full bg-lime-400" />
                 <p className="text-white/80">
-                  You're currently{" "}
-                  <strong className="text-lime-300">#{current.rank}</strong>{" "}
-                  with{" "}
-                  <strong className="text-lime-300">{current.points}</strong>{" "}
-                  points. Keep cooking and exploring!
+                  {t("leaderboard.status.rank", {
+                    rank: String(current.rank),
+                    points: current.points.toLocaleString(),
+                  })}
                 </p>
               </div>
             ) : (
               <div className="flex items-center gap-4">
                 <div className="w-2 h-2 rounded-full bg-amber-400" />
                 <p className="text-white/80">
-                  Earn points to join the leaderboard.
+                  {t("leaderboard.status.noRank")}
                 </p>
               </div>
             )
@@ -119,7 +122,7 @@ export default function LeaderboardPage() {
             <div className="flex items-center gap-4">
               <div className="w-2 h-2 rounded-full bg-blue-400" />
               <p className={isDarkMode ? "text-white/80" : "text-neutral-800"}>
-                Sign in to see your rank on the leaderboard.
+                {t("leaderboard.status.signedOut")}
               </p>
             </div>
           )}
@@ -130,6 +133,7 @@ export default function LeaderboardPage() {
           entries={entries}
           isLoading={isLoading}
           isDarkMode={isDarkMode}
+          t={t}
         />
       </div>
     </DashboardPageLayout>
@@ -140,10 +144,12 @@ function LeaderboardTable({
   entries,
   isLoading,
   isDarkMode,
+  t,
 }: {
   entries: LeaderboardEntry[];
   isLoading: boolean;
   isDarkMode: boolean;
+  t: Translator;
 }) {
   if (isLoading) {
     return (
@@ -162,7 +168,7 @@ function LeaderboardTable({
           }`}
         >
           <div className="w-2 h-2 rounded-full bg-lime-400 animate-pulse" />
-          <p>Loading leaderboard…</p>
+          <p>{t("leaderboard.loading")}</p>
         </div>
       </motion.div>
     );
@@ -185,7 +191,7 @@ function LeaderboardTable({
           }`}
         />
         <p className={`${isDarkMode ? "text-white/60" : "text-neutral-700"}`}>
-          No explorers have logged points yet.
+          {t("leaderboard.empty.title")}
         </p>
         <p
           className={`${
@@ -194,7 +200,7 @@ function LeaderboardTable({
               : "text-neutral-600 text-sm mt-2"
           }`}
         >
-          Be the first to earn experience points!
+          {t("leaderboard.empty.subtitle")}
         </p>
       </motion.div>
     );
@@ -278,10 +284,9 @@ function LeaderboardTable({
               isDarkMode ? "text-white" : "text-neutral-900"
             }`}
           >
-            Top Explorers
+            {t("leaderboard.table.heading")}
           </h3>
         </div>
-      </div>
 
       {/* Leaderboard List */}
       <div className="max-h-96 overflow-y-auto">
@@ -342,7 +347,9 @@ function LeaderboardTable({
                             : "text-neutral-600 text-xs"
                         }`}
                       >
-                        ID: {entry.userId.slice(-6)}
+                        {t("leaderboard.idLabel", {
+                          id: entry.userId.slice(-6),
+                        })}
                       </div>
                     </div>
                   </div>
@@ -361,7 +368,7 @@ function LeaderboardTable({
                           : "text-neutral-600 text-xs"
                       }`}
                     >
-                      points
+                      {t("leaderboard.points")}
                     </div>
                   </div>
                 </div>
@@ -384,7 +391,7 @@ function LeaderboardTable({
             isDarkMode ? "text-white/50" : "text-neutral-600"
           } text-xs text-center`}
         >
-          Updated every 30 seconds • {entries.length} explorers
+          {t("leaderboard.footer", { count: String(entries.length) })}
         </p>
       </div>
     </motion.div>

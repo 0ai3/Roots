@@ -51,8 +51,6 @@ export async function GET() {
       );
     }
     const db = await getDb();
-    const filters = buildUserFilters(userId);
-    let profile: Record<string, unknown> | null = null;
     const projection = {
       _id: 0,
       userId: 1,
@@ -70,15 +68,10 @@ export async function GET() {
       createdAt: 1,
       updatedAt: 1,
     };
-    for (const filter of filters) {
-      const doc = await db.collection(COLLECTION).findOne(filter, {
-        projection,
-      });
-      if (doc) {
-        profile = doc;
-        break;
-      }
-    }
+    const filters = buildUserFilters(userId);
+    const profile = await db
+      .collection(COLLECTION)
+      .findOne({ $or: filters }, { projection });
     if (profile) {
       const resolvedUserId =
         (profile.userId as string | undefined) ??
@@ -161,30 +154,17 @@ export async function POST(request: NextRequest) {
       $setOnInsert: { createdAt: now },
     };
     updateDoc.$unset = { profileId: "" };
-    const baseOptions = {
-      returnDocument: "after" as const,
-      projection: { _id: 0 },
-    };
-    let result = null;
-    for (const filter of filters) {
-      const current = await db
-        .collection(COLLECTION)
-        .findOneAndUpdate(filter, updateDoc, baseOptions);
-      if (current && current.value) {
-        result = current.value;
-        break;
+    const result = await db.collection(COLLECTION).findOneAndUpdate(
+      { $or: filters },
+      updateDoc,
+      {
+        returnDocument: "after",
+        projection: { _id: 0 },
+        upsert: true,
       }
-    }
-    if (!result) {
-      const upserted = await db.collection(COLLECTION).findOneAndUpdate(
-        { userId },
-        updateDoc,
-        { ...baseOptions, upsert: true }
-      );
-      result = upserted ? upserted.value : null;
-    }
+    );
 
-    return NextResponse.json({ profile: result ?? null });
+    return NextResponse.json({ profile: result?.value ?? null });
   } catch (error) {
     console.error("Profile POST error", error);
     return NextResponse.json(

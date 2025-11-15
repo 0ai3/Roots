@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
+import { useI18n } from "@/app/hooks/useI18n";
 import { motion } from "framer-motion";
 import {
   Compass,
@@ -53,26 +54,31 @@ type Props = {
   initialUserId?: string | null;
 };
 
+type Translator = ReturnType<typeof useI18n>["t"];
+
 function MessageBubble({
   message,
   onLogAttraction,
   visitedAttractions,
+  t,
 }: {
   message: ChatMessage;
   onLogAttraction: (title: string) => void;
   visitedAttractions: VisitedMap;
+  t: Translator;
 }) {
   if (message.role === "assistant") {
     const parsed = parseAssistantContent(message.content);
     if (parsed) {
-      return (
-        <AssistantCard
-          payload={parsed}
-          onLogAttraction={onLogAttraction}
-          visitedAttractions={visitedAttractions}
-        />
-      );
-    }
+        return (
+          <AssistantCard
+            payload={parsed}
+            onLogAttraction={onLogAttraction}
+            visitedAttractions={visitedAttractions}
+            t={t}
+          />
+        );
+      }
   }
 
   return (
@@ -91,7 +97,7 @@ function MessageBubble({
         }`}
       >
         <p className="mb-2 text-xs uppercase tracking-wide opacity-60">
-          {message.role === "user" ? "You" : "Roots Guide"}
+          {message.role === "user" ? t("planner.roles.you") : t("planner.roles.guide")}
         </p>
         <p className="whitespace-pre-line">{message.content}</p>
       </div>
@@ -103,10 +109,12 @@ function AssistantCard({
   payload,
   onLogAttraction,
   visitedAttractions,
+  t,
 }: {
   payload: AssistantPayload;
   onLogAttraction: (title: string) => void;
   visitedAttractions: VisitedMap;
+  t: Translator;
 }) {
   const tips = payload.tips?.filter(Boolean) ?? [];
   const attractions = payload.attractions ?? [];
@@ -128,7 +136,7 @@ function AssistantCard({
           <div className="flex items-center gap-2 mb-3">
             <div className="w-2 h-2 rounded-full bg-lime-400" />
             <p className="text-xs uppercase tracking-wide text-neutral-700 dark:text-white/60">
-              Quick Tips
+              {t("planner.common.quickTips")}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -150,7 +158,7 @@ function AssistantCard({
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-lime-400" />
             <p className="text-xs uppercase tracking-wide text-neutral-700 dark:text-white/60">
-              Recommended Attractions
+              {t("planner.attractions.recommendedTitle")}
             </p>
           </div>
           {attractions.map((item, index) => (
@@ -200,7 +208,7 @@ function AssistantCard({
                   className="inline-flex items-center gap-2 text-sm font-medium text-lime-400 hover:text-lime-300 transition-colors"
                 >
                   <Compass className="w-4 h-4" />
-                  Open in Maps
+                  {t("worldExplorer.attractions.openInMaps")}
                 </motion.a>
               )}
 
@@ -229,8 +237,8 @@ function AssistantCard({
               >
                 <Heart className="w-3 h-3" />
                 {visitedAttractions[item.title]
-                  ? "Logged (+2 pts)"
-                  : "I visited (+2 pts)"}
+                  ? t("planner.attractions.logged")
+                  : t("planner.attractions.visitButton")}
               </motion.button>
             </motion.article>
           ))}
@@ -246,28 +254,26 @@ function AssistantCard({
   );
 }
 
-const samplePrompts = [
-  "Plan a Saturday focused on art and design",
-  "Suggest budget-friendly outdoor adventures",
-  "Where should I eat if I love street food?",
-  "Give me rainy-day ideas with indoor options",
-];
-
 function createMessageId() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-export default function AttractionPlanner({
-  initialPoints,
-  initialUserId,
-}: Props = {}) {
+export default function AttractionPlanner({ initialPoints, initialUserId }: Props = {}) {
+  const { t } = useI18n();
+  const samplePrompts = useMemo(
+    () =>
+      t("planner.attractions.samples")
+        .split("|")
+        .map((prompt) => prompt.trim())
+        .filter(Boolean),
+    [t]
+  );
+  const defaultPrompt = samplePrompts[0] ?? "";
   const [location, setLocation] = useState("");
   const [budget, setBudget] = useState("");
   const [interests, setInterests] = useState("");
   const [notes, setNotes] = useState("");
-  const [input, setInput] = useState(
-    "I have one free evening and want to experience the city's vibe."
-  );
+  const [input, setInput] = useState(defaultPrompt);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -281,10 +287,17 @@ export default function AttractionPlanner({
   );
   const showSetupForm = !hasAssistantReply;
 
+  useEffect(() => {
+    if (!hasAssistantReply) {
+      setInput(defaultPrompt);
+    }
+  }, [defaultPrompt, hasAssistantReply]);
+
   const canSubmit =
-    location.trim().length > 0 &&
-    budget.trim().length > 0 &&
-    input.trim().length > 0 &&
+    Boolean(location.trim()) &&
+    Boolean(budget.trim()) &&
+    Boolean(input.trim()) &&
+    Boolean(interests.trim()) &&
     !isLoading;
 
   const handleLogAttraction = (title: string) => {
@@ -335,13 +348,11 @@ export default function AttractionPlanner({
       const data = (await response.json().catch(() => null)) ?? {};
 
       if (!response.ok) {
-        throw new Error(
-          data?.error ?? "Unable to reach the Roots travel guide."
-        );
+        throw new Error(data?.error ?? t("planner.errors.unreachable"));
       }
 
       if (!data?.reply) {
-        throw new Error("Guide reply was empty. Try asking again.");
+        throw new Error(t("planner.errors.empty"));
       }
 
       setMessages((prev) => [
@@ -350,9 +361,7 @@ export default function AttractionPlanner({
       ]);
     } catch (err) {
       const message =
-        err instanceof Error
-          ? err.message
-          : "Unexpected error. Please try again.";
+        err instanceof Error ? err.message : t("planner.errors.generic");
       setError(message);
     } finally {
       setIsLoading(false);
@@ -361,7 +370,7 @@ export default function AttractionPlanner({
 
   const handleReset = () => {
     setMessages([]);
-    setInput("I have one free evening and want to experience the city's vibe.");
+    setInput(defaultPrompt);
     setLocation("");
     setBudget("");
     setInterests("");
@@ -382,14 +391,14 @@ export default function AttractionPlanner({
         <div className="flex items-center gap-3 mb-2">
           <div className="w-2 h-2 rounded-full bg-lime-400" />
           <p className="text-xs uppercase tracking-wide text-black dark:text-white/60">
-            Experience Points
+            {t("dashboard.content.pointsLabel")}
           </p>
         </div>
         <p className="text-3xl font-bold text-neutral-900 dark:text-white mb-1">
           {points}
         </p>
         <p className="text-sm text-neutral-700 dark:text-white/60">
-          Log any museum or attraction visit to earn +2 points
+          {t("planner.common.pointsHint")}
         </p>
       </motion.div>
 
@@ -403,85 +412,86 @@ export default function AttractionPlanner({
         >
           <div className="grid gap-4 md:grid-cols-2">
             <label className="space-y-3">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-neutral-500 dark:text-white/60" />
-                <span className="text-sm font-medium text-neutral-900/80 dark:text-white/80">
-                  City or Region
-                </span>
-              </div>
-              <input
-                type="text"
-                value={location}
-                onChange={(event) => setLocation(event.target.value)}
-                placeholder="e.g., Mexico City historic center"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
-              />
-            </label>
 
-            <label className="space-y-3">
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-neutral-500 dark:text-white/60" />
-                <span className="text-sm font-medium text-neutral-900/80 dark:text-white/80">
-                  Budget
-                </span>
-              </div>
-              <input
-                type="text"
-                value={budget}
-                onChange={(event) => setBudget(event.target.value)}
-                placeholder="e.g., $120 per day"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
-              />
-            </label>
-          </div>
-
-          <label className="space-y-3">
             <div className="flex items-center gap-2">
-              <Heart className="w-4 h-4 text-neutral-500 dark:text-white/60" />
+              <MapPin className="w-4 h-4 text-neutral-500 dark:text-white/60" />
               <span className="text-sm font-medium text-neutral-900/80 dark:text-white/80">
-                Interests or Vibe
+                {t("planner.attractions.locationLabel")}
               </span>
             </div>
             <input
               type="text"
-              value={interests}
-              onChange={(event) => setInterests(event.target.value)}
-              placeholder="Night markets, architecture, coffee shops…"
+              value={location}
+              onChange={(event) => setLocation(event.target.value)}
+              placeholder={t("planner.attractions.locationPlaceholder")}
               className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
             />
           </label>
 
           <label className="space-y-3">
             <div className="flex items-center gap-2">
-              <MessageCircle className="w-4 h-4 text-neutral-500 dark:text-white/60" />
+              <DollarSign className="w-4 h-4 text-neutral-500 dark:text-white/60" />
               <span className="text-sm font-medium text-neutral-900/80 dark:text-white/80">
-                Extra Notes
+                {t("planner.attractions.budgetLabel")}
               </span>
             </div>
-            <textarea
-              value={notes}
-              onChange={(event) => setNotes(event.target.value)}
-              placeholder="Travel dates, accessibility needs, people traveling with you…"
-              rows={3}
+            <input
+              type="text"
+              value={budget}
+              onChange={(event) => setBudget(event.target.value)}
+              placeholder={t("planner.attractions.budgetPlaceholder")}
               className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
             />
           </label>
+        </div>
 
-          <label className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Compass className="w-4 h-4 text-neutral-500 dark:text-white/60" />
-              <span className="text-sm font-medium text-neutral-900/80 dark:text-white/80">
-                What would you like to ask?
-              </span>
-            </div>
-            <textarea
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder="Ask for a themed itinerary or request specific suggestions…"
-              rows={3}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
-            />
-          </label>
+        <label className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Heart className="w-4 h-4 text-neutral-500 dark:text-white/60" />
+            <span className="text-sm font-medium text-neutral-900/80 dark:text-white/80">
+              {t("planner.attractions.interestsLabel")}
+            </span>
+          </div>
+          <input
+            type="text"
+            value={interests}
+            onChange={(event) => setInterests(event.target.value)}
+            placeholder={t("planner.attractions.interestsPlaceholder")}
+            className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
+          />
+        </label>
+
+        <label className="space-y-3">
+          <div className="flex items-center gap-2">
+            <MessageCircle className="w-4 h-4 text-white/60" />
+            <span className="text-sm font-medium text-white/80">
+              {t("planner.attractions.notesLabel")}
+            </span>
+          </div>
+          <textarea
+            value={notes}
+            onChange={(event) => setNotes(event.target.value)}
+            placeholder={t("planner.attractions.notesPlaceholder")}
+            rows={3}
+            className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
+          />
+        </label>
+
+        <label className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Compass className="w-4 h-4 text-white/60" />
+            <span className="text-sm font-medium text-white/80">
+              {t("planner.attractions.questionLabel")}
+            </span>
+          </div>
+          <textarea
+            value={input}
+            onChange={(event) => setInput(event.target.value)}
+            placeholder={t("planner.attractions.questionPlaceholder")}
+            rows={3}
+            className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
+          />
+        </label>
 
           <div className="flex flex-wrap items-center justify-between gap-4">
             <motion.button
@@ -491,14 +501,17 @@ export default function AttractionPlanner({
               whileTap={{ scale: 0.95 }}
               className="rounded-xl bg-lime-500 px-6 py-3 text-sm font-semibold text-neutral-950 transition-all hover:bg-lime-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isLoading ? "Planning..." : "Plan Activities"}
+              {isLoading ? t("planner.attractions.loading") : t("planner.attractions.submit")}
             </motion.button>
             <p className="text-xs uppercase tracking-wide text-white/50">
-              Powered by Google Gemini
+              {t("common.poweredByGemini")}
             </p>
           </div>
 
           <div className="flex flex-wrap gap-2">
+            <div className="w-full text-xs uppercase tracking-wide text-white/50">
+              {t("planner.common.sampleLabel")}
+            </div>
             {samplePrompts.map((prompt) => (
               <motion.button
                 key={prompt}
@@ -510,6 +523,9 @@ export default function AttractionPlanner({
                 {prompt}
               </motion.button>
             ))}
+            <p className="text-xs text-white/50">
+              {t("planner.common.sampleHelp")}
+            </p>
           </div>
 
           {error && (
@@ -539,22 +555,24 @@ export default function AttractionPlanner({
             <div className="flex items-center gap-2 mb-1">
               <div className="w-2 h-2 rounded-full bg-lime-400" />
               <p className="text-sm font-semibold uppercase tracking-wide text-white">
-                {showSetupForm ? "Conversation" : "Roots Concierge"}
+                {showSetupForm
+                  ? t("planner.attractions.conversationTitle")
+                  : t("planner.attractions.conciergeTitle")}
               </p>
             </div>
             <p className="text-xs text-white/60">
               {showSetupForm
-                ? "Share more context to refine your plan"
-                : "Continue chatting with your Roots guide"}
+                ? t("planner.attractions.conversationHint")
+                : t("planner.attractions.chatHint")}
             </p>
           </div>
           {hasAssistantReply && (
             <div className="flex flex-wrap items-center gap-3">
               <span className="rounded-xl border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/60">
-                {location || "Location set"}
+                {location || t("planner.attractions.locationChip")}
               </span>
               <span className="rounded-xl border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/60">
-                {budget || "Flexible budget"}
+                {budget || t("planner.attractions.budgetChip")}
               </span>
               <motion.button
                 type="button"
@@ -563,7 +581,7 @@ export default function AttractionPlanner({
                 className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/60 transition-all hover:border-rose-400 hover:text-white"
               >
                 <RotateCcw className="w-3 h-3" />
-                Reset
+                {t("planner.attractions.reset")}
               </motion.button>
             </div>
           )}
@@ -572,8 +590,8 @@ export default function AttractionPlanner({
         {messages.length === 0 ? (
           <p className="text-sm text-neutral-700 dark:text-white/60 text-center py-8">
             {showSetupForm
-              ? "Fill out the form and ask a question to start discovering curated attractions"
-              : "Waiting for the Roots guide to respond..."}
+              ? t("planner.attractions.emptyForm")
+              : t("planner.attractions.waiting")}
           </p>
         ) : (
           <div className="space-y-4">
@@ -608,13 +626,13 @@ export default function AttractionPlanner({
             <textarea
               value={input}
               onChange={(event) => setInput(event.target.value)}
-              placeholder="Tell the Roots guide what you'd like to explore next..."
+              placeholder={t("planner.attractions.replyPlaceholder")}
               rows={3}
               className="w-full rounded-xl border border-white/10 bg-transparent px-4 py-3 text-white placeholder:text-white/40 focus:border-lime-400 focus:outline-none transition-colors"
             />
             <div className="flex items-center justify-between mt-3">
               <p className="text-xs uppercase tracking-wide text-white/50">
-                Powered by Google Gemini
+                {t("common.poweredByGemini")}
               </p>
               <motion.button
                 type="submit"
@@ -623,7 +641,9 @@ export default function AttractionPlanner({
                 whileTap={{ scale: 0.95 }}
                 className="rounded-xl bg-lime-500 px-5 py-2 text-sm font-semibold text-neutral-950 transition-all hover:bg-lime-400 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isLoading ? "Sending..." : "Send Message"}
+                {isLoading
+                  ? t("planner.attractions.replyLoading")
+                  : t("planner.attractions.replySubmit")}
               </motion.button>
             </div>
           </motion.form>

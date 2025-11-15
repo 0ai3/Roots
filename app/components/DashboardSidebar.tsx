@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { setStoredUserId } from "../lib/userId";
+import { useI18n } from "@/app/hooks/useI18n";
 import {
   Home,
   User,
@@ -24,22 +25,23 @@ type Props = {
 };
 
 const navLinks = [
-  { label: "Dashboard", href: "/app/dashboard", icon: Home },
-  { label: "Profile", href: "/app/profile", icon: User },
-  { label: "Logs", href: "/app/logs", icon: BookOpen },
-  { label: "Map", href: "/app/map", icon: Map },
-  { label: "Games", href: "/app/games", icon: Gamepad2 },
-  { label: "Recipes", href: "/app/recipes", icon: Utensils },
-  { label: "Offers", href: "/app/offerts", icon: Gift },
-  { label: "News", href: "/app/news", icon: Newspaper },
-  { label: "Attractions", href: "/app/attractions", icon: Landmark },
-  { label: "Leaderboard", href: "/app/leaderboard", icon: Trophy },
+  { label: "nav.dashboard", href: "/app/dashboard", icon: Home },
+  { label: "nav.profile", href: "/app/profile", icon: User },
+  { label: "nav.logs", href: "/app/logs", icon: BookOpen },
+  { label: "nav.map", href: "/app/map", icon: Map },
+  { label: "nav.games", href: "/app/games", icon: Gamepad2 },
+  { label: "nav.recipes", href: "/app/recipes", icon: Utensils },
+  { label: "nav.offers", href: "/app/offerts", icon: Gift },
+  { label: "nav.news", href: "/app/news", icon: Newspaper },
+  { label: "nav.attractions", href: "/app/attractions", icon: Landmark },
+  { label: "nav.leaderboard", href: "/app/leaderboard", icon: Trophy },
 ];
 
 export default function DashboardSidebar({ borderClassName }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { t } = useI18n();
   const borderClass = borderClassName ?? "border-white/10";
 
   // Local theme sync so sidebar can adapt to per-page theme toggles without
@@ -136,7 +138,7 @@ export default function DashboardSidebar({ borderClassName }: Props) {
           </p>
         </div>
         <h2 className="text-2xl font-bold tracking-tight text-white">
-          Navigation
+          {t("dashboard.sidebar.navigation")}
         </h2>
       </motion.div>
 
@@ -169,7 +171,7 @@ export default function DashboardSidebar({ borderClassName }: Props) {
                       : "text-white/80 group-hover:text-lime-200"
                   }`}
                 />
-                <span className="flex-1">{link.label}</span>
+                <span className="flex-1">{t(link.label)}</span>
                 {isActive && (
                   <motion.div
                     layoutId="activeIndicator"
@@ -198,7 +200,11 @@ export default function DashboardSidebar({ borderClassName }: Props) {
             isLoggingOut ? "animate-pulse" : "group-hover:translate-x-0.5"
           } text-white`}
         />
-        <span>{isLoggingOut ? "Signing out..." : "Logout"}</span>
+        <span>
+          {isLoggingOut
+            ? t("dashboard.sidebar.signingOut")
+            : t("dashboard.sidebar.logout")}
+        </span>
       </motion.button>
     </motion.aside>
   );

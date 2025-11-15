@@ -31,21 +31,17 @@ export async function getExperiencePointsFromSession(): Promise<ExperiencePoints
     { _id: new ObjectId(cookieUserId) },
     { profileId: cookieUserId },
   ];
-  let doc: ExperiencePointsDocument | null = null;
-  for (const filter of filters) {
-    const current = await db.collection("profiles").findOne<ExperiencePointsDocument>(filter, {
+  const doc = await db.collection("profiles").findOne<ExperiencePointsDocument>(
+    { $or: filters },
+    {
       projection: {
         _id: 0,
         userId: 1,
         points: 1,
         "experiencePoints.points": 1,
       },
-    });
-    if (current) {
-      doc = current;
-      break;
     }
-  }
+  );
 
   const resolvedUserId = doc?.userId ?? cookieUserId;
   const points = Number(
