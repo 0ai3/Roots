@@ -184,9 +184,7 @@ export default function GamesPage() {
                 <div className="flex items-center gap-4 mb-4">
                   <div
                     className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      theme === "dark"
-                        ? "bg-lime-400/20"
-                        : "bg-lime-100"
+                      theme === "dark" ? "bg-lime-400/20" : "bg-lime-100"
                     }`}
                   >
                     <Gamepad2
@@ -238,9 +236,7 @@ export default function GamesPage() {
                 <div className="flex items-center gap-4 mb-4">
                   <div
                     className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      theme === "dark"
-                        ? "bg-blue-400/20"
-                        : "bg-blue-100"
+                      theme === "dark" ? "bg-blue-400/20" : "bg-blue-100"
                     }`}
                   >
                     <Users
@@ -292,9 +288,7 @@ export default function GamesPage() {
                 <div className="flex items-center gap-4 mb-4">
                   <div
                     className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      theme === "dark"
-                        ? "bg-purple-400/20"
-                        : "bg-purple-100"
+                      theme === "dark" ? "bg-purple-400/20" : "bg-purple-100"
                     }`}
                   >
                     <Globe
@@ -346,9 +340,7 @@ export default function GamesPage() {
                 <div className="flex items-center gap-4 mb-4">
                   <div
                     className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      theme === "dark"
-                        ? "bg-orange-400/20"
-                        : "bg-orange-100"
+                      theme === "dark" ? "bg-orange-400/20" : "bg-orange-100"
                     }`}
                   >
                     <Award
@@ -430,7 +422,8 @@ export default function GamesPage() {
                 {
                   icon: Brain,
                   title: "Cultural Quiz",
-                  description: "Answer questions about world cultures and traditions",
+                  description:
+                    "Answer questions about world cultures and traditions",
                   difficulty: "Medium",
                   points: "50-200",
                   color: "lime",
