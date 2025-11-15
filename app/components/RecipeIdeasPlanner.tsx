@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
+import { Loader2 } from "lucide-react";
 
 type ChatMessage = {
   id: string;
@@ -405,8 +406,9 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
             <button
               type="submit"
               disabled={!canSubmit}
-              className="rounded-full bg-amber-400 px-6 py-2 text-sm font-semibold uppercase tracking-wide text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex items-center gap-2 rounded-full bg-amber-400 px-6 py-2 text-sm font-semibold uppercase tracking-wide text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
             >
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
               {isLoading ? "Gathering recipes..." : "Plan menu"}
             </button>
             <p className="text-xs uppercase tracking-wide text-white/50">
@@ -473,13 +475,22 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
         </div>
 
         {messages.length === 0 ? (
-          <p className="text-sm text-white/60">
-            {showSetupForm
-              ? "Fill out the form and ask a question to unlock personalized dishes."
-              : "Waiting for the Roots Test Kitchen to respond..."}
-          </p>
+          <div className="flex min-h-[200px] items-center justify-center">
+            {isLoading ? (
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="h-8 w-8 animate-spin text-amber-400" />
+                <p className="text-sm text-white/60">Crafting your culinary experience...</p>
+              </div>
+            ) : (
+              <p className="text-sm text-white/60">
+                {showSetupForm
+                  ? "Fill out the form and ask a question to unlock personalized dishes."
+                  : "Waiting for the Roots Test Kitchen to respond..."}
+              </p>
+            )}
+          </div>
         ) : (
-          <div className="space-y-4">
+          <div className="max-h-[600px] space-y-4 overflow-y-auto pr-2 scrollbar-thin scrollbar-track-white/5 scrollbar-thumb-white/20 hover:scrollbar-thumb-white/30">
             {messages.map((message) => (
               <MessageBubble
                 key={message.id}
@@ -488,6 +499,12 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
                 cookedRecipes={cookedRecipes}
               />
             ))}
+            {isLoading && (
+              <div className="flex items-center gap-3 rounded-3xl border border-white/10 bg-white/5 px-5 py-4">
+                <Loader2 className="h-5 w-5 animate-spin text-amber-400" />
+                <p className="text-sm text-white/70">Roots Test Kitchen is thinking...</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -507,15 +524,17 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
               onChange={(event) => setInput(event.target.value)}
               placeholder="Ask for substitutions, plating ideas, or follow-up dishes..."
               rows={3}
-              className="w-full rounded-2xl border border-white/10 bg-transparent px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-amber-300 focus:outline-none"
+              disabled={isLoading}
+              className="w-full rounded-2xl border border-white/10 bg-transparent px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-amber-300 focus:outline-none disabled:opacity-50"
             />
             <div className="flex items-center justify-between text-xs uppercase tracking-wide text-white/50">
               <span>Powered by Google Gemini</span>
               <button
                 type="submit"
                 disabled={!canSubmit}
-                className="rounded-full bg-amber-400 px-5 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center gap-2 rounded-full bg-amber-400 px-5 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
               >
+                {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {isLoading ? "Sending..." : "Send"}
               </button>
             </div>

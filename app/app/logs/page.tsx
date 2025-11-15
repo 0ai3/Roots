@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import DashboardPageLayout from "@/app/components/DashboardPageLayout";
-import { MapPin, Utensils, Star, Trash2, Plus, Globe2, Upload, X, Image as ImageIcon } from "lucide-react";
+import { MapPin, Utensils, Star, Trash2, Plus, Globe2, Upload, X, Image as ImageIcon, AlertCircle, CheckCircle, FileText } from "lucide-react";
 import Image from "next/image";
 
 type LogEntry = {
@@ -25,6 +25,11 @@ type LogStats = {
   worldPercentage: number;
 };
 
+type ValidationState = {
+  country: "idle" | "validating" | "valid" | "invalid";
+  city: "idle" | "validating" | "valid" | "invalid";
+};
+
 export default function LogsPage() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [stats, setStats] = useState<LogStats>({
@@ -37,6 +42,12 @@ export default function LogsPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [filterType, setFilterType] = useState<"all" | "attraction" | "recipe">("all");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
+  const [validation, setValidation] = useState<ValidationState>({
+    country: "idle",
+    city: "idle",
+  });
+  const [validationMessage, setValidationMessage] = useState<string>("");
   const [formData, setFormData] = useState({
     type: "attraction" as "attraction" | "recipe",
     title: "",
@@ -73,6 +84,109 @@ export default function LogsPage() {
     loadLogs();
   }, []);
 
+  // Debounced validation for location
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (formData.city && formData.country) {
+        validateLocation(formData.city, formData.country);
+      } else if (formData.country && !formData.city) {
+        validateCountry(formData.country);
+      }
+    }, 800); // Wait 800ms after user stops typing
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.city, formData.country]);
+
+  const validateCountry = async (country: string) => {
+    if (!country.trim()) {
+      setValidation(prev => ({ ...prev, country: "idle" }));
+      return;
+    }
+
+    setValidation(prev => ({ ...prev, country: "validating" }));
+    
+    try {
+      // Using REST Countries API to validate country
+      const response = await fetch(`https://restcountries.com/v3.1/name/${encodeURIComponent(country)}?fullText=false`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        const exactMatch = data.some((c: any) => 
+          c.name.common.toLowerCase() === country.toLowerCase() ||
+          c.name.official.toLowerCase() === country.toLowerCase()
+        );
+        
+        if (exactMatch || data.length > 0) {
+          setValidation(prev => ({ ...prev, country: "valid" }));
+          setValidationMessage(`✓ ${data[0].name.common} found`);
+        } else {
+          setValidation(prev => ({ ...prev, country: "invalid" }));
+          setValidationMessage("Country not found. Please check spelling.");
+        }
+      } else {
+        setValidation(prev => ({ ...prev, country: "invalid" }));
+        setValidationMessage("Country not found. Please check spelling.");
+      }
+    } catch (error) {
+      console.error("Country validation error", error);
+      setValidation(prev => ({ ...prev, country: "idle" }));
+    }
+  };
+
+  const validateLocation = async (city: string, country: string) => {
+    if (!city.trim() || !country.trim()) {
+      setValidation({ country: "idle", city: "idle" });
+      return;
+    }
+
+    setValidation({ country: "validating", city: "validating" });
+    
+    try {
+      // Using OpenStreetMap Nominatim API for location validation
+      const query = `${city}, ${country}`;
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
+        {
+          headers: {
+            'User-Agent': 'RootsApp/1.0'
+          }
+        }
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.length > 0) {
+          const result = data[0];
+          setValidation({ country: "valid", city: "valid" });
+          setValidationMessage(`✓ Location verified: ${result.display_name}`);
+        } else {
+          setValidation({ country: "invalid", city: "invalid" });
+          setValidationMessage("Location not found. Please check city and country spelling.");
+        }
+      } else {
+        setValidation({ country: "idle", city: "idle" });
+        setValidationMessage("");
+      }
+    } catch (error) {
+      console.error("Location validation error", error);
+      setValidation({ country: "idle", city: "idle" });
+      setValidationMessage("");
+    }
+  };
+
+  const toggleNotes = (logId: string) => {
+    setExpandedNotes(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(logId)) {
+        newSet.delete(logId);
+      } else {
+        newSet.add(logId);
+      }
+      return newSet;
+    });
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -106,6 +220,18 @@ export default function LogsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if location is validated when provided
+    if (formData.country && validation.country === "invalid") {
+      alert("Please enter a valid country name.");
+      return;
+    }
+
+    if (formData.city && validation.city === "invalid") {
+      alert("Please enter a valid city name.");
+      return;
+    }
+
     try {
       const response = await fetch("/api/logs", {
         method: "POST",
@@ -124,6 +250,8 @@ export default function LogsPage() {
           imageUrl: "",
         });
         setImagePreview(null);
+        setValidation({ country: "idle", city: "idle" });
+        setValidationMessage("");
         setShowAddForm(false);
         loadLogs();
       }
@@ -149,6 +277,19 @@ export default function LogsPage() {
   const filteredLogs = filterType === "all" 
     ? logs 
     : logs.filter(log => log.type === filterType);
+
+  const getValidationIcon = (field: "country" | "city") => {
+    switch (validation[field]) {
+      case "validating":
+        return <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-emerald-400" />;
+      case "valid":
+        return <CheckCircle className="h-5 w-5 text-emerald-400" />;
+      case "invalid":
+        return <AlertCircle className="h-5 w-5 text-red-400" />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <DashboardPageLayout>
@@ -254,26 +395,59 @@ export default function LogsPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <label className="space-y-2 text-sm font-medium text-white/80">
                 <span>Country</span>
-                <input
-                  type="text"
-                  value={formData.country}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white placeholder:text-white/40"
-                  placeholder="Country name"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={formData.country}
+                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                    className={`w-full rounded-2xl border px-4 py-3 text-white placeholder:text-white/40 pr-12 ${
+                      validation.country === "invalid"
+                        ? "border-red-400/50 bg-red-950/20"
+                        : validation.country === "valid"
+                        ? "border-emerald-400/50 bg-emerald-950/20"
+                        : "border-white/10 bg-slate-950/40"
+                    }`}
+                    placeholder="Country name"
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {getValidationIcon("country")}
+                  </div>
+                </div>
               </label>
 
               <label className="space-y-2 text-sm font-medium text-white/80">
                 <span>City</span>
-                <input
-                  type="text"
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white placeholder:text-white/40"
-                  placeholder="City name"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    className={`w-full rounded-2xl border px-4 py-3 text-white placeholder:text-white/40 pr-12 ${
+                      validation.city === "invalid"
+                        ? "border-red-400/50 bg-red-950/20"
+                        : validation.city === "valid"
+                        ? "border-emerald-400/50 bg-emerald-950/20"
+                        : "border-white/10 bg-slate-950/40"
+                    }`}
+                    placeholder="City name"
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {getValidationIcon("city")}
+                  </div>
+                </div>
               </label>
             </div>
+
+            {/* Validation Message */}
+            {validationMessage && (
+              <div className={`rounded-2xl border px-4 py-3 text-sm ${
+                validation.country === "valid" && validation.city === "valid"
+                  ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-200"
+                  : "border-yellow-400/40 bg-yellow-400/10 text-yellow-200"
+              }`}>
+                {validationMessage}
+              </div>
+            )}
 
             {/* Photo Upload */}
             <div className="space-y-2">
@@ -337,14 +511,15 @@ export default function LogsPage() {
             </label>
 
             <label className="space-y-2 text-sm font-medium text-white/80">
-              <span>Notes</span>
+              <span>Personal Notes</span>
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white placeholder:text-white/40"
-                placeholder="Additional notes..."
+                placeholder="Private notes, tips, things to remember..."
                 rows={2}
               />
+              <p className="text-xs text-white/40">These are your personal notes that will be shown below each log entry.</p>
             </label>
 
             <div className="flex gap-3">
@@ -359,6 +534,8 @@ export default function LogsPage() {
                 onClick={() => {
                   setShowAddForm(false);
                   setImagePreview(null);
+                  setValidation({ country: "idle", city: "idle" });
+                  setValidationMessage("");
                 }}
                 className="rounded-full border border-white/20 px-6 py-2 font-semibold text-white transition hover:bg-white/10"
               >
@@ -457,6 +634,24 @@ export default function LogsPage() {
                           }`}
                         />
                       ))}
+                    </div>
+                  )}
+
+                  {/* Notes Section */}
+                  {log.notes && (
+                    <div className="mt-4">
+                      <button
+                        onClick={() => toggleNotes(log._id)}
+                        className="flex items-center gap-2 text-xs text-white/60 hover:text-white/80 transition"
+                      >
+                        <FileText className="h-4 w-4" />
+                        <span>{expandedNotes.has(log._id) ? "Hide" : "Show"} Personal Notes</span>
+                      </button>
+                      {expandedNotes.has(log._id) && (
+                        <div className="mt-2 rounded-xl border border-white/10 bg-slate-950/40 p-3">
+                          <p className="text-sm text-white/80 whitespace-pre-wrap">{log.notes}</p>
+                        </div>
+                      )}
                     </div>
                   )}
 

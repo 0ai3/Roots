@@ -13,6 +13,7 @@ type ProfileFields = {
   name: string;
   email: string;
   location: string;
+  homeCountry: string;
   favoriteMuseums: string;
   favoriteRecipes: string;
   bio: string;
@@ -38,6 +39,7 @@ const EMPTY_FORM: ProfileFields = {
   name: "",
   email: "",
   location: "",
+  homeCountry: "",
   favoriteMuseums: "",
   favoriteRecipes: "",
   bio: "",
@@ -93,6 +95,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
             name: profile.name ?? "",
             email: profile.email ?? "",
             location: profile.location ?? "",
+            homeCountry: profile.homeCountry ?? "",
             favoriteMuseums: profile.favoriteMuseums ?? "",
             favoriteRecipes: profile.favoriteRecipes ?? "",
             bio: profile.bio ?? "",
@@ -176,6 +179,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
           name: profile.name ?? "",
           email: profile.email ?? "",
           location: profile.location ?? "",
+          homeCountry: profile.homeCountry ?? "",
           favoriteMuseums: profile.favoriteMuseums ?? "",
           favoriteRecipes: profile.favoriteRecipes ?? "",
           bio: profile.bio ?? "",
@@ -280,17 +284,33 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
           </label>
         </div>
 
-        <label className="space-y-2 text-sm font-medium text-white/80">
-          <span>Location</span>
-          <input
-            type="text"
-            value={formState.location}
-            onChange={handleChange("location")}
-            placeholder="City, Country"
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
-            disabled={isFormDisabled}
-          />
-        </label>
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="space-y-2 text-sm font-medium text-white/80">
+            <span>Current Location</span>
+            <input
+              type="text"
+              value={formState.location}
+              onChange={handleChange("location")}
+              placeholder="City, Country"
+              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
+              disabled={isFormDisabled}
+            />
+            <p className="text-xs text-white/40">Where you are currently or traveling to</p>
+          </label>
+
+          <label className="space-y-2 text-sm font-medium text-white/80">
+            <span>Home Country</span>
+            <input
+              type="text"
+              value={formState.homeCountry}
+              onChange={handleChange("homeCountry")}
+              placeholder="e.g., United States, Romania, Japan"
+              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
+              disabled={isFormDisabled}
+            />
+            <p className="text-xs text-white/40">Your country of origin for law comparisons</p>
+          </label>
+        </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-2 text-sm font-medium text-white/80">
