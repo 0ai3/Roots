@@ -287,7 +287,7 @@ function LeaderboardTable({
             {t("leaderboard.table.heading")}
           </h3>
         </div>
-
+      </div>    
       {/* Leaderboard List */}
       <div className="max-h-96 overflow-y-auto">
         <ul className="divide-y divide-white/5">
