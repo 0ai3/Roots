@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { cookies } from "next/headers";
-import { getDb } from "@/app/lib/mongo";
+import { getDb } from "../../../app/lib/mongo";
 
 const NEWS_COLLECTION = "cached_news";
 const PROFILE_COLLECTION = "profiles";

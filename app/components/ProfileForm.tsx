@@ -3,7 +3,7 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { setStoredUserId } from "../lib/userId";
-import { useI18n } from "@/app/hooks/useI18n";
+import { useI18n } from "../../app/hooks/useI18n";
 import { Loader2, MapPin, Heart, CheckCircle, AlertCircle } from "lucide-react";
 import Image from "next/image";
 

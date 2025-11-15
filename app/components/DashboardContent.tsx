@@ -12,7 +12,7 @@ import {
   Moon,
 } from "lucide-react";
 import DashboardSidebar from "./DashboardSidebar";
-import { useI18n } from "@/app/hooks/useI18n";
+import { useI18n } from "../../app/hooks/useI18n";
 
 type Role = "client" | "admin";
 

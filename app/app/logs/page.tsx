@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DashboardPageLayout from "@/app/components/DashboardPageLayout";
-import PageThemeToggle from "@/app/components/PageThemeToggle";
+import DashboardPageLayout from "../../../app/components/DashboardPageLayout";
+import PageThemeToggle from "../../../app/components/PageThemeToggle";
 import {
   MapPin,
   Utensils,

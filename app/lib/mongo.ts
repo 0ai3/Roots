@@ -4,7 +4,7 @@ const MONGODB_URI = process.env.MONGODB_URI || "";
 const MONGODB_DB = process.env.MONGODB_DB || "roots";
 
 if (!MONGODB_URI) {
-  throw new Error("Please define MONGODB_URI environment variable");
+  throw new Error("Please define MONGODB_URI environment variable in .env.local");
 }
 
 let cachedClient: MongoClient | null = null;

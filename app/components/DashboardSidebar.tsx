@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { setStoredUserId } from "../lib/userId";
-import { useI18n } from "@/app/hooks/useI18n";
+import { useI18n } from "../../app/hooks/useI18n";
 import {
   Home,
   User,

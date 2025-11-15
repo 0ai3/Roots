@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
-import { useI18n } from "@/app/hooks/useI18n";
+import { useI18n } from "../../app/hooks/useI18n";
 import { Loader2 } from "lucide-react";
 
 type ChatMessage = {
