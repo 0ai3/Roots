@@ -93,24 +93,7 @@ export default function OffertsPage() {
     };
   }, []);
 
-  const toggleTheme = () => {
-    const next = !isDarkMode;
-    setIsDarkMode(next);
-    try {
-      if (next) {
-        document.documentElement.classList.add("dark");
-        localStorage.setItem("theme", "dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-        localStorage.setItem("theme", "light");
-      }
-      window.dispatchEvent(
-        new CustomEvent("theme-change", { detail: { isDark: next } })
-      );
-    } catch (e) {
-      // ignore
-    }
-  };
+  // Theme is controlled by the global ThemeToggle provider
 
   // Color utility functions
   const getBgColor = () => {
@@ -241,27 +224,7 @@ export default function OffertsPage() {
     <DashboardPageLayout isDarkMode={isDarkMode}>
       <div className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}>
         <div className="space-y-6 p-6">
-          {/* Theme Toggle - KEEPING THE BUTTON */}
-          <div className="flex justify-end">
-            <motion.button
-              type="button"
-              onClick={toggleTheme}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors border ${
-                isDarkMode
-                  ? "bg-neutral-800/60 text-white border-neutral-700 hover:bg-neutral-700/60"
-                  : "bg-white text-neutral-900 border-neutral-200 hover:bg-slate-50 shadow-sm"
-              }`}
-            >
-              {isDarkMode ? (
-                <Sun className="w-4 h-4 text-amber-300" />
-              ) : (
-                <Moon className="w-4 h-4 text-neutral-700" />
-              )}
-              <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
-            </motion.button>
-          </div>
+          {/* Theme is controlled by the global ThemeToggle component */}
 
           {/* Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

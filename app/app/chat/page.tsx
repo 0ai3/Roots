@@ -15,7 +15,6 @@ import {
   Heart,
 } from "lucide-react";
 import DashboardPageLayout from "../../components/DashboardPageLayout";
-import PageThemeToggle from "../../components/PageThemeToggle";
 import ChatInterface from "../../components/ChatInterface";
 import Image from "next/image";
 import { useTheme } from "../../components/ThemeProvider";
@@ -453,9 +452,7 @@ export default function ChatPage() {
   return (
     <DashboardPageLayout
     >
-      <div className="flex justify-end mb-6">
-        <PageThemeToggle />
-      </div>
+      {/* Theme controlled by global ThemeToggle */}
 
       {!showChat ? (
         <>

@@ -1,5 +1,4 @@
 import DashboardPageLayout from "../../components/DashboardPageLayout";
-import PageThemeToggle from "../../components/PageThemeToggle";
 import LearnAndEarnGame from "../../components/LearnAndEarnGame";
 import { getExperiencePointsFromSession } from "../../lib/experiencePoints.server";
 import { getRequestLocale } from "../../lib/i18n/server";
@@ -14,11 +13,8 @@ export default async function GamesPage() {
     <DashboardPageLayout
       title={t("games.title")}
       description={t("games.description")}
-      isDarkMode={false}
     >
-      <div className="flex justify-end">
-        <PageThemeToggle />
-      </div>
+      {/* Theme controlled by global ThemeToggle */}
       <LearnAndEarnGame
         initialPoints={experience.points}
         initialUserId={experience.userId}

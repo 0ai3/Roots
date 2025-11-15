@@ -30,12 +30,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
     localStorage.setItem("theme", next);
+    try {
+      // Notify any non-React components listening for theme changes
+      window.dispatchEvent(new CustomEvent("theme-change", { detail: { isDark: next === "dark" } }));
+    } catch (e) {
+      // ignore in non-browser environments
+    }
   };
 
   // allow consumers to set the theme explicitly
   const setThemeExplicit = (t: Theme) => {
     setTheme(t);
     localStorage.setItem("theme", t);
+    try {
+      window.dispatchEvent(new CustomEvent("theme-change", { detail: { isDark: t === "dark" } }));
+    } catch (e) {
+      // ignore
+    }
   };
 
   useEffect(() => {

@@ -12,24 +12,7 @@ export default function ThemeToggle() {
   const { t } = useI18n();
 
   // Hide the global fixed toggle on specific pages where we provide
-  // a per-page theme control or want to force a light-style layout.
-  const hiddenPaths = [
-    "leaderboard",
-    "attractions",
-    "news",
-    "offerts",
-    "recipes",
-    "games",
-    "map",
-    "profile",
-    "dashboard",
-    "logs",
-  ];
-  if (typeof pathname === "string") {
-    for (const p of hiddenPaths) {
-      if (pathname.includes(p)) return null;
-    }
-  }
+  // The global toggle is always visible now; per-page toggles were removed.
 
   return (
     <motion.button

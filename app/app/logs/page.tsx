@@ -67,28 +67,7 @@ export default function LogsPage() {
     }
   }, []);
 
-  const toggleTheme = () => {
-    const next = !isDarkMode;
-    setIsDarkMode(next);
-    try {
-      if (next) {
-        document.documentElement.classList.add("dark");
-        localStorage.setItem("theme", "dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-        localStorage.setItem("theme", "light");
-      }
-      try {
-        window.dispatchEvent(
-          new CustomEvent("theme-change", { detail: { isDark: next } })
-        );
-      } catch (e) {
-        // ignore
-      }
-    } catch (e) {
-      // ignore
-    }
-  };
+  // Theme is controlled by the global ThemeToggle provider
 
   // Color utility functions
   const getBgColor = (opacity: string = "") => {
@@ -529,22 +508,7 @@ export default function LogsPage() {
               <p className={`mt-2 ${getMutedTextColor()}`}>Track your adventures and complete verification tasks</p>
             </div>
             <div className="flex items-center gap-4">
-              {/* THEME TOGGLE BUTTON */}
-              <motion.button
-                type="button"
-                onClick={toggleTheme}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`rounded-xl px-6 py-3 flex items-center gap-3 transition-all duration-300 backdrop-blur-sm border ${
-                  isDarkMode 
-                    ? "bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50" 
-                    : "bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-200"
-                }`}
-              >
-                {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                {isDarkMode ? "Light Mode" : "Dark Mode"}
-              </motion.button>
-              
+              {/* Theme is controlled by the global ThemeToggle component */}
               {/* EXISTING BUTTON */}
               <button
                 onClick={() => activeTab === "logs" ? setShowAddForm(!showAddForm) : setShowTaskForm(!showTaskForm)}

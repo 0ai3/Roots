@@ -1,5 +1,4 @@
 import DashboardPageLayout from "../../components/DashboardPageLayout";
-import PageThemeToggle from "../../components/PageThemeToggle";
 import RecipeIdeasPlanner from "../../components/RecipeIdeasPlanner";
 import { getExperiencePointsFromSession } from "../../lib/experiencePoints.server";
 import { getRequestLocale } from "../../lib/i18n/server";
@@ -14,11 +13,8 @@ export default async function RecipesPage() {
     <DashboardPageLayout
       title={t("recipes.title")}
       description={t("recipes.description")}
-      isDarkMode={false}
     >
-      <div className="flex justify-end">
-        <PageThemeToggle />
-      </div>
+      {/* Theme controlled by global ThemeToggle */}
       <RecipeIdeasPlanner
         initialPoints={experience.points}
         initialUserId={experience.userId}

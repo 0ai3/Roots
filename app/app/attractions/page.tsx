@@ -16,7 +16,6 @@ import {
   Share2,
 } from "lucide-react";
 import DashboardPageLayout from "../../components/DashboardPageLayout";
-import PageThemeToggle from "../../components/PageThemeToggle";
 import AttractionPlanner from "../../components/AttractionPlanner";
 import Image from "next/image";
 import { useTheme } from "../../components/ThemeProvider";
@@ -523,9 +522,7 @@ export default function AttractionsPage() {
 
   return (
     <DashboardPageLayout>
-      <div className="flex justify-end mb-6">
-        <PageThemeToggle />
-      </div>
+      {/* Theme controlled by global ThemeToggle */}
 
       {!showPlanner ? (
         <>
