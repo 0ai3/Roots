@@ -3,6 +3,7 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { setStoredUserId } from "../lib/userId";
+import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
 type Props = {
   initialPoints?: number;
@@ -74,6 +75,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [homeCountryValidation, setHomeCountryValidation] = useState<"idle" | "validating" | "valid" | "invalid">("idle");
 
   useEffect(() => {
     let isActive = true;
@@ -139,6 +141,43 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
     };
   }, []);
 
+  // Validate home country
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (formState.homeCountry && formState.homeCountry.trim().length > 0) {
+        validateHomeCountry(formState.homeCountry);
+      } else {
+        setHomeCountryValidation("idle");
+      }
+    }, 800);
+
+    return () => clearTimeout(timeoutId);
+  }, [formState.homeCountry]);
+
+  const validateHomeCountry = async (country: string) => {
+    setHomeCountryValidation("validating");
+    
+    try {
+      const response = await fetch(
+        `https://restcountries.com/v3.1/name/${encodeURIComponent(country)}?fullText=false`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.length > 0) {
+          setHomeCountryValidation("valid");
+        } else {
+          setHomeCountryValidation("invalid");
+        }
+      } else {
+        setHomeCountryValidation("invalid");
+      }
+    } catch (error) {
+      console.error("Country validation error", error);
+      setHomeCountryValidation("idle");
+    }
+  };
+
   const formattedCreatedAt = useMemo(
     () => formatDate(profileMeta?.createdAt ?? null),
     [profileMeta?.createdAt]
@@ -160,6 +199,13 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
     if (isSaving) {
       return;
     }
+
+    // Check validation
+    if (formState.homeCountry && homeCountryValidation === "invalid") {
+      setErrorMessage("Please enter a valid home country name.");
+      return;
+    }
+
     setErrorMessage(null);
     setStatusMessage(null);
     setIsSaving(true);
@@ -206,6 +252,19 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
   };
 
   const isFormDisabled = isLoading || isSaving;
+
+  const getValidationIcon = () => {
+    switch (homeCountryValidation) {
+      case "validating":
+        return <Loader2 className="h-5 w-5 animate-spin text-white/40" />;
+      case "valid":
+        return <CheckCircle className="h-5 w-5 text-emerald-400" />;
+      case "invalid":
+        return <AlertCircle className="h-5 w-5 text-red-400" />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <section className="space-y-8">
@@ -300,14 +359,25 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
 
           <label className="space-y-2 text-sm font-medium text-white/80">
             <span>Home Country</span>
-            <input
-              type="text"
-              value={formState.homeCountry}
-              onChange={handleChange("homeCountry")}
-              placeholder="e.g., United States, Romania, Japan"
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
-              disabled={isFormDisabled}
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={formState.homeCountry}
+                onChange={handleChange("homeCountry")}
+                placeholder="e.g., United States, Romania, Japan"
+                className={`w-full rounded-2xl border px-4 py-3 pr-12 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${
+                  homeCountryValidation === "invalid"
+                    ? "border-red-400/50 bg-red-950/20"
+                    : homeCountryValidation === "valid"
+                    ? "border-emerald-400/50 bg-emerald-950/20"
+                    : "border-white/10 bg-slate-950/40"
+                }`}
+                disabled={isFormDisabled}
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                {getValidationIcon()}
+              </div>
+            </div>
             <p className="text-xs text-white/40">Your country of origin for law comparisons</p>
           </label>
         </div>
@@ -365,7 +435,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
         <div className="flex flex-wrap gap-3 pt-2">
           <button
             type="submit"
-            disabled={isFormDisabled}
+            disabled={isFormDisabled || (formState.homeCountry !== "" && homeCountryValidation === "invalid")}
             className="rounded-full bg-emerald-500 px-6 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSaving ? "Saving..." : isLoading ? "Loading..." : "Save profile"}

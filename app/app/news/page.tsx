@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import DashboardPageLayout from "@/app/components/DashboardPageLayout";
-import { Newspaper, AlertTriangle, Info, Sparkles, Calendar, RefreshCw } from "lucide-react";
+import { Newspaper, AlertTriangle, Info, Sparkles, Calendar, RefreshCw, Settings } from "lucide-react";
 
 type NewsItem = {
   title: string;
@@ -28,19 +29,27 @@ type NewsData = {
 };
 
 export default function NewsPage() {
+  const router = useRouter();
   const [newsData, setNewsData] = useState<NewsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [location, setLocation] = useState("");
   const [homeCountry, setHomeCountry] = useState("");
   const [isCached, setIsCached] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
+  const [needsSetup, setNeedsSetup] = useState(false);
 
   const loadNews = async () => {
     setIsLoading(true);
     setError(null);
+    setErrorDetails(null);
+    setNeedsSetup(false);
     try {
+      console.log("Fetching news from API...");
       const response = await fetch("/api/news");
       const data = await response.json();
+      
+      console.log("API response:", response.status, data);
       
       if (response.ok) {
         setNewsData(data.news);
@@ -49,10 +58,15 @@ export default function NewsPage() {
         setIsCached(data.cached);
       } else {
         setError(data.error || "Failed to load news");
+        setErrorDetails(data.details || null);
+        if (data.needsSetup) {
+          setNeedsSetup(true);
+        }
       }
     } catch (err) {
-      setError("Unable to load news. Please try again.");
-      console.error("News load error", err);
+      console.error("News load error:", err);
+      setError("Unable to connect to the news service. Please try again.");
+      setErrorDetails(err instanceof Error ? err.message : String(err));
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +113,7 @@ export default function NewsPage() {
         </div>
 
         {/* Location Info */}
-        {location && (
+        {location && !error && (
           <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 p-6 backdrop-blur">
             <div className="flex items-center justify-between">
               <div>
@@ -124,14 +138,42 @@ export default function NewsPage() {
             <div className="text-center">
               <RefreshCw className="mx-auto h-12 w-12 animate-spin text-emerald-400" />
               <p className="mt-4 text-white/60">Loading latest news and local laws...</p>
+              <p className="mt-2 text-xs text-white/40">This may take a few moments...</p>
             </div>
           </div>
         ) : error ? (
-          <div className="rounded-3xl border border-red-400/50 bg-red-500/10 p-8 text-center">
-            <p className="text-red-200">{error}</p>
-            <p className="mt-2 text-sm text-red-300/60">
-              Make sure your location is set in your profile
-            </p>
+          <div className="rounded-3xl border border-red-400/50 bg-red-500/10 p-8">
+            <div className="text-center">
+              <AlertTriangle className="mx-auto h-12 w-12 text-red-400" />
+              <p className="mt-4 text-lg text-red-200">{error}</p>
+              {errorDetails && (
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm text-red-300/60 hover:text-red-300">
+                    Show technical details
+                  </summary>
+                  <pre className="mt-2 overflow-auto rounded-xl bg-black/30 p-4 text-left text-xs text-red-200">
+                    {errorDetails}
+                  </pre>
+                </details>
+              )}
+              {needsSetup ? (
+                <button
+                  onClick={() => router.push("/app/profile")}
+                  className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400"
+                >
+                  <Settings className="h-5 w-5" />
+                  Go to Profile Settings
+                </button>
+              ) : (
+                <button
+                  onClick={loadNews}
+                  className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400"
+                >
+                  <RefreshCw className="h-5 w-5" />
+                  Try Again
+                </button>
+              )}
+            </div>
           </div>
         ) : newsData ? (
           <>
@@ -232,6 +274,13 @@ export default function NewsPage() {
             <p className="mt-4 text-white/60">
               Set your location in your profile to see personalized news
             </p>
+            <button
+              onClick={() => router.push("/app/profile")}
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400"
+            >
+              <Settings className="h-5 w-5" />
+              Go to Profile
+            </button>
           </div>
         )}
       </div>

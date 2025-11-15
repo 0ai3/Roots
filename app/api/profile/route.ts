@@ -19,6 +19,27 @@ function buildUserFilters(userId: string) {
   return filters;
 }
 
+async function validateCountry(country: string): Promise<boolean> {
+  if (!country || country.trim().length === 0) {
+    return true; // Empty is okay
+  }
+
+  try {
+    const response = await fetch(
+      `https://restcountries.com/v3.1/name/${encodeURIComponent(country)}?fullText=false`
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.length > 0;
+    }
+    return false;
+  } catch (error) {
+    console.error("Country validation error", error);
+    return false;
+  }
+}
+
 export async function GET() {
   try {
     const cookieStore = await cookies();
@@ -39,6 +60,7 @@ export async function GET() {
       email: 1,
       name: 1,
       location: 1,
+      homeCountry: 1,
       favoriteMuseums: 1,
       favoriteRecipes: 1,
       bio: 1,
@@ -90,6 +112,7 @@ export async function POST(request: NextRequest) {
     const name = sanitize(payload?.name);
     const email = sanitize(payload?.email);
     const location = sanitize(payload?.location);
+    const homeCountry = sanitize(payload?.homeCountry);
     const favoriteMuseums = sanitize(payload?.favoriteMuseums);
     const favoriteRecipes = sanitize(payload?.favoriteRecipes);
     const bio = sanitize(payload?.bio);
@@ -100,6 +123,19 @@ export async function POST(request: NextRequest) {
         { error: "Name and email are required." },
         { status: 400 }
       );
+    }
+
+    // Validate home country if provided
+    if (homeCountry && homeCountry.length > 0) {
+      const isValidCountry = await validateCountry(homeCountry);
+      if (!isValidCountry) {
+        return NextResponse.json(
+          {
+            error: `"${homeCountry}" is not a valid country name. Please check spelling.`,
+          },
+          { status: 400 }
+        );
+      }
     }
 
     const db = await getDb();
@@ -115,6 +151,7 @@ export async function POST(request: NextRequest) {
         name,
         email,
         location,
+        homeCountry,
         favoriteMuseums,
         favoriteRecipes,
         bio,
