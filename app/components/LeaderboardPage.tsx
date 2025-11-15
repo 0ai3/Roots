@@ -6,7 +6,19 @@ import PageThemeToggle from "./PageThemeToggle";
 import { useTheme } from "./ThemeProvider";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { motion } from "framer-motion";
-import { Trophy, Medal, Crown, Star, Sun, Moon, ArrowRight, TrendingUp, Users, Award, Zap } from "lucide-react";
+import {
+  Trophy,
+  Medal,
+  Crown,
+  Star,
+  Sun,
+  Moon,
+  ArrowRight,
+  TrendingUp,
+  Users,
+  Award,
+  Zap,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { useI18n } from "@/app/hooks/useI18n";
 import Image from "next/image";
@@ -86,11 +98,13 @@ export default function LeaderboardPage() {
                 className="object-cover"
                 priority
               />
-              <div className={`absolute inset-0 ${
-                isDarkMode 
-                  ? "bg-linear-to-br from-black/80 via-black/70 to-black/80" 
-                  : "bg-linear-to-br from-black/60 via-black/50 to-black/60"
-              }`} />
+              <div
+                className={`absolute inset-0 ${
+                  isDarkMode
+                    ? "bg-linear-to-br from-black/80 via-black/70 to-black/80"
+                    : "bg-linear-to-br from-black/60 via-black/50 to-black/60"
+                }`}
+              />
             </div>
 
             <div className="relative z-10 max-w-5xl mx-auto px-6 text-center text-white">
@@ -111,7 +125,9 @@ export default function LeaderboardPage() {
                 className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
               >
                 Global{" "}
-                <span className={isDarkMode ? "text-lime-400" : "text-lime-300"}>
+                <span
+                  className={isDarkMode ? "text-lime-400" : "text-lime-300"}
+                >
                   Leaderboard
                 </span>
               </motion.h1>
@@ -122,7 +138,8 @@ export default function LeaderboardPage() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="text-xl mb-8 max-w-2xl mx-auto text-white/90"
               >
-                Compete with cultural explorers worldwide and climb the ranks by earning experience points
+                Compete with cultural explorers worldwide and climb the ranks by
+                earning experience points
               </motion.p>
 
               <motion.div
@@ -166,7 +183,9 @@ export default function LeaderboardPage() {
                     label: "Your Rank",
                     value: current?.rank ? `#${current.rank}` : "N/A",
                     color: "yellow",
-                    desc: current ? `${current.points.toLocaleString()} points` : "Not ranked yet",
+                    desc: current
+                      ? `${current.points.toLocaleString()} points`
+                      : "Not ranked yet",
                   },
                   {
                     icon: Award,
@@ -272,7 +291,11 @@ export default function LeaderboardPage() {
                   }`}
                 >
                   Top{" "}
-                  <span className={isDarkMode ? "text-lime-400" : "text-emerald-600"}>
+                  <span
+                    className={
+                      isDarkMode ? "text-lime-400" : "text-emerald-600"
+                    }
+                  >
                     Champions
                   </span>
                 </h2>
@@ -300,22 +323,40 @@ export default function LeaderboardPage() {
                     } md:mt-8`}
                   >
                     <div className="relative inline-block mb-4">
-                      <div className={`w-20 h-20 rounded-full flex items-center justify-center ${
-                        isDarkMode ? "bg-gray-400/20" : "bg-gray-100"
-                      }`}>
-                        <Medal className={`w-10 h-10 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`} />
+                      <div
+                        className={`w-20 h-20 rounded-full flex items-center justify-center ${
+                          isDarkMode ? "bg-gray-400/20" : "bg-gray-100"
+                        }`}
+                      >
+                        <Medal
+                          className={`w-10 h-10 ${
+                            isDarkMode ? "text-gray-300" : "text-gray-600"
+                          }`}
+                        />
                       </div>
                       <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-gray-400 text-white font-bold flex items-center justify-center text-sm">
                         2
                       </div>
                     </div>
-                    <h3 className={`font-bold text-lg mb-2 ${isDarkMode ? "text-white" : "text-neutral-900"}`}>
+                    <h3
+                      className={`font-bold text-lg mb-2 ${
+                        isDarkMode ? "text-white" : "text-neutral-900"
+                      }`}
+                    >
                       {entries[1].name}
                     </h3>
-                    <p className={`text-2xl font-bold mb-1 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                    <p
+                      className={`text-2xl font-bold mb-1 ${
+                        isDarkMode ? "text-gray-300" : "text-gray-600"
+                      }`}
+                    >
                       {entries[1].points.toLocaleString()}
                     </p>
-                    <p className={`text-sm ${isDarkMode ? "text-neutral-500" : "text-neutral-500"}`}>
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? "text-neutral-500" : "text-neutral-500"
+                      }`}
+                    >
                       points
                     </p>
                   </motion.div>
@@ -332,22 +373,40 @@ export default function LeaderboardPage() {
                     }`}
                   >
                     <div className="relative inline-block mb-4">
-                      <div className={`w-24 h-24 rounded-full flex items-center justify-center ${
-                        isDarkMode ? "bg-yellow-400/20" : "bg-yellow-100"
-                      }`}>
-                        <Crown className={`w-12 h-12 ${isDarkMode ? "text-yellow-400" : "text-yellow-600"}`} />
+                      <div
+                        className={`w-24 h-24 rounded-full flex items-center justify-center ${
+                          isDarkMode ? "bg-yellow-400/20" : "bg-yellow-100"
+                        }`}
+                      >
+                        <Crown
+                          className={`w-12 h-12 ${
+                            isDarkMode ? "text-yellow-400" : "text-yellow-600"
+                          }`}
+                        />
                       </div>
                       <div className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-yellow-400 text-black font-bold flex items-center justify-center">
                         1
                       </div>
                     </div>
-                    <h3 className={`font-bold text-xl mb-2 ${isDarkMode ? "text-white" : "text-neutral-900"}`}>
+                    <h3
+                      className={`font-bold text-xl mb-2 ${
+                        isDarkMode ? "text-white" : "text-neutral-900"
+                      }`}
+                    >
                       {entries[0].name}
                     </h3>
-                    <p className={`text-3xl font-bold mb-1 ${isDarkMode ? "text-yellow-400" : "text-yellow-600"}`}>
+                    <p
+                      className={`text-3xl font-bold mb-1 ${
+                        isDarkMode ? "text-yellow-400" : "text-yellow-600"
+                      }`}
+                    >
                       {entries[0].points.toLocaleString()}
                     </p>
-                    <p className={`text-sm ${isDarkMode ? "text-yellow-300/70" : "text-yellow-700"}`}>
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? "text-yellow-300/70" : "text-yellow-700"
+                      }`}
+                    >
                       points
                     </p>
                   </motion.div>
@@ -365,22 +424,40 @@ export default function LeaderboardPage() {
                     } md:mt-8`}
                   >
                     <div className="relative inline-block mb-4">
-                      <div className={`w-20 h-20 rounded-full flex items-center justify-center ${
-                        isDarkMode ? "bg-amber-600/20" : "bg-amber-100"
-                      }`}>
-                        <Medal className={`w-10 h-10 ${isDarkMode ? "text-amber-600" : "text-amber-600"}`} />
+                      <div
+                        className={`w-20 h-20 rounded-full flex items-center justify-center ${
+                          isDarkMode ? "bg-amber-600/20" : "bg-amber-100"
+                        }`}
+                      >
+                        <Medal
+                          className={`w-10 h-10 ${
+                            isDarkMode ? "text-amber-600" : "text-amber-600"
+                          }`}
+                        />
                       </div>
                       <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-amber-600 text-white font-bold flex items-center justify-center text-sm">
                         3
                       </div>
                     </div>
-                    <h3 className={`font-bold text-lg mb-2 ${isDarkMode ? "text-white" : "text-neutral-900"}`}>
+                    <h3
+                      className={`font-bold text-lg mb-2 ${
+                        isDarkMode ? "text-white" : "text-neutral-900"
+                      }`}
+                    >
                       {entries[2].name}
                     </h3>
-                    <p className={`text-2xl font-bold mb-1 ${isDarkMode ? "text-amber-500" : "text-amber-600"}`}>
+                    <p
+                      className={`text-2xl font-bold mb-1 ${
+                        isDarkMode ? "text-amber-500" : "text-amber-600"
+                      }`}
+                    >
                       {entries[2].points.toLocaleString()}
                     </p>
-                    <p className={`text-sm ${isDarkMode ? "text-neutral-500" : "text-neutral-500"}`}>
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? "text-neutral-500" : "text-neutral-500"
+                      }`}
+                    >
                       points
                     </p>
                   </motion.div>
@@ -406,7 +483,9 @@ export default function LeaderboardPage() {
           </section>
         </div>
       ) : (
-        <div className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}>
+        <div
+          className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}
+        >
           <div className="flex justify-between items-center mb-6 px-6 pt-6">
             <button
               onClick={() => setShowBrowse(true)}
@@ -426,43 +505,43 @@ export default function LeaderboardPage() {
               animate={{ opacity: 1, y: 0 }}
               className={`rounded-2xl p-6 backdrop-blur-sm border ${getBorderColor()} ${getCardBg()}`}
             >
-            {userId ? (
-              current ? (
-                <div className="flex items-center gap-4">
-                  <div className="w-2 h-2 rounded-full bg-lime-400" />
-                  <p className={getMutedTextColor()}>
-                    {t("leaderboard.status.rank", {
-                      rank: String(current.rank),
-                      points: current.points.toLocaleString(),
-                    })}
-                  </p>
-                </div>
+              {userId ? (
+                current ? (
+                  <div className="flex items-center gap-4">
+                    <div className="w-2 h-2 rounded-full bg-lime-400" />
+                    <p className={getMutedTextColor()}>
+                      {t("leaderboard.status.rank", {
+                        rank: String(current.rank),
+                        points: current.points.toLocaleString(),
+                      })}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <div className="w-2 h-2 rounded-full bg-amber-400" />
+                    <p className={getMutedTextColor()}>
+                      {t("leaderboard.status.noRank")}
+                    </p>
+                  </div>
+                )
               ) : (
                 <div className="flex items-center gap-4">
-                  <div className="w-2 h-2 rounded-full bg-amber-400" />
+                  <div className="w-2 h-2 rounded-full bg-blue-400" />
                   <p className={getMutedTextColor()}>
-                    {t("leaderboard.status.noRank")}
+                    {t("leaderboard.status.signedOut")}
                   </p>
                 </div>
-              )
-            ) : (
-              <div className="flex items-center gap-4">
-                <div className="w-2 h-2 rounded-full bg-blue-400" />
-                <p className={getMutedTextColor()}>
-                  {t("leaderboard.status.signedOut")}
-                </p>
-              </div>
-            )}
-          </motion.div>
+              )}
+            </motion.div>
 
-          {/* Leaderboard */}
-          <LeaderboardTable
-            entries={entries}
-            isLoading={isLoading}
-            isDarkMode={isDarkMode}
-            t={t}
-          />
-        </div>
+            {/* Leaderboard */}
+            <LeaderboardTable
+              entries={entries}
+              isLoading={isLoading}
+              isDarkMode={isDarkMode}
+              t={t}
+            />
+          </div>
         </div>
       )}
     </DashboardPageLayout>
@@ -508,7 +587,9 @@ function LeaderboardTable({
         animate={{ opacity: 1 }}
         className={`rounded-2xl p-8 text-center backdrop-blur-sm border ${getBorderColor()} ${getCardBg()}`}
       >
-        <div className={`flex items-center justify-center gap-3 ${getMutedTextColor()}`}>
+        <div
+          className={`flex items-center justify-center gap-3 ${getMutedTextColor()}`}
+        >
           <div className="w-2 h-2 rounded-full bg-lime-400 animate-pulse" />
           <p>{t("leaderboard.loading")}</p>
         </div>
@@ -523,12 +604,8 @@ function LeaderboardTable({
         animate={{ opacity: 1 }}
         className={`rounded-2xl p-8 text-center backdrop-blur-sm border ${getBorderColor()} ${getCardBg()}`}
       >
-        <Trophy
-          className={`w-12 h-12 mx-auto mb-4 ${getMutedTextColor()}`}
-        />
-        <p className={getMutedTextColor()}>
-          {t("leaderboard.empty.title")}
-        </p>
+        <Trophy className={`w-12 h-12 mx-auto mb-4 ${getMutedTextColor()}`} />
+        <p className={getMutedTextColor()}>{t("leaderboard.empty.title")}</p>
         <p className={`${getMutedTextColor()} text-sm mt-2`}>
           {t("leaderboard.empty.subtitle")}
         </p>
@@ -599,7 +676,9 @@ function LeaderboardTable({
       className={`overflow-hidden rounded-2xl backdrop-blur-sm border ${getBorderColor()} ${getCardBg()}`}
     >
       {/* Header - Fixed JSX structure */}
-      <div className={`border-b ${getBorderColor()} ${getHeaderBg()} px-6 py-4`}>
+      <div
+        className={`border-b ${getBorderColor()} ${getHeaderBg()} px-6 py-4`}
+      >
         <div className="flex items-center gap-3">
           <Trophy className="w-5 h-5 text-lime-400" />
           <h3 className={`font-semibold ${getTextColor()}`}>
@@ -610,7 +689,11 @@ function LeaderboardTable({
 
       {/* Leaderboard List */}
       <div className="max-h-96 overflow-y-auto">
-        <ul className={`divide-y ${isDarkMode ? "divide-white/5" : "divide-slate-200"}`}>
+        <ul
+          className={`divide-y ${
+            isDarkMode ? "divide-white/5" : "divide-slate-200"
+          }`}
+        >
           {entries.map((entry, index) => {
             const rankStyle = getRankStyle(entry.rank);
 
@@ -685,7 +768,9 @@ function LeaderboardTable({
       </div>
 
       {/* Footer */}
-      <div className={`border-t ${getBorderColor()} ${getHeaderBg()} px-6 py-3`}>
+      <div
+        className={`border-t ${getBorderColor()} ${getHeaderBg()} px-6 py-3`}
+      >
         <p className={`${getMutedTextColor()} text-xs text-center`}>
           {t("leaderboard.footer", { count: String(entries.length) })}
         </p>
