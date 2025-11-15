@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import DashboardPageLayout from "@/app/components/DashboardPageLayout";
-import { MapPin, Utensils, Star, Trash2, Plus, Globe2, Upload, X, Image as ImageIcon, AlertCircle, CheckCircle, FileText, Camera, Award, Loader2 } from "lucide-react";
+import { MapPin, Utensils, Star, Trash2, Plus, Globe2, Upload, X, Image as ImageIcon, AlertCircle, CheckCircle, FileText, Camera, Award, Loader2, Sun, Moon } from "lucide-react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 type LogEntry = {
   _id: string;
@@ -50,6 +51,91 @@ type ValidationState = {
 };
 
 export default function LogsPage() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Theme management
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("theme");
+      if (saved) {
+        setIsDarkMode(saved === "dark");
+      } else {
+        setIsDarkMode(document.documentElement.classList.contains("dark"));
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const next = !isDarkMode;
+    setIsDarkMode(next);
+    try {
+      if (next) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+      try {
+        window.dispatchEvent(
+          new CustomEvent("theme-change", { detail: { isDark: next } })
+        );
+      } catch (e) {
+        // ignore
+      }
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  // Color utility functions
+  const getBgColor = (opacity: string = "") => {
+    return isDarkMode 
+      ? `bg-slate-900${opacity}` 
+      : `bg-white${opacity}`;
+  };
+
+  const getTextColor = () => {
+    return isDarkMode ? "text-white" : "text-slate-900";
+  };
+
+  const getMutedTextColor = () => {
+    return isDarkMode ? "text-white/70" : "text-slate-600";
+  };
+
+  const getBorderColor = () => {
+    return isDarkMode ? "border-white/10" : "border-slate-200";
+  };
+
+  const getCardBg = () => {
+    return isDarkMode ? "bg-white/5" : "bg-slate-50";
+  };
+
+  const getInputBg = () => {
+    return isDarkMode ? "bg-slate-950/40" : "bg-white";
+  };
+
+  // Accent color helpers: emerald in light mode, lime in dark mode
+  const accent = {
+    bg500: isDarkMode ? 'bg-lime-500' : 'bg-emerald-500',
+    hover400: isDarkMode ? 'hover:bg-lime-400' : 'hover:bg-emerald-400',
+    text400: isDarkMode ? 'text-lime-400' : 'text-emerald-400',
+    border400_50: isDarkMode ? 'border-lime-400/50' : 'border-emerald-400/50',
+    bg50: isDarkMode ? 'bg-lime-50' : 'bg-emerald-50',
+    text900: isDarkMode ? 'text-lime-900' : 'text-emerald-900',
+    border400_40: isDarkMode ? 'border-lime-400/40' : 'border-emerald-400/40',
+    bg400_10: isDarkMode ? 'bg-lime-400/10' : 'bg-emerald-400/10',
+    text700: isDarkMode ? 'text-lime-700' : 'text-emerald-700',
+    hoverBorder400_50: isDarkMode ? 'hover:border-lime-400/50' : 'hover:border-emerald-400/50',
+    from500_20: isDarkMode ? 'from-lime-500/20' : 'from-emerald-500/20',
+    from400: isDarkMode ? 'from-lime-400' : 'from-emerald-400'
+    , bg500_10: isDarkMode ? 'bg-lime-500/10' : 'bg-emerald-500/10',
+    border400_30: isDarkMode ? 'border-lime-400/30' : 'border-emerald-400/30'
+  };
+
+  // ALL YOUR EXISTING STATE VARIABLES - KEEP EVERYTHING EXACTLY AS IS
   const [activeTab, setActiveTab] = useState<"logs" | "tasks">("logs");
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -422,9 +508,9 @@ export default function LogsPage() {
   const getValidationIcon = (field: "country" | "city") => {
     switch (validation[field]) {
       case "validating":
-        return <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-emerald-400" />;
+        return <div className={`h-5 w-5 animate-spin rounded-full border-2 ${isDarkMode ? 'border-white/20' : 'border-slate-400'} ${isDarkMode ? 'border-t-lime-400' : 'border-t-emerald-400'}`} />;
       case "valid":
-        return <CheckCircle className="h-5 w-5 text-emerald-400" />;
+        return <CheckCircle className={`h-5 w-5 ${isDarkMode ? 'text-lime-400' : 'text-emerald-400'}`} />;
       case "invalid":
         return <AlertCircle className="h-5 w-5 text-red-400" />;
       default:
@@ -434,53 +520,77 @@ export default function LogsPage() {
 
   return (
     <DashboardPageLayout>
-      <div className="space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-white">Travel Logs & Tasks</h1>
-            <p className="mt-2 text-white/70">Track your adventures and complete verification tasks</p>
+      <div className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}>
+        <div className="space-y-8 p-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold">Travel Logs & Tasks</h1>
+              <p className={`mt-2 ${getMutedTextColor()}`}>Track your adventures and complete verification tasks</p>
+            </div>
+            <div className="flex items-center gap-4">
+              {/* THEME TOGGLE BUTTON */}
+              <motion.button
+                type="button"
+                onClick={toggleTheme}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`rounded-xl px-6 py-3 flex items-center gap-3 transition-all duration-300 backdrop-blur-sm border ${
+                  isDarkMode 
+                    ? "bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50" 
+                    : "bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-200"
+                }`}
+              >
+                {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                {isDarkMode ? "Light Mode" : "Dark Mode"}
+              </motion.button>
+              
+              {/* EXISTING BUTTON */}
+              <button
+                onClick={() => activeTab === "logs" ? setShowAddForm(!showAddForm) : setShowTaskForm(!showTaskForm)}
+                className={`flex items-center gap-2 rounded-full ${accent.bg500} px-6 py-3 font-semibold text-slate-950 transition ${accent.hover400}`}
+              >
+                <Plus className="h-5 w-5" />
+                {activeTab === "logs" ? "Add Entry" : "New Task"}
+              </button>
+            </div>
           </div>
-          <button
-            onClick={() => activeTab === "logs" ? setShowAddForm(!showAddForm) : setShowTaskForm(!showTaskForm)}
-            className="flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400"
-          >
-            <Plus className="h-5 w-5" />
-            {activeTab === "logs" ? "Add Entry" : "New Task"}
-          </button>
-        </div>
 
-        {/* Tab Navigation */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setActiveTab("logs")}
-            className={`flex items-center gap-2 rounded-full px-6 py-3 font-semibold transition ${
-              activeTab === "logs"
-                ? "bg-emerald-500 text-slate-950"
-                : "bg-white/10 text-white hover:bg-white/20"
-            }`}
-          >
-            <Globe2 className="h-5 w-5" />
-            Logs
-          </button>
-          <button
-            onClick={() => setActiveTab("tasks")}
-            className={`flex items-center gap-2 rounded-full px-6 py-3 font-semibold transition ${
-              activeTab === "tasks"
-                ? "bg-emerald-500 text-slate-950"
-                : "bg-white/10 text-white hover:bg-white/20"
-            }`}
-          >
-            <Award className="h-5 w-5" />
-            Verification Tasks
-          </button>
-        </div>
+          {/* Tab Navigation */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setActiveTab("logs")}
+              className={`flex items-center gap-2 rounded-full px-6 py-3 font-semibold transition ${
+                activeTab === "logs"
+                  ? `${accent.bg500} text-slate-950`
+                  : isDarkMode 
+                    ? "bg-white/10 text-white hover:bg-white/20" 
+                    : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+              }`}
+            >
+              <Globe2 className="h-5 w-5" />
+              Logs
+            </button>
+            <button
+              onClick={() => setActiveTab("tasks")}
+              className={`flex items-center gap-2 rounded-full px-6 py-3 font-semibold transition ${
+                activeTab === "tasks"
+                  ? `${accent.bg500} text-slate-950`
+                  : isDarkMode 
+                    ? "bg-white/10 text-white hover:bg-white/20" 
+                    : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+              }`}
+            >
+              <Award className="h-5 w-5" />
+              Verification Tasks
+            </button>
+          </div>
 
         {activeTab === "logs" ? (
           <>
             {/* Stats Grid */}
             <div className="grid gap-4 md:grid-cols-4">
-              <div className="rounded-3xl border border-white/10 bg-linear-to-br from-emerald-500/20 to-teal-500/20 p-6 backdrop-blur">
+              <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 p-6 backdrop-blur">
                 <div className="flex items-center gap-3">
                   <Globe2 className="h-8 w-8 text-emerald-400" />
                   <div>
@@ -490,339 +600,351 @@ export default function LogsPage() {
                 </div>
                 <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
                   <div
-                    className="h-full bg-linear-to-r from-emerald-400 to-teal-400 transition-all duration-500"
+                    className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 transition-all duration-500"
                     style={{ width: `${stats.worldPercentage}%` }}
                   />
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-                <div className="flex items-center gap-3">
-                  <MapPin className="h-8 w-8 text-blue-400" />
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-white/60">Attractions</p>
-                    <p className="text-3xl font-bold text-white">{stats.totalAttractions}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-                <div className="flex items-center gap-3">
-                  <Utensils className="h-8 w-8 text-orange-400" />
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-white/60">Recipes Cooked</p>
-                    <p className="text-3xl font-bold text-white">{stats.totalRecipes}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-                <div className="flex items-center gap-3">
-                  <Globe2 className="h-8 w-8 text-purple-400" />
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-white/60">Countries</p>
-                    <p className="text-3xl font-bold text-white">{stats.countriesVisited}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Add Form */}
-            {showAddForm && (
-              <form
-                onSubmit={handleSubmit}
-                className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur"
-              >
-                <h3 className="text-xl font-semibold text-white">Add New Entry</h3>
-                
-                <div className="grid gap-4 md:grid-cols-2">
-                  <label className="space-y-2 text-sm font-medium text-white/80">
-                    <span>Type</span>
-                    <select
-                      value={formData.type}
-                      onChange={(e) => setFormData({ ...formData, type: e.target.value as "attraction" | "recipe" })}
-                      className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white"
-                    >
-                      <option value="attraction">Attraction</option>
-                      <option value="recipe">Recipe</option>
-                    </select>
-                  </label>
-
-                  <label className="space-y-2 text-sm font-medium text-white/80">
-                    <span>Title *</span>
-                    <input
-                      type="text"
-                      value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white placeholder:text-white/40"
-                      placeholder="Name of place or recipe"
-                      required
-                    />
-                  </label>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <label className="space-y-2 text-sm font-medium text-white/80">
-                    <span>Country</span>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={formData.country}
-                        onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                        className={`w-full rounded-2xl border px-4 py-3 text-white placeholder:text-white/40 pr-12 ${
-                          validation.country === "invalid"
-                            ? "border-red-400/50 bg-red-950/20"
-                            : validation.country === "valid"
-                            ? "border-emerald-400/50 bg-emerald-950/20"
-                            : "border-white/10 bg-slate-950/40"
-                        }`}
-                        placeholder="Country name"
-                      />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        {getValidationIcon("country")}
-                      </div>
+                <div className={`rounded-3xl border ${getBorderColor()} ${getCardBg()} p-6 backdrop-blur`}>
+                  <div className="flex items-center gap-3">
+                    <MapPin className="h-8 w-8 text-blue-400" />
+                    <div>
+                      <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>Attractions</p>
+                      <p className="text-3xl font-bold">{stats.totalAttractions}</p>
                     </div>
-                  </label>
-
-                  <label className="space-y-2 text-sm font-medium text-white/80">
-                    <span>City</span>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={formData.city}
-                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                        className={`w-full rounded-2xl border px-4 py-3 text-white placeholder:text-white/40 pr-12 ${
-                          validation.city === "invalid"
-                            ? "border-red-400/50 bg-red-950/20"
-                            : validation.city === "valid"
-                            ? "border-emerald-400/50 bg-emerald-950/20"
-                            : "border-white/10 bg-slate-950/40"
-                        }`}
-                        placeholder="City name"
-                      />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        {getValidationIcon("city")}
-                      </div>
-                    </div>
-                  </label>
+                  </div>
                 </div>
 
-                {/* Validation Message */}
-                {validationMessage && (
-                  <div className={`rounded-2xl border px-4 py-3 text-sm ${
-                    validation.country === "valid" && validation.city === "valid"
-                      ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-200"
-                      : "border-yellow-400/40 bg-yellow-400/10 text-yellow-200"
-                  }`}>
-                    {validationMessage}
+                <div className={`rounded-3xl border ${getBorderColor()} ${getCardBg()} p-6 backdrop-blur`}>
+                  <div className="flex items-center gap-3">
+                    <Utensils className="h-8 w-8 text-orange-400" />
+                    <div>
+                      <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>Recipes Cooked</p>
+                      <p className="text-3xl font-bold">{stats.totalRecipes}</p>
+                    </div>
                   </div>
-                )}
+                </div>
 
-                {/* Photo Upload */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white/80">
-                    Photo (Optional)
-                  </label>
-                  {imagePreview ? (
-                    <div className="relative">
-                      <div className="relative h-64 w-full overflow-hidden rounded-2xl border border-white/10">
-                        <Image
-                          src={imagePreview}
-                          alt="Preview"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={removeImage}
-                        className="absolute right-2 top-2 rounded-full bg-red-500 p-2 text-white transition hover:bg-red-600"
+                <div className={`rounded-3xl border ${getBorderColor()} ${getCardBg()} p-6 backdrop-blur`}>
+                  <div className="flex items-center gap-3">
+                    <Globe2 className="h-8 w-8 text-purple-400" />
+                    <div>
+                      <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>Countries</p>
+                      <p className="text-3xl font-bold">{stats.countriesVisited}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Add Form */}
+              {showAddForm && (
+                <form
+                  onSubmit={handleSubmit}
+                  className={`space-y-4 rounded-3xl border ${getBorderColor()} ${getCardBg()} p-6 backdrop-blur`}
+                >
+                  <h3 className="text-xl font-semibold">Add New Entry</h3>
+                  
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+                      <span>Type</span>
+                      <select
+                        value={formData.type}
+                        onChange={(e) => setFormData({ ...formData, type: e.target.value as "attraction" | "recipe" })}
+                        className={`w-full rounded-2xl border ${getBorderColor()} ${getInputBg()} px-4 py-3`}
                       >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <label className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-slate-950/40 transition hover:border-emerald-400/50 hover:bg-slate-950/60">
-                      <Upload className="h-8 w-8 text-white/40" />
-                      <span className="mt-2 text-sm text-white/60">Click to upload a photo</span>
-                      <span className="mt-1 text-xs text-white/40">PNG, JPG up to 5MB</span>
+                        <option value="attraction">Attraction</option>
+                        <option value="recipe">Recipe</option>
+                      </select>
+                    </label>
+
+                    <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+                      <span>Title *</span>
                       <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="hidden"
+                        type="text"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        className={`w-full rounded-2xl border ${getBorderColor()} ${getInputBg()} px-4 py-3 placeholder:${getMutedTextColor()}`}
+                        placeholder="Name of place or recipe"
+                        required
                       />
                     </label>
-                  )}
-                </div>
+                  </div>
 
-                <label className="space-y-2 text-sm font-medium text-white/80">
-                  <span>Description</span>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white placeholder:text-white/40"
-                    placeholder="Tell us about your experience..."
-                    rows={3}
-                  />
-                </label>
-
-                <label className="space-y-2 text-sm font-medium text-white/80">
-                  <span>Rating: {formData.rating}/5</span>
-                  <input
-                    type="range"
-                    min="1"
-                    max="5"
-                    value={formData.rating}
-                    onChange={(e) => setFormData({ ...formData, rating: parseInt(e.target.value) })}
-                    className="w-full"
-                  />
-                </label>
-
-                <label className="space-y-2 text-sm font-medium text-white/80">
-                  <span>Personal Notes</span>
-                  <textarea
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white placeholder:text-white/40"
-                    placeholder="Private notes, tips, things to remember..."
-                    rows={2}
-                  />
-                  <p className="text-xs text-white/40">These are your personal notes that will be shown below each log entry.</p>
-                </label>
-
-                <div className="flex gap-3">
-                  <button
-                    type="submit"
-                    className="rounded-full bg-emerald-500 px-6 py-2 font-semibold text-slate-950 transition hover:bg-emerald-400"
-                  >
-                    Save Entry
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowAddForm(false);
-                      setImagePreview(null);
-                      setValidation({ country: "idle", city: "idle" });
-                      setValidationMessage("");
-                    }}
-                    className="rounded-full border border-white/20 px-6 py-2 font-semibold text-white transition hover:bg-white/10"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* Filter Tabs */}
-            <div className="flex gap-2">
-              {(["all", "attraction", "recipe"] as const).map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setFilterType(type)}
-                  className={`rounded-full px-5 py-2 text-sm font-medium transition ${
-                    filterType === type
-                      ? "bg-emerald-500 text-slate-950"
-                      : "bg-white/10 text-white hover:bg-white/20"
-                  }`}
-                >
-                  {type === "all" ? "All" : type === "attraction" ? "Attractions" : "Recipes"}
-                </button>
-              ))}
-            </div>
-
-            {/* Logs List */}
-            {isLoading ? (
-              <p className="text-center text-white/60">Loading your travel logs...</p>
-            ) : filteredLogs.length === 0 ? (
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-12 text-center backdrop-blur">
-                <p className="text-white/60">No entries yet. Start logging your adventures!</p>
-              </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {filteredLogs.map((log) => (
-                  <div
-                    key={log._id}
-                    className="group rounded-3xl border border-white/10 bg-white/5 backdrop-blur transition hover:bg-white/10 overflow-hidden"
-                  >
-                    {/* Image */}
-                    {log.imageUrl ? (
-                      <div className="relative h-48 w-full">
-                        <Image
-                          src={log.imageUrl}
-                          alt={log.title}
-                          fill
-                          className="object-cover"
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+                      <span>Country</span>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={formData.country}
+                          onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                          className={`w-full rounded-2xl border px-4 py-3 pr-12 ${
+                            validation.country === "invalid"
+                              ? "border-red-400/50 bg-red-50 text-red-900"
+                              : validation.country === "valid"
+                              ? `${accent.border400_50} ${accent.bg50} ${accent.text900}`
+                              : `${getBorderColor()} ${getInputBg()}`
+                          }`}
+                          placeholder="Country name"
                         />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          {getValidationIcon("country")}
+                        </div>
                       </div>
-                    ) : (
-                      <div className="flex h-48 w-full items-center justify-center bg-linear-to-br from-slate-800/50 to-slate-900/50">
-                        <ImageIcon className="h-16 w-16 text-white/20" />
-                      </div>
-                    )}
+                    </label>
 
-                    <div className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-2">
-                          {log.type === "attraction" ? (
-                            <MapPin className="h-5 w-5 text-blue-400" />
-                          ) : (
-                            <Utensils className="h-5 w-5 text-orange-400" />
-                          )}
-                          <span className="text-xs uppercase tracking-wide text-white/50">
-                            {log.type}
-                          </span>
+                    <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+                      <span>City</span>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={formData.city}
+                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                          className={`w-full rounded-2xl border px-4 py-3 pr-12 ${
+                            validation.city === "invalid"
+                              ? "border-red-400/50 bg-red-50 text-red-900"
+                              : validation.city === "valid"
+                              ? `${accent.border400_50} ${accent.bg50} ${accent.text900}`
+                              : `${getBorderColor()} ${getInputBg()}`
+                          }`}
+                          placeholder="City name"
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          {getValidationIcon("city")}
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  {/* Validation Message */}
+                  {validationMessage && (
+                    <div className={`rounded-2xl border px-4 py-3 text-sm ${
+                      validation.country === "valid" && validation.city === "valid"
+                        ? `${accent.border400_40} ${accent.bg400_10} ${accent.text700}`
+                        : "border-yellow-400/40 bg-yellow-400/10 text-yellow-700"
+                    }`}>
+                      {validationMessage}
+                    </div>
+                  )}
+
+                  {/* Photo Upload */}
+                  <div className="space-y-2">
+                    <label className={`text-sm font-medium ${getMutedTextColor()}`}>
+                      Photo (Optional)
+                    </label>
+                    {imagePreview ? (
+                      <div className="relative">
+                        <div className={`relative h-64 w-full overflow-hidden rounded-2xl border ${getBorderColor()}`}>
+                          <Image
+                            src={imagePreview}
+                            alt="Preview"
+                            fill
+                            className="object-cover"
+                          />
                         </div>
                         <button
-                          onClick={() => handleDelete(log._id)}
-                          className="opacity-0 transition group-hover:opacity-100"
+                          type="button"
+                          onClick={removeImage}
+                          className="absolute right-2 top-2 rounded-full bg-red-500 p-2 text-white transition hover:bg-red-600"
                         >
-                          <Trash2 className="h-4 w-4 text-red-400 hover:text-red-300" />
+                          <X className="h-4 w-4" />
                         </button>
                       </div>
+                    ) : (
+                      <label className={`flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed ${
+                        isDarkMode ? 'border-white/20' : 'border-slate-300'
+                      } ${getInputBg()} transition ${accent.hoverBorder400_50}`}>
+                        <Upload className={`h-8 w-8 ${getMutedTextColor()}`} />
+                        <span className={`mt-2 text-sm ${getMutedTextColor()}`}>Click to upload a photo</span>
+                        <span className={`mt-1 text-xs ${getMutedTextColor()}`}>PNG, JPG up to 5MB</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="hidden"
+                        />
+                      </label>
+                    )}
+                  </div>
 
-                      <h3 className="mt-3 text-xl font-semibold text-white">{log.title}</h3>
-                      
-                      {(log.city || log.country) && (
-                        <p className="mt-1 text-sm text-emerald-400">
-                          {[log.city, log.country].filter(Boolean).join(", ")}
-                        </p>
-                      )}
+                  <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+                    <span>Description</span>
+                    <textarea
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      className={`w-full rounded-2xl border ${getBorderColor()} ${getInputBg()} px-4 py-3 placeholder:${getMutedTextColor()}`}
+                      placeholder="Tell us about your experience..."
+                      rows={3}
+                    />
+                  </label>
 
-                      {log.description && (
-                        <p className="mt-3 text-sm text-white/70 line-clamp-2">{log.description}</p>
-                      )}
+                  <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+                    <span>Rating: {formData.rating}/5</span>
+                    <input
+                      type="range"
+                      min="1"
+                      max="5"
+                      value={formData.rating}
+                      onChange={(e) => setFormData({ ...formData, rating: parseInt(e.target.value) })}
+                      className="w-full"
+                    />
+                  </label>
 
-                      {log.rating && (
-                        <div className="mt-3 flex items-center gap-1">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-4 w-4 ${
-                                i < log.rating! ? "fill-yellow-400 text-yellow-400" : "text-white/20"
-                              }`}
-                            />
-                          ))}
+                  <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+                    <span>Personal Notes</span>
+                    <textarea
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      className={`w-full rounded-2xl border ${getBorderColor()} ${getInputBg()} px-4 py-3 placeholder:${getMutedTextColor()}`}
+                      placeholder="Private notes, tips, things to remember..."
+                      rows={2}
+                    />
+                    <p className={`text-xs ${getMutedTextColor()}`}>These are your personal notes that will be shown below each log entry.</p>
+                  </label>
+
+                  <div className="flex gap-3">
+                    <button
+                      type="submit"
+                      className={`rounded-full ${accent.bg500} px-6 py-2 font-semibold text-slate-950 transition ${accent.hover400}`}
+                    >
+                      Save Entry
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowAddForm(false);
+                        setImagePreview(null);
+                        setValidation({ country: "idle", city: "idle" });
+                        setValidationMessage("");
+                      }}
+                      className={`rounded-full border ${getBorderColor()} px-6 py-2 font-semibold transition ${
+                        isDarkMode ? 'text-white hover:bg-white/10' : 'text-slate-800 hover:bg-slate-100'
+                      }`}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Filter Tabs */}
+              <div className="flex gap-2">
+                {(["all", "attraction", "recipe"] as const).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setFilterType(type)}
+                    className={`rounded-full px-5 py-2 text-sm font-medium transition ${
+                      filterType === type
+                        ? `${accent.bg500} text-slate-950`
+                        : isDarkMode 
+                          ? "bg-white/10 text-white hover:bg-white/20" 
+                          : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+                    }`}
+                  >
+                    {type === "all" ? "All" : type === "attraction" ? "Attractions" : "Recipes"}
+                  </button>
+                ))}
+              </div>
+
+              {/* Logs List */}
+              {isLoading ? (
+                <p className={`text-center ${getMutedTextColor()}`}>Loading your travel logs...</p>
+              ) : filteredLogs.length === 0 ? (
+                <div className={`rounded-3xl border ${getBorderColor()} ${getCardBg()} p-12 text-center backdrop-blur`}>
+                  <p className={getMutedTextColor()}>No entries yet. Start logging your adventures!</p>
+                </div>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredLogs.map((log) => (
+                    <div
+                      key={log._id}
+                      className={`group rounded-3xl border ${getBorderColor()} ${getCardBg()} backdrop-blur transition hover:${isDarkMode ? 'bg-white/10' : 'bg-slate-100'} overflow-hidden`}
+                    >
+                      {/* Image */}
+                      {log.imageUrl ? (
+                        <div className="relative h-48 w-full">
+                          <Image
+                            src={log.imageUrl}
+                            alt={log.title}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className={`flex h-48 w-full items-center justify-center ${
+                          isDarkMode 
+                            ? 'bg-linear-to-br from-slate-800/50 to-slate-900/50' 
+                            : 'bg-slate-200'
+                        }`}>
+                          <ImageIcon className={`h-16 w-16 ${isDarkMode ? 'text-white/20' : 'text-slate-400'}`} />
                         </div>
                       )}
 
-                      {/* Notes Section */}
-                      {log.notes && (
-                        <div className="mt-4">
+                      <div className="p-6">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-2">
+                            {log.type === "attraction" ? (
+                              <MapPin className="h-5 w-5 text-blue-400" />
+                            ) : (
+                              <Utensils className="h-5 w-5 text-orange-400" />
+                            )}
+                            <span className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+                              {log.type}
+                            </span>
+                          </div>
                           <button
-                            onClick={() => toggleNotes(log._id)}
-                            className="flex items-center gap-2 text-xs text-white/60 hover:text-white/80 transition"
+                            onClick={() => handleDelete(log._id)}
+                            className="opacity-0 transition group-hover:opacity-100"
                           >
-                            <FileText className="h-4 w-4" />
-                            <span>{expandedNotes.has(log._id) ? "Hide" : "Show"} Personal Notes</span>
+                            <Trash2 className="h-4 w-4 text-red-400 hover:text-red-300" />
                           </button>
-                          {expandedNotes.has(log._id) && (
-                            <div className="mt-2 rounded-xl border border-white/10 bg-slate-950/40 p-3">
-                              <p className="text-sm text-white/80 whitespace-pre-wrap">{log.notes}</p>
-                            </div>
-                          )}
                         </div>
-                      )}
+
+                        <h3 className="mt-3 text-xl font-semibold">{log.title}</h3>
+                        
+                        {(log.city || log.country) && (
+                          <p className={`mt-1 text-sm ${accent.text400}`}>
+                            {[log.city, log.country].filter(Boolean).join(", ")}
+                          </p>
+                        )}
+
+                        {log.description && (
+                          <p className={`mt-3 text-sm ${getMutedTextColor()} line-clamp-2`}>{log.description}</p>
+                        )}
+
+                        {log.rating && (
+                          <div className="mt-3 flex items-center gap-1">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`h-4 w-4 ${
+                                  i < log.rating! ? "fill-yellow-400 text-yellow-400" : getMutedTextColor()
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Notes Section */}
+                        {log.notes && (
+                          <div className="mt-4">
+                            <button
+                              onClick={() => toggleNotes(log._id)}
+                              className={`flex items-center gap-2 text-xs ${getMutedTextColor()} hover:${isDarkMode ? 'text-white/80' : 'text-slate-800'} transition`}
+                            >
+                              <FileText className="h-4 w-4" />
+                              <span>{expandedNotes.has(log._id) ? "Hide" : "Show"} Personal Notes</span>
+                            </button>
+                            {expandedNotes.has(log._id) && (
+                              <div className={`mt-2 rounded-xl border ${getBorderColor()} ${
+                                isDarkMode ? 'bg-slate-950/40' : 'bg-slate-100'
+                              } p-3`}>
+                                <p className={`text-sm ${getMutedTextColor()} whitespace-pre-wrap`}>{log.notes}</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
 
                       <p className="mt-4 text-xs text-white/40">
                         {new Date(log.visitedAt).toLocaleDateString(undefined, {
@@ -840,7 +962,7 @@ export default function LogsPage() {
         ) : (
           <>
             {/* Tasks Tab Content */}
-            <div className="rounded-3xl border border-white/10 bg-linear-to-br from-purple-500/20 to-pink-500/20 p-6 backdrop-blur">
+            <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-purple-500/20 to-pink-500/20 p-6 backdrop-blur">
               <h2 className="flex items-center gap-2 text-xl font-bold text-white">
                 <Award className="h-6 w-6 text-purple-400" />
                 Photo Verification Challenges
@@ -860,264 +982,271 @@ export default function LogsPage() {
               </div>
             </div>
 
-            {/* Task Form */}
-            {showTaskForm && (
-              <form
-                onSubmit={handleTaskSubmit}
-                className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur"
-              >
-                <h3 className="text-xl font-semibold text-white">Submit Verification Task</h3>
-                
-                <label className="space-y-2 text-sm font-medium text-white/80">
-                  <span>Task Type</span>
-                  <select
-                    value={taskFormData.type}
-                    onChange={(e) => setTaskFormData({ ...taskFormData, type: e.target.value as "recipe" | "location" })}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white"
-                  >
-                    <option value="recipe">Recipe (Before & After Photos)</option>
-                    <option value="location">Location (Photo at Place)</option>
-                  </select>
-                </label>
+              {/* Task Form */}
+              {showTaskForm && (
+                <form
+                  onSubmit={handleTaskSubmit}
+                  className={`space-y-4 rounded-3xl border ${getBorderColor()} ${getCardBg()} p-6 backdrop-blur`}
+                >
+                  <h3 className="text-xl font-semibold">Submit Verification Task</h3>
+                  
+                  <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+                    <span>Task Type</span>
+                    <select
+                      value={taskFormData.type}
+                      onChange={(e) => setTaskFormData({ ...taskFormData, type: e.target.value as "recipe" | "location" })}
+                      className={`w-full rounded-2xl border ${getBorderColor()} ${getInputBg()} px-4 py-3`}
+                    >
+                      <option value="recipe">Recipe (Before & After Photos)</option>
+                      <option value="location">Location (Photo at Place)</option>
+                    </select>
+                  </label>
 
-                <label className="space-y-2 text-sm font-medium text-white/80">
-                  <span>{taskFormData.type === "recipe" ? "Recipe Name" : "Location Name"} *</span>
-                  <input
-                    type="text"
-                    value={taskFormData.title}
-                    onChange={(e) => setTaskFormData({ ...taskFormData, title: e.target.value })}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white placeholder:text-white/40"
-                    placeholder={taskFormData.type === "recipe" ? "e.g., Sushi Rolls" : "e.g., Eiffel Tower"}
-                    required
-                  />
-                </label>
+                  <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+                    <span>{taskFormData.type === "recipe" ? "Recipe Name" : "Location Name"} *</span>
+                    <input
+                      type="text"
+                      value={taskFormData.title}
+                      onChange={(e) => setTaskFormData({ ...taskFormData, title: e.target.value })}
+                      className={`w-full rounded-2xl border ${getBorderColor()} ${getInputBg()} px-4 py-3 placeholder:${getMutedTextColor()}`}
+                      placeholder={taskFormData.type === "recipe" ? "e.g., Sushi Rolls" : "e.g., Eiffel Tower"}
+                      required
+                    />
+                  </label>
 
-                {taskFormData.type === "location" && (
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <label className="space-y-2 text-sm font-medium text-white/80">
-                      <span>City/Location</span>
-                      <input
-                        type="text"
-                        value={taskFormData.location}
-                        onChange={(e) => setTaskFormData({ ...taskFormData, location: e.target.value })}
-                        className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white placeholder:text-white/40"
-                        placeholder="Paris"
-                      />
-                    </label>
+                  {taskFormData.type === "location" && (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+                        <span>City/Location</span>
+                        <input
+                          type="text"
+                          value={taskFormData.location}
+                          onChange={(e) => setTaskFormData({ ...taskFormData, location: e.target.value })}
+                          className={`w-full rounded-2xl border ${getBorderColor()} ${getInputBg()} px-4 py-3 placeholder:${getMutedTextColor()}`}
+                          placeholder="Paris"
+                        />
+                      </label>
 
-                    <label className="space-y-2 text-sm font-medium text-white/80">
-                      <span>Country</span>
-                      <input
-                        type="text"
-                        value={taskFormData.country}
-                        onChange={(e) => setTaskFormData({ ...taskFormData, country: e.target.value })}
-                        className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white placeholder:text-white/40"
-                        placeholder="France"
-                      />
-                    </label>
-                  </div>
-                )}
+                      <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+                        <span>Country</span>
+                        <input
+                          type="text"
+                          value={taskFormData.country}
+                          onChange={(e) => setTaskFormData({ ...taskFormData, country: e.target.value })}
+                          className={`w-full rounded-2xl border ${getBorderColor()} ${getInputBg()} px-4 py-3 placeholder:${getMutedTextColor()}`}
+                          placeholder="France"
+                        />
+                      </label>
+                    </div>
+                  )}
 
-                {/* Photo Uploads */}
-                <div className={`grid gap-4 ${taskFormData.type === "recipe" ? "md:grid-cols-2" : ""}`}>
-                  {taskFormData.type === "recipe" && (
+                  {/* Photo Uploads */}
+                  <div className={`grid gap-4 ${taskFormData.type === "recipe" ? "md:grid-cols-2" : ""}`}>
+                    {taskFormData.type === "recipe" && (
+                      <div className="space-y-2">
+                        <label className={`text-sm font-medium ${getMutedTextColor()}`}>Before Photo (Ingredients/Process) *</label>
+                        {beforePreview ? (
+                          <div className="relative">
+                            <div className={`relative h-48 w-full overflow-hidden rounded-2xl border ${getBorderColor()}`}>
+                              <Image src={beforePreview} alt="Before" fill className="object-cover" />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeTaskImage("before")}
+                              className="absolute right-2 top-2 rounded-full bg-red-500 p-2 text-white transition hover:bg-red-600"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <label className={`flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed ${
+                            isDarkMode ? 'border-white/20' : 'border-slate-300'
+                          } ${getInputBg()} transition ${accent.hoverBorder400_50}`}>
+                            <Camera className={`h-8 w-8 ${getMutedTextColor()}`} />
+                            <span className={`mt-2 text-sm ${getMutedTextColor()}`}>Upload before photo</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleTaskImageChange("before")}
+                              className="hidden"
+                            />
+                          </label>
+                        )}
+                      </div>
+                    )}
+
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-white/80">Before Photo (Ingredients/Process) *</label>
-                      {beforePreview ? (
+                      <label className={`text-sm font-medium ${getMutedTextColor()}`}>
+                        {taskFormData.type === "recipe" ? "After Photo (Finished Dish)" : "Location Photo"} *
+                      </label>
+                      {afterPreview ? (
                         <div className="relative">
-                          <div className="relative h-48 w-full overflow-hidden rounded-2xl border border-white/10">
-                            <Image src={beforePreview} alt="Before" fill className="object-cover" />
+                          <div className={`relative h-48 w-full overflow-hidden rounded-2xl border ${getBorderColor()}`}>
+                            <Image src={afterPreview} alt="After" fill className="object-cover" />
                           </div>
                           <button
                             type="button"
-                            onClick={() => removeTaskImage("before")}
+                            onClick={() => removeTaskImage("after")}
                             className="absolute right-2 top-2 rounded-full bg-red-500 p-2 text-white transition hover:bg-red-600"
                           >
                             <X className="h-4 w-4" />
                           </button>
                         </div>
                       ) : (
-                        <label className="flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-slate-950/40 transition hover:border-emerald-400/50">
-                          <Camera className="h-8 w-8 text-white/40" />
-                          <span className="mt-2 text-sm text-white/60">Upload before photo</span>
+                        <label className={`flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed ${
+                          isDarkMode ? 'border-white/20' : 'border-slate-300'
+                        } ${getInputBg()} transition ${accent.hoverBorder400_50}`}>
+                          <Camera className={`h-8 w-8 ${getMutedTextColor()}`} />
+                          <span className={`mt-2 text-sm ${getMutedTextColor()}`}>Upload {taskFormData.type === "recipe" ? "after" : "location"} photo</span>
                           <input
                             type="file"
                             accept="image/*"
-                            onChange={handleTaskImageChange("before")}
+                            onChange={handleTaskImageChange("after")}
                             className="hidden"
                           />
                         </label>
                       )}
                     </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-white/80">
-                      {taskFormData.type === "recipe" ? "After Photo (Finished Dish)" : "Location Photo"} *
-                    </label>
-                    {afterPreview ? (
-                      <div className="relative">
-                        <div className="relative h-48 w-full overflow-hidden rounded-2xl border border-white/10">
-                          <Image src={afterPreview} alt="After" fill className="object-cover" />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeTaskImage("after")}
-                          className="absolute right-2 top-2 rounded-full bg-red-500 p-2 text-white transition hover:bg-red-600"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <label className="flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-slate-950/40 transition hover:border-emerald-400/50">
-                        <Camera className="h-8 w-8 text-white/40" />
-                        <span className="mt-2 text-sm text-white/60">Upload {taskFormData.type === "recipe" ? "after" : "location"} photo</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleTaskImageChange("after")}
-                          className="hidden"
-                        />
-                      </label>
-                    )}
                   </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      type="submit"
+                      disabled={isVerifying || !afterPreview || (taskFormData.type === "recipe" && !beforePreview)}
+                      className={`flex items-center gap-2 rounded-full ${accent.bg500} px-6 py-2 font-semibold text-slate-950 transition ${accent.hover400} disabled:cursor-not-allowed disabled:opacity-60`}
+                    >
+                      {isVerifying && <Loader2 className="h-4 w-4 animate-spin" />}
+                      {isVerifying ? "Verifying with AI..." : "Submit for Verification"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowTaskForm(false);
+                        setBeforePreview(null);
+                        setAfterPreview(null);
+                      }}
+                      className={`rounded-full border ${getBorderColor()} px-6 py-2 font-semibold transition ${
+                        isDarkMode ? 'text-white hover:bg-white/10' : 'text-slate-800 hover:bg-slate-100'
+                      }`}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Tasks List */}
+              {tasks.length === 0 ? (
+                <div className={`rounded-3xl border ${getBorderColor()} ${getCardBg()} p-12 text-center backdrop-blur`}>
+                  <Camera className={`mx-auto h-12 w-12 ${getMutedTextColor()}`} />
+                  <p className={`mt-4 ${getMutedTextColor()}`}>No verification tasks yet. Start completing challenges!</p>
                 </div>
-
-                <div className="flex gap-3">
-                  <button
-                    type="submit"
-                    disabled={isVerifying || !afterPreview || (taskFormData.type === "recipe" && !beforePreview)}
-                    className="flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-2 font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {isVerifying && <Loader2 className="h-4 w-4 animate-spin" />}
-                    {isVerifying ? "Verifying with AI..." : "Submit for Verification"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowTaskForm(false);
-                      setBeforePreview(null);
-                      setAfterPreview(null);
-                    }}
-                    className="rounded-full border border-white/20 px-6 py-2 font-semibold text-white transition hover:bg-white/10"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* Tasks List */}
-            {tasks.length === 0 ? (
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-12 text-center backdrop-blur">
-                <Camera className="mx-auto h-12 w-12 text-white/40" />
-                <p className="mt-4 text-white/60">No verification tasks yet. Start completing challenges!</p>
-              </div>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2">
-                {tasks.map((task) => (
-                  <div
-                    key={task._id}
-                    className={`rounded-3xl border p-6 backdrop-blur ${
-                      task.verification.verified
-                        ? "border-emerald-400/50 bg-emerald-500/10"
-                        : "border-red-400/50 bg-red-500/10"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2">
-                        {task.type === "recipe" ? (
-                          <Utensils className="h-5 w-5 text-orange-400" />
-                        ) : (
-                          <MapPin className="h-5 w-5 text-blue-400" />
-                        )}
-                        <span className="text-xs uppercase tracking-wide text-white/50">
-                          {task.type}
-                        </span>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {tasks.map((task) => (
+                    <div
+                      key={task._id}
+                      className={`rounded-3xl border p-6 backdrop-blur ${
+                        task.verification.verified
+                          ? `${accent.border400_50} ${accent.bg500_10}`
+                          : "border-red-400/50 bg-red-500/10"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          {task.type === "recipe" ? (
+                            <Utensils className="h-5 w-5 text-orange-400" />
+                          ) : (
+                            <MapPin className="h-5 w-5 text-blue-400" />
+                          )}
+                          <span className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+                            {task.type}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {task.verification.verified ? (
+                            <CheckCircle className={`h-5 w-5 ${accent.text400}`} />
+                          ) : (
+                            <X className="h-5 w-5 text-red-400" />
+                          )}
+                          <button
+                            onClick={() => handleDeleteTask(task._id)}
+                            className="rounded-full p-1 transition hover:bg-white/10"
+                          >
+                            <Trash2 className="h-4 w-4 text-white/60 hover:text-red-400" />
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        {task.verification.verified ? (
-                          <CheckCircle className="h-5 w-5 text-emerald-400" />
-                        ) : (
-                          <X className="h-5 w-5 text-red-400" />
+
+                      <h3 className="mt-3 text-xl font-semibold">{task.title}</h3>
+                      {task.location && (
+                        <p className={`text-sm ${getMutedTextColor()}`}>{task.location}, {task.country}</p>
+                      )}
+
+                      <div className="mt-4 grid gap-2 md:grid-cols-2">
+                        {task.beforeImage && (
+                          <div className={`relative h-32 overflow-hidden rounded-xl border ${getBorderColor()}`}>
+                            <Image src={task.beforeImage} alt="Before" fill className="object-cover" />
+                            <div className="absolute bottom-0 left-0 right-0 bg-black/50 px-2 py-1 text-xs text-white">
+                              Before
+                            </div>
+                          </div>
                         )}
-                        <button
-                          onClick={() => handleDeleteTask(task._id)}
-                          className="rounded-full p-1 transition hover:bg-white/10"
-                        >
-                          <Trash2 className="h-4 w-4 text-white/60 hover:text-red-400" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <h3 className="mt-3 text-xl font-semibold text-white">{task.title}</h3>
-                    {task.location && (
-                      <p className="text-sm text-white/60">{task.location}, {task.country}</p>
-                    )}
-
-                    <div className="mt-4 grid gap-2 md:grid-cols-2">
-                      {task.beforeImage && (
-                        <div className="relative h-32 overflow-hidden rounded-xl border border-white/10">
-                          <Image src={task.beforeImage} alt="Before" fill className="object-cover" />
+                        <div className={`relative h-32 overflow-hidden rounded-xl border ${getBorderColor()}`}>
+                          <Image src={task.afterImage} alt="After" fill className="object-cover" />
                           <div className="absolute bottom-0 left-0 right-0 bg-black/50 px-2 py-1 text-xs text-white">
-                            Before
+                            {task.type === "recipe" ? "After" : "Location"}
                           </div>
                         </div>
-                      )}
-                      <div className="relative h-32 overflow-hidden rounded-xl border border-white/10">
-                        <Image src={task.afterImage} alt="After" fill className="object-cover" />
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/50 px-2 py-1 text-xs text-white">
-                          {task.type === "recipe" ? "After" : "Location"}
-                        </div>
                       </div>
-                    </div>
 
-                    <div className={`mt-4 rounded-xl border p-3 ${
-                      task.verification.verified
-                        ? "border-emerald-400/30 bg-emerald-500/10"
-                        : "border-red-400/30 bg-red-500/10"
-                    }`}>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold text-white">
-                          {task.verification.verified ? "✓ Verified" : "✗ Not Verified"}
-                        </span>
-                        {task.verification.verified && (
-                          <span className="text-sm font-bold text-emerald-400">
-                            +{task.pointsEarned} pts
+                      <div className={`mt-4 rounded-xl border p-3 ${
+                        task.verification.verified
+                          ? `${accent.border400_30} ${accent.bg500_10}`
+                          : "border-red-400/30 bg-red-500/10"
+                      }`}>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold">
+                            {task.verification.verified ? "✓ Verified" : "✗ Not Verified"}
                           </span>
+                          {task.verification.verified && (
+                            <span className={`text-sm font-bold ${accent.text400}`}>
+                              +{task.pointsEarned} pts
+                            </span>
+                          )}
+                        </div>
+                        <p className={`mt-2 text-xs ${getMutedTextColor()}`}>
+                          Confidence: {task.verification.confidence}%
+                        </p>
+                        <p className={`mt-1 text-sm ${getMutedTextColor()}`}>
+                          {task.verification.reasoning}
+                        </p>
+                        {task.verification.dishIdentified && (
+                          <p className={`mt-1 text-xs ${getMutedTextColor()}`}>
+                            Identified: {task.verification.dishIdentified}
+                          </p>
+                        )}
+                        {task.verification.locationIdentified && (
+                          <p className={`mt-1 text-xs ${getMutedTextColor()}`}>
+                            Identified: {task.verification.locationIdentified}
+                          </p>
                         )}
                       </div>
-                      <p className="mt-2 text-xs text-white/70">
-                        Confidence: {task.verification.confidence}%
-                      </p>
-                      <p className="mt-1 text-sm text-white/80">
-                        {task.verification.reasoning}
-                      </p>
-                      {task.verification.dishIdentified && (
-                        <p className="mt-1 text-xs text-white/60">
-                          Identified: {task.verification.dishIdentified}
-                        </p>
-                      )}
-                      {task.verification.locationIdentified && (
-                        <p className="mt-1 text-xs text-white/60">
-                          Identified: {task.verification.locationIdentified}
-                        </p>
-                      )}
-                    </div>
 
-                    <p className="mt-3 text-xs text-white/40">
-                      {new Date(task.createdAt).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
-        )}
+                      <p className={`mt-3 text-xs ${getMutedTextColor()}`}>
+                        {new Date(task.createdAt).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </DashboardPageLayout>
   );
