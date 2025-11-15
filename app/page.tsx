@@ -13,18 +13,13 @@ import {
   Palette,
   MapPin,
   Play,
-  Menu,
-  X,
-  Moon,
-  Sun,
 } from "lucide-react";
 import Navbar from "./components/Navbar";
 import { useTheme } from "./components/ThemeProvider";
 import ThemeToggle from "./components/ThemeToggle";
+import Image from "next/image";
 
-interface NavbarProps {
-  scrollY: number;
-}
+
 
 interface HeroSectionProps {
   scrollY: number;
@@ -1133,12 +1128,12 @@ function ImageWithFallback({
   height,
 }: ImageWithFallbackProps) {
   return (
-    <img
+    <Image
       src={src}
       alt={alt}
       className={className}
-      width={width}
-      height={height}
+      width={width as number}
+      height={height as number}
     />
   );
 }

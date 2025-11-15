@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Menu as MenuIcon, X as XIcon } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
+import Link from "next/link";
 
 interface NavbarProps {scrollY?: number;}
 
@@ -74,14 +75,14 @@ export default function Navbar(e: NavbarProps) {
                 />
               </svg>
             </div>
-            <a
+            <Link
               href="/"
               className={`text-xl ${
                 theme === "dark" ? "text-white" : "text-neutral-900"
               }`}
             >
               Roots
-            </a>
+            </Link>
           </motion.div>
 
           <div className="hidden md:flex items-center gap-8">
