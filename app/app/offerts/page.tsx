@@ -2,9 +2,6 @@
 
 import { useEffect, useState } from "react";
 import DashboardPageLayout from "../../components/DashboardPageLayout";
-import { Ticket, Clock, Sparkles, Gift, Coffee, Utensils, Building2, Loader2, CheckCircle, X } from "lucide-react";
-import PageThemeToggle from "../../components/PageThemeToggle";
-import { useTheme } from "../../components/ThemeProvider";
 import {
   Ticket,
   Clock,
@@ -16,13 +13,12 @@ import {
   Loader2,
   CheckCircle,
   X,
-  Sun,
-  Moon,
   ArrowRight,
   Tag,
   TrendingUp,
   Users,
 } from "lucide-react";
+import PageThemeToggle from "../../components/PageThemeToggle";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
@@ -51,7 +47,6 @@ type RedeemedCoupon = {
 };
 
 export default function OffertsPage() {
-  const { theme } = useTheme();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showBrowse, setShowBrowse] = useState(true);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -69,30 +64,37 @@ export default function OffertsPage() {
 
   // Theme management
   useEffect(() => {
-    const updateTheme = () => {
-      try {
-        const saved = localStorage.getItem("theme");
-        if (saved) {
-          const dark = saved === "dark";
-          setIsDarkMode(dark);
-          if (dark) {
-            document.documentElement.classList.add("dark");
-          } else {
-            document.documentElement.classList.remove("dark");
-          }
+    try {
+      const saved = localStorage.getItem("theme");
+      if (saved) {
+        const dark = saved === "dark";
+        setIsDarkMode(dark);
+        if (dark) {
+          document.documentElement.classList.add("dark");
         } else {
-          const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          setIsDarkMode(systemDark);
-          if (systemDark) {
-            document.documentElement.classList.add("dark");
-          }
+          document.documentElement.classList.remove("dark");
         }
-      } catch {
-        // ignore
+      } else {
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setIsDarkMode(systemDark);
+        if (systemDark) {
+          document.documentElement.classList.add("dark");
+        }
       }
+    } catch {
+      // ignore
+    }
+
+    const handleThemeChange = (event: CustomEvent<{ isDark: boolean }>) => {
+      setIsDarkMode(event.detail.isDark);
     };
-    setIsDarkMode(theme === "dark");
-  }, [theme]);
+
+    window.addEventListener('theme-change', handleThemeChange as EventListener);
+
+    return () => {
+      window.removeEventListener('theme-change', handleThemeChange as EventListener);
+    };
+  }, []);
 
   // Color utility functions
   const getBgColor = () => {

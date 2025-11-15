@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Access the API key - it will be injected at build time or from environment
-const API_KEY = import.meta.env.GEMINI_API_KEY ; // Hardcoded as fallback since process.env won't work in browser
+// Access the API key from Vite's environment variables
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 export interface QuizQuestion {
