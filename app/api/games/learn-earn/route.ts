@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { jsonrepair } from "jsonrepair";
 
 const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
@@ -51,6 +50,17 @@ function extractJson(text: string) {
     throw new Error("Gemini response did not contain JSON");
   }
   return payload.slice(start, end + 1);
+}
+
+function parseJsonPayload(payload: string) {
+  try {
+    return JSON.parse(payload);
+  } catch {
+    const sanitized = payload
+      .replace(/,\s*([}\]])/g, "$1")
+      .replace(/\u0000/g, "");
+    return JSON.parse(sanitized);
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -105,8 +115,7 @@ export async function POST(request: NextRequest) {
     }
 
     const jsonPayload = extractJson(text);
-    const repaired = jsonrepair(jsonPayload);
-    const module = JSON.parse(repaired) as LearnEarnModulePayload;
+    const module = parseJsonPayload(jsonPayload) as LearnEarnModulePayload;
 
     if (!module?.quiz || !Array.isArray(module.quiz) || module.quiz.length !== 10) {
       throw new Error("Gemini did not return 10 quiz questions");

@@ -109,7 +109,12 @@ export async function POST(request: NextRequest) {
     const favoriteMuseums = sanitize(payload?.favoriteMuseums);
     const favoriteRecipes = sanitize(payload?.favoriteRecipes);
     const bio = sanitize(payload?.bio);
-    const socialHandle = sanitize(payload?.socialHandle);
+    const rawHandle = sanitize(payload?.socialHandle);
+    const normalizedHandle = rawHandle.replace(/^@+/, "").replace(/\s+/g, "");
+    const socialHandle = normalizedHandle
+      ? `@${normalizedHandle}`
+      : "";
+    const socialHandleNormalized = normalizedHandle.toLowerCase();
 
     if (!name || !email) {
       return NextResponse.json(
@@ -149,6 +154,7 @@ export async function POST(request: NextRequest) {
         favoriteRecipes,
         bio,
         socialHandle,
+        socialHandleNormalized,
         updatedAt: now,
       },
       $setOnInsert: { createdAt: now },
