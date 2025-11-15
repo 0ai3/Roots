@@ -388,7 +388,7 @@ function AssistantCard({
                     detail={detailState.detail}
                     onListen={() => onListenToRecipe(recipe.name)}
                     onPause={() => handlePauseRecipeAudio(recipe.name)}
-                    onSeek={(value) => handleSeekRecipeAudio(recipe.name, value)}
+                    onSeek={(value) => (recipe.name, value)}
                     audioState={{
                       isGenerating: Boolean(detailState.isSpeaking),
                       isPlaying: Boolean(detailState.isAudioPlaying),
