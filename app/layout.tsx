@@ -41,13 +41,10 @@ export default async function RootLayout({
         <I18nProvider initialLocale={initialLocale}>
         <ThemeProvider>
           <ThemeToggle />
-          {children}
-        </ThemeProvider>
-        
-          <ThemeProvider>
+       
             <ThemeToggle />
             <LanguageSwitcher />
-            {children}
+          {children}
           </ThemeProvider>
         </I18nProvider>
       </body>
