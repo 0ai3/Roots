@@ -26,6 +26,9 @@ type Attraction = {
   description?: string;
   mapLink?: string;
   notes?: string[];
+  category?: string;
+  latitude?: number;
+  longitude?: number;
 };
 
 type AssistantPayload = {
@@ -34,6 +37,32 @@ type AssistantPayload = {
   attractions?: Attraction[];
   closing?: string;
 };
+
+const CATEGORY_KEYWORDS: Array<{ key: string; patterns: RegExp[] }> = [
+  { key: "museum", patterns: [/museum/i, /gallery/i, /exhibit/i, /history/i] },
+  { key: "park", patterns: [/park/i, /garden/i, /trail/i, /hike/i] },
+  { key: "food", patterns: [/cafe/i, /restaurant/i, /food/i, /market/i, /bakery/i] },
+  { key: "nightlife", patterns: [/bar/i, /club/i, /night/i, /speakeasy/i] },
+  { key: "shopping", patterns: [/shop/i, /shopping/i, /boutique/i, /bazaar/i] },
+  { key: "landmark", patterns: [/tower/i, /bridge/i, /monument/i, /plaza/i] },
+];
+
+function resolveCategory(rawCategory?: string, text?: string) {
+  const normalized = rawCategory?.trim().toLowerCase();
+  if (normalized && normalized !== "other") {
+    return normalized;
+  }
+  const haystack = text?.toLowerCase() ?? "";
+  if (!haystack) {
+    return normalized || undefined;
+  }
+  for (const entry of CATEGORY_KEYWORDS) {
+    if (entry.patterns.some((pattern) => pattern.test(haystack))) {
+      return entry.key;
+    }
+  }
+  return normalized || undefined;
+}
 
 function parseAssistantContent(raw: string): AssistantPayload | null {
   try {
@@ -62,12 +91,14 @@ function MessageBubble({
   visitedAttractions,
   t,
   isDarkMode,
+  savingAttractionId,
 }: {
   message: ChatMessage;
-  onLogAttraction: (title: string) => void;
+  onLogAttraction: (attraction: Attraction) => void | Promise<void>;
   visitedAttractions: VisitedMap;
   t: Translator;
   isDarkMode: boolean;
+  savingAttractionId?: string | null;
 }) {
   if (message.role === "assistant") {
     const parsed = parseAssistantContent(message.content);
@@ -79,6 +110,7 @@ function MessageBubble({
             visitedAttractions={visitedAttractions}
             t={t}
             isDarkMode={isDarkMode}
+            savingAttractionId={savingAttractionId}
           />
         );
       }
@@ -122,12 +154,14 @@ function AssistantCard({
   visitedAttractions,
   t,
   isDarkMode,
+  savingAttractionId,
 }: {
   payload: AssistantPayload;
-  onLogAttraction: (title: string) => void;
+  onLogAttraction: (attraction: Attraction) => void | Promise<void>;
   visitedAttractions: VisitedMap;
   t: Translator;
   isDarkMode: boolean;
+  savingAttractionId?: string | null;
 }) {
   const tips = payload.tips?.filter(Boolean) ?? [];
   const attractions = payload.attractions ?? [];
@@ -270,8 +304,11 @@ function AssistantCard({
 
               <motion.button
                 type="button"
-                onClick={() => onLogAttraction(item.title)}
-                disabled={Boolean(visitedAttractions[item.title])}
+                onClick={() => onLogAttraction(item)}
+                disabled={
+                  Boolean(visitedAttractions[item.title]) ||
+                  savingAttractionId === item.title
+                }
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className={`mt-4 rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-wide transition-all flex items-center gap-2 ${
@@ -287,6 +324,8 @@ function AssistantCard({
                 <Heart className="w-3 h-3" />
                 {visitedAttractions[item.title]
                   ? t("planner.attractions.logged")
+                  : savingAttractionId === item.title
+                  ? "Saving..."
                   : t("planner.attractions.visitButton")}
               </motion.button>
             </motion.article>
@@ -409,6 +448,11 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [visitedAttractions, setVisitedAttractions] = useState<VisitedMap>({});
+  const [savingAttractionId, setSavingAttractionId] = useState<string | null>(null);
+  const [saveBanner, setSaveBanner] = useState<{
+    tone: "success" | "error";
+    message: string;
+  } | null>(null);
   const { points, addPoints } = useExperiencePoints({
     initialPoints,
     initialUserId,
@@ -431,15 +475,62 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
     Boolean(interests.trim()) &&
     !isLoading;
 
-  const handleLogAttraction = (title: string) => {
-    if (!title) {
+  const handleLogAttraction = async (attraction: Attraction) => {
+    const title = attraction.title?.trim();
+    if (!title || visitedAttractions[title]) {
       return;
     }
-    if (visitedAttractions[title]) {
-      return;
+
+    setSavingAttractionId(title);
+    setSaveBanner(null);
+
+    const hasCoordinates =
+      typeof attraction.latitude === "number" &&
+      typeof attraction.longitude === "number";
+
+    try {
+      if (hasCoordinates) {
+        const category = resolveCategory(
+          attraction.category,
+          `${attraction.title} ${attraction.description ?? ""}`
+        );
+        const response = await fetch("/api/profile/attractions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            latitude: attraction.latitude,
+            longitude: attraction.longitude,
+            title,
+            label: title,
+            category,
+            description: attraction.description,
+            source: "attraction-planner",
+          }),
+        });
+        const data = (await response.json().catch(() => null)) ?? {};
+        if (!response.ok) {
+          throw new Error((data as { error?: string })?.error ?? t("planner.errors.generic"));
+        }
+        setSaveBanner({
+          tone: "success",
+          message: `${title} saved to your live map.`,
+        });
+      } else {
+        setSaveBanner({
+          tone: "error",
+          message: `${title} logged, but no coordinates were provided in the AI response.`,
+        });
+      }
+
+      setVisitedAttractions((prev) => ({ ...prev, [title]: true }));
+      addPoints(2);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : t("planner.errors.generic");
+      setSaveBanner({ tone: "error", message });
+    } finally {
+      setSavingAttractionId(null);
     }
-    setVisitedAttractions((prev) => ({ ...prev, [title]: true }));
-    addPoints(2);
   };
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -509,6 +600,8 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
     setError(null);
     setIsLoading(false);
     setVisitedAttractions({});
+    setSavingAttractionId(null);
+    setSaveBanner(null);
   };
 
   return (
@@ -535,6 +628,20 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
             {t("planner.common.pointsHint")}
           </p>
         </motion.div>
+
+        {saveBanner && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`rounded-2xl border px-4 py-3 text-sm ${
+              saveBanner.tone === "success"
+                ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-200"
+                : "border-rose-400/40 bg-rose-400/10 text-rose-100"
+            }`}
+          >
+            {saveBanner.message}
+          </motion.div>
+        )}
 
         {/* Setup Form */}
         {showSetupForm && (
@@ -754,6 +861,7 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
                   visitedAttractions={visitedAttractions}
                   t={t}
                   isDarkMode={isDarkMode}
+                  savingAttractionId={savingAttractionId}
                 />
               ))}
             </div>
