@@ -31,6 +31,7 @@ export default function NewsPage() {
   const router = useRouter();
   const [newsData, setNewsData] = useState<NewsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [location, setLocation] = useState("");
   const [homeCountry, setHomeCountry] = useState("");
   const [isCached, setIsCached] = useState(false);
@@ -38,8 +39,12 @@ export default function NewsPage() {
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [needsSetup, setNeedsSetup] = useState(false);
 
-  const loadNews = async () => {
-    setIsLoading(true);
+  const loadNews = async (isManualRefresh = false) => {
+    if (isManualRefresh) {
+      setIsRefreshing(true);
+    } else {
+      setIsLoading(true);
+    }
     setError(null);
     setErrorDetails(null);
     setNeedsSetup(false);
@@ -68,6 +73,7 @@ export default function NewsPage() {
       setErrorDetails(err instanceof Error ? err.message : String(err));
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -101,11 +107,11 @@ export default function NewsPage() {
             </p>
           </div>
           <button
-            onClick={loadNews}
-            disabled={isLoading}
+            onClick={() => loadNews(true)}
+            disabled={isLoading || isRefreshing}
             className="flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:opacity-50"
           >
-            <RefreshCw className={`h-5 w-5 ${isLoading ? "animate-spin" : ""}`} />
+            <RefreshCw className={`h-5 w-5 ${isRefreshing ? "animate-spin" : ""}`} />
             Refresh
           </button>
         </div>
@@ -164,7 +170,7 @@ export default function NewsPage() {
                 </button>
               ) : (
                 <button
-                  onClick={loadNews}
+                  onClick={() => loadNews(true)}
                   className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400"
                 >
                   <RefreshCw className="h-5 w-5" />

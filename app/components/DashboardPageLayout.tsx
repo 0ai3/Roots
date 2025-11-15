@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import DashboardSidebar from "./DashboardSidebar";
+import { usePrefetchNews } from "@/app/hooks/usePrefetchNews";
 
 type Props = {
   children: ReactNode;
@@ -19,6 +20,8 @@ export default function DashboardPageLayout({
   contentClassName,
   isDarkMode: isDarkModeProp,
 }: Props) {
+  // Prefetch news in the background for better UX
+  usePrefetchNews();
 
   const [isDarkMode, setIsDarkMode] = useState<boolean>(
     isDarkModeProp ?? false
