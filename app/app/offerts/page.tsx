@@ -18,7 +18,6 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import PageThemeToggle from "../../components/PageThemeToggle";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
@@ -47,7 +46,6 @@ type RedeemedCoupon = {
 };
 
 export default function OffertsPage() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [showBrowse, setShowBrowse] = useState(true);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [redeemedCoupons, setRedeemedCoupons] = useState<RedeemedCoupon[]>([]);
@@ -62,60 +60,16 @@ export default function OffertsPage() {
     {}
   );
 
-  // Theme management
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("theme");
-      if (saved) {
-        const dark = saved === "dark";
-        setIsDarkMode(dark);
-        if (dark) {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-        }
-      } else {
-        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        setIsDarkMode(systemDark);
-        if (systemDark) {
-          document.documentElement.classList.add("dark");
-        }
-      }
-    } catch {
-      // ignore
-    }
-
-    const handleThemeChange = (event: CustomEvent<{ isDark: boolean }>) => {
-      setIsDarkMode(event.detail.isDark);
-    };
-
-    window.addEventListener('theme-change', handleThemeChange as EventListener);
-
-    return () => {
-      window.removeEventListener('theme-change', handleThemeChange as EventListener);
-    };
-  }, []);
-
   // Color utility functions
-  const getBgColor = () => {
-    return isDarkMode ? "bg-black" : "bg-white";
-  };
+  const getBgColor = () => "bg-black";
 
-  const getTextColor = () => {
-    return isDarkMode ? "text-white" : "text-slate-900";
-  };
+  const getTextColor = () => "text-white";
 
-  const getMutedTextColor = () => {
-    return isDarkMode ? "text-white/70" : "text-slate-600";
-  };
+  const getMutedTextColor = () => "text-white/70";
 
-  const getBorderColor = () => {
-    return isDarkMode ? "border-white/10" : "border-slate-200";
-  };
+  const getBorderColor = () => "border-white/10";
 
-  const getCardBg = () => {
-    return isDarkMode ? "bg-white/5" : "bg-slate-50";
-  };
+  const getCardBg = () => "bg-white/5";
 
   const loadCoupons = async () => {
     setIsLoading(true);
@@ -222,10 +176,9 @@ export default function OffertsPage() {
   );
 
   return (
-    <DashboardPageLayout isDarkMode={isDarkMode}>
-      {/* PageThemeToggle removed per request */}
+    <DashboardPageLayout isDarkMode={true}>
       {showBrowse ? (
-        <div className={`min-h-screen ${getBgColor()}`}>
+        <div className="min-h-screen bg-black">
           {/* Hero Section */}
           <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0">
@@ -237,11 +190,7 @@ export default function OffertsPage() {
                 priority
               />
               <div
-                className={`absolute inset-0 ${
-                  isDarkMode
-                    ? "bg-linear-to-br from-black/80 via-black/70 to-black/80"
-                    : "bg-linear-to-br from-black/60 via-black/50 to-black/60"
-                }`}
+                className={`absolute inset-0 bg-linear-to-br from-black/80 via-black/70 to-black/80`}
               />
             </div>
 
@@ -264,7 +213,7 @@ export default function OffertsPage() {
               >
                 Special{" "}
                 <span
-                  className={isDarkMode ? "text-lime-400" : "text-lime-300"}
+                  className="text-lime-400"
                 >
                   Offers
                 </span>
@@ -291,9 +240,7 @@ export default function OffertsPage() {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowBrowse(false)}
                   className={`px-8 py-4 rounded-xl font-semibold flex items-center gap-2 transition-colors ${
-                    isDarkMode
-                      ? "bg-lime-400 text-black hover:bg-lime-300"
-                      : "bg-lime-500 text-white hover:bg-lime-600"
+                    "bg-lime-400 text-black hover:bg-lime-300"
                   }`}
                 >
                   <Ticket className="w-5 h-5" />
@@ -344,55 +291,37 @@ export default function OffertsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: i * 0.1 }}
                     className={`rounded-2xl p-6 backdrop-blur-sm border ${
-                      isDarkMode
-                        ? "bg-neutral-900/90 border-white/10"
-                        : "bg-white border-neutral-200 shadow-lg"
+                      "bg-neutral-900/90 border-white/10"
                     }`}
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div
                         className={`p-3 rounded-xl ${
                           stat.color === "lime"
-                            ? isDarkMode
-                              ? "bg-lime-400/20"
-                              : "bg-lime-100"
+                            ? "bg-lime-400/20"
                             : stat.color === "emerald"
-                            ? isDarkMode
-                              ? "bg-emerald-400/20"
-                              : "bg-emerald-100"
+                            ? "bg-emerald-400/20"
                             : stat.color === "yellow"
-                            ? isDarkMode
-                              ? "bg-yellow-400/20"
-                              : "bg-yellow-100"
-                            : isDarkMode
-                            ? "bg-blue-400/20"
-                            : "bg-blue-100"
+                            ? "bg-yellow-400/20"
+                            : "bg-blue-400/20"
                         }`}
                       >
                         <stat.icon
                           className={`w-6 h-6 ${
                             stat.color === "lime"
-                              ? isDarkMode
-                                ? "text-lime-400"
-                                : "text-lime-600"
+                              ? "text-lime-400"
                               : stat.color === "emerald"
-                              ? isDarkMode
-                                ? "text-emerald-400"
-                                : "text-emerald-600"
+                              ? "text-emerald-400"
                               : stat.color === "yellow"
-                              ? isDarkMode
-                                ? "text-yellow-400"
-                                : "text-yellow-600"
-                              : isDarkMode
-                              ? "text-blue-400"
-                              : "text-blue-600"
+                              ? "text-yellow-400"
+                              : "text-blue-400"
                           }`}
                         />
                       </div>
                       <div className="text-right">
                         <p
                           className={`text-3xl font-bold ${
-                            isDarkMode ? "text-white" : "text-neutral-900"
+                            "text-white"
                           }`}
                         >
                           {stat.value}
@@ -401,7 +330,7 @@ export default function OffertsPage() {
                     </div>
                     <p
                       className={`text-xs ${
-                        isDarkMode ? "text-neutral-500" : "text-neutral-500"
+                        "text-neutral-500"
                       }`}
                     >
                       {stat.desc}
@@ -420,9 +349,7 @@ export default function OffertsPage() {
             <button
               onClick={() => setShowBrowse(true)}
               className={`px-6 py-3 rounded-xl font-semibold transition-colors ${
-                isDarkMode
-                  ? "bg-neutral-800 text-white hover:bg-neutral-700"
-                  : "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
+                "bg-neutral-800 text-white hover:bg-neutral-700"
               }`}
             >
               ← Back to Overview
@@ -439,14 +366,12 @@ export default function OffertsPage() {
               </div>
               <div
                 className={`flex items-center gap-3 rounded-full border px-6 py-3 backdrop-blur ${
-                  isDarkMode
-                    ? "bg-linear-to-r from-emerald-500/20 to-teal-500/20 border-emerald-400/30"
-                    : "bg-white border-emerald-200 shadow-sm"
+                  "bg-linear-to-r from-emerald-500/20 to-teal-500/20 border-emerald-400/30"
                 }`}
               >
                 <Sparkles
                   className={`h-6 w-6 ${
-                    isDarkMode ? "text-emerald-400" : "text-emerald-600"
+                    "text-emerald-400"
                   }`}
                 />
                 <div>
@@ -466,7 +391,7 @@ export default function OffertsPage() {
                 <h2 className="text-2xl font-bold flex items-center gap-2">
                   <CheckCircle
                     className={`h-6 w-6 ${
-                      isDarkMode ? "text-emerald-400" : "text-emerald-600"
+                      "text-emerald-400"
                     }`}
                   />
                   Active Coupons
@@ -483,25 +408,19 @@ export default function OffertsPage() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className={`relative overflow-hidden rounded-2xl border p-6 backdrop-blur ${
-                          isDarkMode
-                            ? "border-emerald-400/50 bg-linear-to-br from-emerald-500/20 to-teal-500/20"
-                            : "border-emerald-300 bg-linear-to-br from-emerald-50 to-teal-50 shadow-lg"
+                          "border-emerald-400/50 bg-linear-to-br from-emerald-500/20 to-teal-500/20"
                         }`}
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
                             <div
                               className={`rounded-xl p-3 border ${
-                                isDarkMode
-                                  ? "bg-emerald-400/20 border-emerald-400/30"
-                                  : "bg-emerald-100 border-emerald-300"
+                                "bg-emerald-400/20 border-emerald-400/30"
                               }`}
                             >
                               <Icon
                                 className={`h-6 w-6 ${
-                                  isDarkMode
-                                    ? "text-emerald-400"
-                                    : "text-emerald-700"
+                                  "text-emerald-400"
                                 }`}
                               />
                             </div>
@@ -511,9 +430,7 @@ export default function OffertsPage() {
                               </h3>
                               <p
                                 className={`text-sm ${
-                                  isDarkMode
-                                    ? "text-emerald-400"
-                                    : "text-emerald-700"
+                                  "text-emerald-400"
                                 }`}
                               >
                                 {coupon.couponDiscount} off
@@ -523,11 +440,7 @@ export default function OffertsPage() {
                           <div
                             className={`flex items-center gap-2 rounded-full px-3 py-1 border ${
                               isExpiring
-                                ? isDarkMode
-                                  ? "bg-red-500/20 border-red-400/30"
-                                  : "bg-red-50 border-red-300"
-                                : isDarkMode
-                                ? "bg-white/10 border-white/20"
+                                ? "bg-red-500/20 border-red-400/30"
                                 : "bg-white border-slate-200"
                             }`}
                           >
@@ -535,18 +448,14 @@ export default function OffertsPage() {
                               className={`h-4 w-4 ${
                                 isExpiring
                                   ? "text-red-400"
-                                  : isDarkMode
-                                  ? "text-white/70"
-                                  : "text-slate-600"
+                                  : "text-white/70"
                               }`}
                             />
                             <span
                               className={`text-sm font-mono ${
                                 isExpiring
                                   ? "text-red-400"
-                                  : isDarkMode
-                                  ? "text-white/70"
-                                  : "text-slate-600"
+                                  : "text-white/70"
                               }`}
                             >
                               {formatTime(remaining)}
@@ -597,11 +506,7 @@ export default function OffertsPage() {
                       onClick={() => setFilterCategory(category)}
                       className={`rounded-full px-5 py-2 text-sm font-medium transition ${
                         filterCategory === category
-                          ? isDarkMode
-                            ? "bg-emerald-500 text-slate-950"
-                            : "bg-emerald-600 text-white"
-                          : isDarkMode
-                          ? "bg-white/10 text-white hover:bg-white/20"
+                          ? "bg-emerald-600 text-white"
                           : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
                       }`}
                     >
@@ -616,11 +521,7 @@ export default function OffertsPage() {
                 onClick={() => setShowActiveOnly(!showActiveOnly)}
                 className={`rounded-full px-5 py-2 text-sm font-medium transition ${
                   showActiveOnly
-                    ? isDarkMode
-                      ? "bg-teal-500 text-slate-950"
-                      : "bg-teal-600 text-white"
-                    : isDarkMode
-                    ? "bg-white/10 text-white hover:bg-white/20"
+                    ? "bg-teal-600 text-white"
                     : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
                 }`}
               >
@@ -633,7 +534,7 @@ export default function OffertsPage() {
               <div className="flex items-center justify-center py-20">
                 <Loader2
                   className={`h-8 w-8 animate-spin ${
-                    isDarkMode ? "text-emerald-400" : "text-emerald-600"
+                    "text-emerald-400"
                   }`}
                 />
               </div>
@@ -665,20 +566,14 @@ export default function OffertsPage() {
                       whileHover={{ scale: 1.02 }}
                       className={`group relative overflow-hidden rounded-2xl border backdrop-blur transition-all ${
                         canAfford
-                          ? isDarkMode
-                            ? "border-white/10 bg-white/5 hover:border-emerald-400/50"
-                            : "border-slate-200 bg-white hover:border-emerald-300 shadow-sm hover:shadow-md"
-                          : isDarkMode
-                          ? "border-white/5 bg-white/200 opacity-60"
-                          : "border-slate-100 bg-slate-50 opacity-60"
+                          ? "border-white/10 bg-white/5 hover:border-emerald-400/50"
+                          : "border-white/5 bg-white/200 opacity-60"
                       }`}
                     >
                       {/* Icon Badge */}
                       <div
                         className={`absolute right-4 top-4 text-4xl transition-opacity ${
-                          isDarkMode
-                            ? "opacity-20 group-hover:opacity-30"
-                            : "opacity-10 group-hover:opacity-20"
+                          "opacity-20 group-hover:opacity-30"
                         }`}
                       >
                         {coupon.icon}
@@ -689,31 +584,19 @@ export default function OffertsPage() {
                           <div
                             className={`rounded-xl p-3 border ${
                               coupon.category === "museum"
-                                ? isDarkMode
-                                  ? "bg-blue-500/20 border-blue-400/30"
-                                  : "bg-blue-50 border-blue-200"
+                                ? "bg-blue-500/20 border-blue-400/30"
                                 : coupon.category === "coffee"
-                                ? isDarkMode
-                                  ? "bg-orange-500/20 border-orange-400/30"
-                                  : "bg-orange-50 border-orange-200"
-                                : isDarkMode
-                                ? "bg-pink-500/20 border-pink-400/30"
-                                : "bg-pink-50 border-pink-200"
+                                ? "bg-orange-500/20 border-orange-400/30"
+                                : "bg-pink-500/20 border-pink-400/30"
                             }`}
                           >
                             <Icon
                               className={`h-6 w-6 ${
                                 coupon.category === "museum"
-                                  ? isDarkMode
-                                    ? "text-blue-400"
-                                    : "text-blue-600"
+                                  ? "text-blue-400"
                                   : coupon.category === "coffee"
-                                  ? isDarkMode
-                                    ? "text-orange-400"
-                                    : "text-orange-600"
-                                  : isDarkMode
-                                  ? "text-pink-400"
-                                  : "text-pink-600"
+                                  ? "text-orange-400"
+                                  : "text-pink-400"
                               }`}
                             />
                           </div>
@@ -746,15 +629,13 @@ export default function OffertsPage() {
                           </div>
                           <div
                             className={`h-2 overflow-hidden rounded-full ${
-                              isDarkMode ? "bg-white/10" : "bg-slate-200"
+                              "bg-white/10"
                             }`}
                           >
                             <div
                               className={`h-full transition-all ${
                                 isLowStock
                                   ? "bg-red-400"
-                                  : isDarkMode
-                                  ? "bg-emerald-400"
                                   : "bg-emerald-600"
                               }`}
                               style={{ width: `${percentRemaining}%` }}
@@ -772,9 +653,7 @@ export default function OffertsPage() {
                           <div className="flex items-center gap-2">
                             <span
                               className={`text-2xl font-bold ${
-                                isDarkMode
-                                  ? "text-emerald-400"
-                                  : "text-emerald-600"
+                                "text-emerald-600"
                               }`}
                             >
                               {coupon.pointsCost}
@@ -794,12 +673,8 @@ export default function OffertsPage() {
                             }
                             className={`rounded-full px-6 py-2 font-semibold transition-all ${
                               canAfford && coupon.usesRemaining > 0
-                                ? isDarkMode
-                                  ? "bg-emerald-500 text-slate-950 hover:bg-emerald-400"
-                                  : "bg-emerald-600 text-white hover:bg-emerald-700"
-                                : isDarkMode
-                                ? "bg-white/10 text-white/40 cursor-not-allowed"
-                                : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                                ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                                : "bg-white/10 text-white/40 cursor-not-allowed"
                             }`}
                           >
                             {isRedeeming === coupon._id ? (
@@ -823,19 +698,17 @@ export default function OffertsPage() {
                       {coupon.usesRemaining === 0 && (
                         <div
                           className={`absolute inset-0 flex items-center justify-center backdrop-blur-sm ${
-                            isDarkMode ? "bg-slate-950/80" : "bg-white/90"
+                            "bg-slate-950/80"
                           }`}
                         >
                           <div
                             className={`rounded-full border px-6 py-3 ${
-                              isDarkMode
-                                ? "bg-red-500/20 border-red-400/50"
-                                : "bg-red-50 border-red-300"
+                              "bg-red-500/20 border-red-400/50"
                             }`}
                           >
                             <p
                               className={`font-bold flex items-center gap-2 ${
-                                isDarkMode ? "text-red-400" : "text-red-600"
+                                "text-red-600"
                               }`}
                             >
                               <X className="h-5 w-5" />

@@ -17,7 +17,6 @@ import {
 import DashboardPageLayout from "../../components/DashboardPageLayout";
 import ChatInterface from "../../components/ChatInterface";
 import Image from "next/image";
-import { useTheme } from "../../components/ThemeProvider";
 
 // Sample conversation starters
 const conversationTopics = [
@@ -52,8 +51,6 @@ const conversationTopics = [
 ];
 
 function HeroSection() {
-  const { theme } = useTheme();
-
   return (
     <section className="relative min-h-[60vh] flex items-center overflow-hidden">
       <div className="absolute inset-0">
@@ -64,13 +61,7 @@ function HeroSection() {
           className="object-cover"
           priority
         />
-        <div
-          className={`absolute inset-0 ${
-            theme === "dark"
-              ? "bg-linear-to-b from-neutral-950/80 via-neutral-950/70 to-neutral-950"
-              : "bg-linear-to-b from-white/60 via-orange-50/80 to-white"
-          }`}
-        />
+        <div className="absolute inset-0 bg-linear-to-b from-neutral-950/80 via-neutral-950/70 to-neutral-950" />
       </div>
 
       <div className="relative z-10 w-full px-6 lg:px-12 py-20">
@@ -81,47 +72,19 @@ function HeroSection() {
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
-            <motion.div
-              className={`inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full border ${
-                theme === "dark"
-                  ? "bg-lime-400/10 border-lime-400/20"
-                  : "bg-emerald-100/80 border-emerald-300/50"
-              }`}
-            >
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  theme === "dark" ? "bg-lime-400" : "bg-emerald-600"
-                }`}
-              />
-              <span
-                className={`text-sm ${
-                  theme === "dark" ? "text-lime-400" : "text-emerald-700"
-                }`}
-              >
+            <motion.div className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full border bg-lime-400/10 border-lime-400/20">
+              <div className="w-2 h-2 rounded-full bg-lime-400" />
+              <span className="text-sm text-lime-400">
                 AI-Powered Cultural Assistant
               </span>
             </motion.div>
 
-            <h1
-              className={`text-5xl lg:text-6xl font-bold mb-6 ${
-                theme === "dark" ? "text-white" : "text-neutral-900"
-              }`}
-            >
+            <h1 className="text-5xl lg:text-6xl font-bold mb-6 text-white">
               Chat About{" "}
-              <span
-                className={
-                  theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                }
-              >
-                Culture
-              </span>
+              <span className="text-lime-400">Culture</span>
             </h1>
 
-            <p
-              className={`text-lg mb-8 ${
-                theme === "dark" ? "text-neutral-300" : "text-neutral-700"
-              }`}
-            >
+            <p className="text-lg mb-8 text-neutral-300">
               Have meaningful conversations about global cultures, traditions,
               languages, and heritage. Get instant answers, learn new phrases,
               and explore the world&apos;s cultural diversity through AI-powered
@@ -130,11 +93,7 @@ function HeroSection() {
 
             <div className="flex flex-wrap gap-4">
               <motion.button
-                className={`px-8 py-4 rounded-full flex items-center gap-2 transition-colors ${
-                  theme === "dark"
-                    ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
-                    : "bg-emerald-600 text-white hover:bg-emerald-700"
-                }`}
+                className="px-8 py-4 rounded-full flex items-center gap-2 bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -143,11 +102,7 @@ function HeroSection() {
               </motion.button>
 
               <motion.button
-                className={`px-8 py-4 rounded-full backdrop-blur-sm border transition-colors flex items-center gap-2 ${
-                  theme === "dark"
-                    ? "bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50"
-                    : "bg-white/70 text-neutral-900 border-neutral-300 hover:bg-white"
-                }`}
+                className="px-8 py-4 rounded-full backdrop-blur-sm border bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50 transition-colors flex items-center gap-2"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -163,8 +118,6 @@ function HeroSection() {
 }
 
 function StatsSection() {
-  const { theme } = useTheme();
-
   const stats = [
     {
       label: "Conversations",
@@ -178,11 +131,7 @@ function StatsSection() {
   ];
 
   return (
-    <section
-      className={`py-16 px-6 lg:px-12 ${
-        theme === "dark" ? "bg-neutral-950" : "bg-white"
-      }`}
-    >
+    <section className="py-16 px-6 lg:px-12 bg-neutral-950">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
@@ -192,11 +141,7 @@ function StatsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className={`relative overflow-hidden rounded-3xl border p-6 backdrop-blur ${
-                theme === "dark"
-                  ? "bg-neutral-900 border-neutral-800"
-                  : "bg-slate-50 border-slate-200"
-              }`}
+              className="relative overflow-hidden rounded-3xl border p-6 backdrop-blur bg-neutral-900 border-neutral-800"
             >
               <stat.icon
                 className={`w-8 h-8 mb-3 ${
@@ -209,20 +154,10 @@ function StatsSection() {
                     : "text-yellow-400"
                 }`}
               />
-              <p
-                className={`text-3xl font-bold mb-1 ${
-                  theme === "dark" ? "text-white" : "text-neutral-900"
-                }`}
-              >
+              <p className="text-3xl font-bold mb-1 text-white">
                 {stat.value}
               </p>
-              <p
-                className={`text-sm ${
-                  theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-                }`}
-              >
-                {stat.label}
-              </p>
+              <p className="text-sm text-neutral-400">{stat.label}</p>
             </motion.div>
           ))}
         </div>
@@ -232,16 +167,8 @@ function StatsSection() {
 }
 
 function TopicsSection() {
-  const { theme } = useTheme();
-
   return (
-    <section
-      className={`py-24 px-6 lg:px-12 ${
-        theme === "dark"
-          ? "bg-neutral-900"
-          : "bg-linear-to-b from-white to-orange-50/30"
-      }`}
-    >
+    <section className="py-24 px-6 lg:px-12 bg-neutral-900">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -250,27 +177,13 @@ function TopicsSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div
-            className={`inline-block px-4 py-2 rounded-full mb-4 ${
-              theme === "dark"
-                ? "bg-lime-400/10 text-lime-400"
-                : "bg-emerald-100 text-emerald-700"
-            }`}
-          >
+          <div className="inline-block px-4 py-2 rounded-full mb-4 bg-lime-400/10 text-lime-400">
             Popular Topics
           </div>
-          <h2
-            className={`text-4xl font-bold mb-4 ${
-              theme === "dark" ? "text-white" : "text-neutral-900"
-            }`}
-          >
+          <h2 className="text-4xl font-bold mb-4 text-white">
             What Would You Like to Explore?
           </h2>
-          <p
-            className={`max-w-2xl mx-auto ${
-              theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-            }`}
-          >
+          <p className="max-w-2xl mx-auto text-neutral-400">
             Choose a topic to start your cultural journey or ask anything
             you&apos;re curious about
           </p>
@@ -287,20 +200,8 @@ function TopicsSection() {
               whileHover={{ y: -8 }}
               className="group cursor-pointer"
             >
-              <div
-                className={`relative overflow-hidden rounded-3xl border p-6 transition-all h-full ${
-                  theme === "dark"
-                    ? "bg-neutral-900 border-neutral-800 hover:border-lime-400/30"
-                    : "bg-white border-neutral-200 hover:border-emerald-400/50 shadow-lg hover:shadow-xl"
-                }`}
-              >
-                <div
-                  className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${
-                    theme === "dark"
-                      ? "bg-lime-400/10 border border-lime-400/20"
-                      : "bg-emerald-50 border border-emerald-200"
-                  }`}
-                >
+              <div className="relative overflow-hidden rounded-3xl border p-6 transition-all h-full bg-neutral-900 border-neutral-800 hover:border-lime-400/30">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-lime-400/10 border border-lime-400/20">
                   <topic.icon
                     className={`w-7 h-7 ${
                       topic.color === "blue"
@@ -314,29 +215,15 @@ function TopicsSection() {
                   />
                 </div>
 
-                <h3
-                  className={`text-xl font-bold mb-2 ${
-                    theme === "dark" ? "text-white" : "text-neutral-900"
-                  }`}
-                >
+                <h3 className="text-xl font-bold mb-2 text-white">
                   {topic.title}
                 </h3>
 
-                <p
-                  className={`text-sm mb-4 ${
-                    theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-                  }`}
-                >
+                <p className="text-sm mb-4 text-neutral-400">
                   {topic.description}
                 </p>
 
-                <motion.div
-                  className={`flex items-center gap-2 text-sm font-semibold ${
-                    theme === "dark"
-                      ? "text-lime-400 group-hover:text-lime-300"
-                      : "text-emerald-600 group-hover:text-emerald-700"
-                  }`}
-                >
+                <motion.div className="flex items-center gap-2 text-sm font-semibold text-lime-400 group-hover:text-lime-300">
                   Ask about this
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </motion.div>
@@ -350,8 +237,6 @@ function TopicsSection() {
 }
 
 function FeaturesSection() {
-  const { theme } = useTheme();
-
   const features = [
     {
       title: "Instant Responses",
@@ -376,11 +261,7 @@ function FeaturesSection() {
   ];
 
   return (
-    <section
-      className={`py-24 px-6 lg:px-12 ${
-        theme === "dark" ? "bg-neutral-950" : "bg-white"
-      }`}
-    >
+    <section className="py-24 px-6 lg:px-12 bg-neutral-950">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -388,18 +269,10 @@ function FeaturesSection() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2
-            className={`text-4xl font-bold mb-4 ${
-              theme === "dark" ? "text-white" : "text-neutral-900"
-            }`}
-          >
+          <h2 className="text-4xl font-bold mb-4 text-white">
             Why Chat With Us?
           </h2>
-          <p
-            className={`max-w-2xl mx-auto ${
-              theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-            }`}
-          >
+          <p className="max-w-2xl mx-auto text-neutral-400">
             Experience the power of AI-driven cultural education
           </p>
         </motion.div>
@@ -412,29 +285,13 @@ function FeaturesSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className={`rounded-3xl border p-6 ${
-                theme === "dark"
-                  ? "bg-neutral-900 border-neutral-800"
-                  : "bg-slate-50 border-slate-200"
-              }`}
+              className="rounded-3xl border p-6 bg-neutral-900 border-neutral-800"
             >
-              <feature.icon
-                className={`w-10 h-10 mb-4 ${
-                  theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                }`}
-              />
-              <h3
-                className={`text-lg font-bold mb-2 ${
-                  theme === "dark" ? "text-white" : "text-neutral-900"
-                }`}
-              >
+              <feature.icon className="w-10 h-10 mb-4 text-lime-400" />
+              <h3 className="text-lg font-bold mb-2 text-white">
                 {feature.title}
               </h3>
-              <p
-                className={`text-sm ${
-                  theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-                }`}
-              >
+              <p className="text-sm text-neutral-400">
                 {feature.description}
               </p>
             </motion.div>
@@ -446,12 +303,10 @@ function FeaturesSection() {
 }
 
 export default function ChatPage() {
-  const { theme } = useTheme();
   const [showChat, setShowChat] = useState(false);
 
   return (
-    <DashboardPageLayout
-    >
+    <DashboardPageLayout>
       {/* Theme controlled by global ThemeToggle */}
 
       {!showChat ? (
@@ -462,39 +317,21 @@ export default function ChatPage() {
           <FeaturesSection />
 
           {/* CTA to Chat Interface */}
-          <section
-            className={`py-24 px-6 lg:px-12 ${
-              theme === "dark" ? "bg-neutral-950" : "bg-white"
-            }`}
-          >
+          <section className="py-24 px-6 lg:px-12 bg-neutral-950">
             <div className="max-w-4xl mx-auto text-center">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className={`rounded-3xl border p-12 ${
-                  theme === "dark"
-                    ? "bg-linear-to-br from-neutral-900 to-neutral-800 border-neutral-700"
-                    : "bg-linear-to-br from-emerald-50 to-orange-50 border-emerald-200"
-                }`}
+                className="rounded-3xl border p-12 bg-linear-to-br from-neutral-900 to-neutral-800 border-neutral-700"
               >
                 <MessageCircle
-                  className={`w-16 h-16 mx-auto mb-6 ${
-                    theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                  }`}
+                  className="w-16 h-16 mx-auto mb-6 text-lime-400"
                 />
-                <h2
-                  className={`text-3xl font-bold mb-4 ${
-                    theme === "dark" ? "text-white" : "text-neutral-900"
-                  }`}
-                >
+                <h2 className="text-3xl font-bold mb-4 text-white">
                   Ready to Start Your Cultural Journey?
                 </h2>
-                <p
-                  className={`text-lg mb-8 ${
-                    theme === "dark" ? "text-neutral-300" : "text-neutral-700"
-                  }`}
-                >
+                <p className="text-lg mb-8 text-neutral-300">
                   Begin a conversation with our AI assistant and explore
                   cultures, traditions, and languages from around the world
                 </p>
@@ -502,11 +339,7 @@ export default function ChatPage() {
                   onClick={() => setShowChat(true)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className={`px-8 py-4 rounded-full flex items-center gap-2 mx-auto transition-colors ${
-                    theme === "dark"
-                      ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
-                      : "bg-emerald-600 text-white hover:bg-emerald-700"
-                  }`}
+                  className="px-8 py-4 rounded-full flex items-center gap-2 mx-auto transition-colors bg-lime-400 text-neutral-950 hover:bg-lime-300"
                 >
                   Open Chat Interface
                   <ArrowRight className="w-5 h-5" />
@@ -519,11 +352,7 @@ export default function ChatPage() {
         <div className="space-y-6">
           <button
             onClick={() => setShowChat(false)}
-            className={`flex items-center gap-2 text-sm font-medium ${
-              theme === "dark"
-                ? "text-lime-400 hover:text-lime-300"
-                : "text-emerald-600 hover:text-emerald-700"
-            }`}
+            className="flex items-center gap-2 text-sm font-medium text-lime-400 hover:text-lime-300"
           >
             ← Back to Overview
           </button>

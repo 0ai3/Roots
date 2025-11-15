@@ -79,86 +79,6 @@ const formatDate = (value?: string | null, locale?: string) => {
 };
 
 export default function ProfileForm({ initialPoints, initialUserId }: Props = {}) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  // Theme management
-  useEffect(() => {
-    const updateTheme = () => {
-      try {
-        const saved = localStorage.getItem("theme");
-        if (saved) {
-          const dark = saved === "dark";
-          setIsDarkMode(dark);
-          if (dark) {
-            document.documentElement.classList.add("dark");
-          } else {
-            document.documentElement.classList.remove("dark");
-          }
-        } else {
-          const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          setIsDarkMode(systemDark);
-          if (systemDark) {
-            document.documentElement.classList.add("dark");
-          }
-        }
-      } catch (e) {
-        // ignore
-      }
-    };
-
-    updateTheme();
-
-    const handleThemeChange = (event: CustomEvent) => {
-      setIsDarkMode(event.detail.isDark);
-    };
-
-    window.addEventListener('theme-change', handleThemeChange as EventListener);
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem("theme")) {
-        setIsDarkMode(e.matches);
-        if (e.matches) {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-        }
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
-
-    return () => {
-      window.removeEventListener('theme-change', handleThemeChange as EventListener);
-      mediaQuery.removeEventListener('change', handleSystemThemeChange);
-    };
-  }, []);
-
-  // Color utility functions
-  const getBgColor = () => {
-    return isDarkMode ? "bg-black" : "bg-white";
-  };
-
-  const getTextColor = () => {
-    return isDarkMode ? "text-white" : "text-slate-900";
-  };
-
-  const getMutedTextColor = () => {
-    return isDarkMode ? "text-white/70" : "text-slate-600";
-  };
-
-  const getBorderColor = () => {
-    return isDarkMode ? "border-white/10" : "border-slate-200";
-  };
-
-  const getCardBg = () => {
-    return isDarkMode ? "bg-white/5" : "bg-slate-50";
-  };
-
-  const getInputBg = () => {
-    return isDarkMode ? "bg-black/40" : "bg-white";
-  };
-
   const { points } = useExperiencePoints({ initialPoints, initialUserId });
   const { t, locale } = useI18n();
   const [formState, setFormState] = useState<ProfileFields>(EMPTY_FORM);
@@ -413,97 +333,85 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
   };
 
   return (
-    <section className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}>
+    <section className={`min-h-screen bg-black text-white transition-colors duration-300`}>
       <div className="space-y-8 p-6">
         <div className="grid gap-4 md:grid-cols-2">
-          <div className={`rounded-3xl border p-5 ${getBorderColor()} ${getCardBg()}`}>
-            <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+          <div className={`rounded-3xl border p-5 border-white/10 bg-white/5`}>
+            <p className={`text-xs uppercase tracking-wide text-white/70`}>
               {t("dashboard.content.pointsLabel")}
             </p>
-            <p className={`text-4xl font-semibold ${getTextColor()}`}>{formattedPoints}</p>
-            <p className={`text-xs ${getMutedTextColor()}`}>{t("profile.pointsHint")}</p>
+            <p className={`text-4xl font-semibold text-white`}>{formattedPoints}</p>
+            <p className={`text-xs text-white/70`}>{t("profile.pointsHint")}</p>
           </div>
 
-          <div className={`rounded-3xl border p-5 ${getBorderColor()} ${getCardBg()}`}>
-            <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+          <div className={`rounded-3xl border p-5 border-white/10 bg-white/5`}>
+            <p className={`text-xs uppercase tracking-wide text-white/70`}>
               {t("profile.accountLabel")}
             </p>
-            <p className={`text-base font-semibold ${getTextColor()}`}>{profileMeta?.email || "—"}</p>
+            <p className={`text-base font-semibold text-white`}>{profileMeta?.email || "—"}</p>
             <dl className="mt-4 space-y-2 text-sm">
               <div className="flex items-center justify-between">
-                <dt className={`uppercase tracking-wide ${getMutedTextColor()}`}>
+                <dt className={`uppercase tracking-wide text-white/70`}>
                   {t("dashboard.content.roleLabel")}
                 </dt>
-                <dd className={`rounded-full border px-3 py-1 text-xs ${
-                  isDarkMode 
-                    ? "border-white/15 text-white" 
-                    : "border-slate-300 text-slate-700"
-                }`}>
+                <dd className={`rounded-full border px-3 py-1 text-xs border-white/15 text-white`}>
                   {profileRoleLabel}
                 </dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className={`uppercase tracking-wide ${getMutedTextColor()}`}>
+                <dt className={`uppercase tracking-wide text-white/70`}>
                   {t("dashboard.content.memberSince")}
                 </dt>
-                <dd className={getMutedTextColor()}>{formattedCreatedAt ?? "—"}</dd>
+                <dd className={`text-white/70`}>{formattedCreatedAt ?? "—"}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className={`uppercase tracking-wide ${getMutedTextColor()}`}>
+                <dt className={`uppercase tracking-wide text-white/70`}>
                   {t("common.lastUpdated")}
                 </dt>
-                <dd className={getMutedTextColor()}>{formattedUpdatedAt ?? "—"}</dd>
+                <dd className={`text-white/70`}>{formattedUpdatedAt ?? "—"}</dd>
               </div>
             </dl>
           </div>
         </div>
 
         {errorMessage && (
-          <div className={`rounded-2xl border px-4 py-3 text-sm ${
-            isDarkMode 
-              ? "border-red-500/40 bg-red-500/10 text-red-200" 
-              : "border-red-400/40 bg-red-400/10 text-red-700"
-          }`}>
+          <div className={`rounded-2xl border px-4 py-3 text-sm border-red-500/40 bg-red-500/10 text-red-200`}>
             {errorMessage}
           </div>
         )}
 
         {statusMessage && !errorMessage && (
-          <div className={`rounded-2xl border px-4 py-3 text-sm ${
-            isDarkMode 
-              ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-200" 
-              : "border-emerald-500/40 bg-emerald-500/10 text-emerald-700"
-          }`}>
+          <div className={`rounded-2xl border px-4 py-3 text-sm border-emerald-400/40 bg-emerald-400/10 text-emerald-200`}>
             {statusMessage}
           </div>
         )}
 
         <form
           onSubmit={handleSubmit}
-          className={`space-y-5 rounded-3xl border p-6 backdrop-blur ${getBorderColor()} ${getCardBg()}`}
+          className={`space-y-5 rounded-3xl border p-6 backdrop-blur border-white/10 bg-white/5`}
         >
           <div className="grid gap-4 md:grid-cols-2">
-            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+            <label className={`space-y-2 text-sm font-medium text-white/70`}>
               <span>{t("profile.fields.name")}</span>
               <input
                 type="text"
                 value={formState.name}
                 onChange={handleChange("name")}
                 placeholder={t("profile.fields.namePlaceholder")}
-                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:text-white/70 focus:border-emerald-300 focus:outline-none disabled:opacity-50 border-white/10 bg-black/40 text-white`}
                 disabled={isFormDisabled}
                 required
               />
             </label>
 
-            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+            <label className={`space-y-2 text-sm font-medium text-white/70`}>
               <span>{t("profile.fields.email")}</span>
               <input
                 type="email"
                 value={formState.email}
                 onChange={handleChange("email")}
                 placeholder={t("profile.fields.emailPlaceholder")}
-                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:text-white/70 focus:border-emerald-300 focus:outline-none disabled:opacity-50 border-white/10 bg-black/40 text-white`}
                 disabled={isFormDisabled}
                 required
               />
@@ -511,7 +419,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
         </div>
 
           <div className="grid gap-4 md:grid-cols-1">
-            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+            <label className={`space-y-2 text-sm font-medium text-white/70`}>
               <span>{t("profile.fields.homeCountry")}</span>
               <div className="relative">
                 <input
@@ -519,16 +427,12 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
                   value={formState.homeCountry}
                   onChange={handleChange("homeCountry")}
                   placeholder={t("profile.fields.homeCountryPlaceholder")}
-                  className={`w-full rounded-2xl border px-4 py-3 pr-12 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${
+                  className={`w-full rounded-2xl border px-4 py-3 pr-12 text-base placeholder:text-white/70 focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${
                     homeCountryValidation === "invalid"
-                      ? isDarkMode
-                        ? "border-red-400/50 bg-red-950/20"
-                        : "border-red-400/50 bg-red-50 text-red-900"
+                      ? "border-red-400/50 bg-red-950/20"
                       : homeCountryValidation === "valid"
-                      ? isDarkMode
-                        ? "border-emerald-400/50 bg-emerald-950/20"
-                        : "border-emerald-400/50 bg-emerald-50 text-emerald-900"
-                      : `${getBorderColor()} ${getInputBg()} ${getTextColor()}`
+                      ? "border-emerald-400/50 bg-emerald-950/20"
+                      : "border-white/10 bg-black/40 text-white"
                   }`}
                   disabled={isFormDisabled}
                 />
@@ -536,58 +440,58 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
                   {getValidationIcon()}
                 </div>
               </div>
-              <p className={`text-xs ${getMutedTextColor()}`}>
+              <p className={`text-xs text-white/70`}>
                 {t("profile.fields.homeCountryHelper")}
               </p>
             </label>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+            <label className={`space-y-2 text-sm font-medium text-white/70`}>
               <span>{t("profile.fields.favoriteMuseums")}</span>
               <textarea
                 value={formState.favoriteMuseums}
                 onChange={handleChange("favoriteMuseums")}
                 placeholder={t("profile.fields.favoriteMuseumsPlaceholder")}
                 rows={4}
-                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:text-white/70 focus:border-emerald-300 focus:outline-none disabled:opacity-50 border-white/10 bg-black/40 text-white`}
                 disabled={isFormDisabled}
               />
             </label>
 
-            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+            <label className={`space-y-2 text-sm font-medium text-white/70`}>
               <span>{t("profile.fields.favoriteRecipes")}</span>
               <textarea
                 value={formState.favoriteRecipes}
                 onChange={handleChange("favoriteRecipes")}
                 placeholder={t("profile.fields.favoriteRecipesPlaceholder")}
                 rows={4}
-                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:text-white/70 focus:border-emerald-300 focus:outline-none disabled:opacity-50 border-white/10 bg-black/40 text-white`}
                 disabled={isFormDisabled}
               />
             </label>
           </div>
 
-          <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+          <label className={`space-y-2 text-sm font-medium text-white/70`}>
             <span>{t("profile.fields.bio")}</span>
             <textarea
               value={formState.bio}
               onChange={handleChange("bio")}
               placeholder={t("profile.fields.bioPlaceholder")}
               rows={4}
-              className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+              className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:text-white/70 focus:border-emerald-300 focus:outline-none disabled:opacity-50 border-white/10 bg-black/40 text-white`}
               disabled={isFormDisabled}
             />
           </label>
 
-          <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+          <label className={`space-y-2 text-sm font-medium text-white/70`}>
             <span>{t("profile.fields.socialHandle")}</span>
             <input
               type="text"
               value={formState.socialHandle}
               onChange={handleChange("socialHandle")}
               placeholder={t("profile.fields.socialHandlePlaceholder")}
-              className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+              className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:text-white/70 focus:border-emerald-300 focus:outline-none disabled:opacity-50 border-white/10 bg-black/40 text-white`}
               disabled={isFormDisabled}
             />
           </label>
@@ -604,27 +508,27 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
                   ? t("profile.status.loading")
                   : t("profile.actions.save")}
             </button>
-            <p className={`text-xs ${getMutedTextColor()}`}>
+            <p className={`text-xs text-white/70`}>
               {t("profile.actions.helper")}
             </p>
           </div>
         </form>
 
         {/* Favorite Attractions Section */}
-        <div className={`space-y-4 rounded-3xl border p-6 backdrop-blur ${getBorderColor()} ${getCardBg()}`}>
+        <div className={`space-y-4 rounded-3xl border p-6 backdrop-blur border-white/10 bg-white/5`}>
           <div className="flex items-center gap-2 mb-4">
-            <Heart className={`w-5 h-5 ${isDarkMode ? "text-lime-400 fill-lime-400" : "text-emerald-600 fill-emerald-600"}`} />
-            <h3 className={`text-xl font-semibold ${getTextColor()}`}>
+            <Heart className={`w-5 h-5 text-lime-400 fill-lime-400`} />
+            <h3 className={`text-xl font-semibold text-white`}>
               Favorite Attractions
             </h3>
           </div>
 
           {loadingFavorites ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className={`w-8 h-8 animate-spin ${getMutedTextColor()}`} />
+              <Loader2 className={`w-8 h-8 animate-spin text-white/70`} />
             </div>
           ) : favorites.length === 0 ? (
-            <div className={`text-center py-8 ${getMutedTextColor()}`}>
+            <div className={`text-center py-8 text-white/70`}>
               <MapPin className="w-12 h-12 mx-auto mb-2 opacity-30" />
               <p className="text-sm">No favorite attractions yet</p>
               <p className="text-xs mt-1">Visit the Attractions page to add favorites</p>
@@ -634,9 +538,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
               {favorites.map((fav) => (
                 <div
                   key={fav.attractionId}
-                  className={`group relative overflow-hidden rounded-2xl border ${getBorderColor()} ${
-                    isDarkMode ? "hover:border-lime-400/30" : "hover:border-emerald-400/50"
-                  } transition-all`}
+                  className="group relative overflow-hidden rounded-2xl border border-white/10 hover:border-lime-400/30 transition-all"
                 >
                   <div className="relative h-40 overflow-hidden">
                     <Image
@@ -645,34 +547,26 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <div className={`absolute inset-0 ${
-                      isDarkMode
-                        ? "bg-linear-to-t from-neutral-900 via-neutral-900/40 to-transparent"
-                        : "bg-linear-to-t from-white via-white/40 to-transparent"
-                    }`} />
+                    <div className="absolute inset-0 bg-linear-to-t from-neutral-900 via-neutral-900/40 to-transparent" />
                     <button
                       onClick={() => removeFavorite(fav.attractionId)}
-                      className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm transition ${
-                        isDarkMode
-                          ? "bg-red-500/80 hover:bg-red-600/90"
-                          : "bg-red-500/90 hover:bg-red-600"
-                      }`}
+                      className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm transition bg-red-500/80 hover:bg-red-600/90"
                       title="Remove from favorites"
                     >
                       <Heart className="w-4 h-4 text-white fill-white" />
                     </button>
                   </div>
-                  <div className={`p-4 ${getInputBg()}`}>
-                    <h4 className={`font-semibold mb-1 ${getTextColor()} text-sm line-clamp-1`}>
+                  <div className="p-4 bg-black/40">
+                    <h4 className="font-semibold mb-1 text-white text-sm line-clamp-1">
                       {fav.attraction.title}
                     </h4>
                     <div className="flex items-center gap-1 mb-2">
-                      <MapPin className={`w-3 h-3 ${isDarkMode ? "text-lime-400" : "text-emerald-600"}`} />
-                      <span className={`text-xs ${getMutedTextColor()} line-clamp-1`}>
+                      <MapPin className="w-3 h-3 text-lime-400" />
+                      <span className="text-xs text-white/70 line-clamp-1">
                         {fav.attraction.location}
                       </span>
                     </div>
-                    <p className={`text-xs ${getMutedTextColor()} line-clamp-2`}>
+                    <p className="text-xs text-white/70 line-clamp-2">
                       {fav.attraction.description}
                     </p>
                   </div>

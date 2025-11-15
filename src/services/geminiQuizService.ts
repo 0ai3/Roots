@@ -27,71 +27,128 @@ Topics to cover:
 - National symbols, clothing, and traditional arts
 - Religious and spiritual practices worldwide
 - Food traditions and culinary heritage
+- Traditional music and instruments
+- Cultural ceremonies and rituals
 
-Make questions engaging and educational. Include cultures from Africa, Asia, Europe, Americas, and Oceania.`,
+Format questions like:
+- "Which country celebrates [festival name]?"
+- "What is the traditional clothing called in [country]?"
+- "Which culture practices [custom]?"
+
+Include cultures from Africa, Asia, Europe, Americas, and Oceania.`,
   
-  geography: `Create {count} multiple choice geography quiz questions.
+  geography: `Create {count} multiple choice geography quiz questions focused on NEIGHBORS and LOCATIONS.
 
-Topics to cover:
-- World capitals and major cities
-- Famous landmarks and monuments
-- Countries, continents, and their locations
-- Rivers, mountains, and natural wonders
-- Flags and geographic features
-
-Mix easy identification questions with interesting geographic facts.`,
-  
-  tradition: `Create {count} multiple choice questions about matching cultural traditions to their origins.
+Question types (mix these):
+1. Neighboring countries: "Which country borders [Country X] to the north?"
+2. Geographic regions: "Which countries share a border with [Country]?"
+3. Island nations: "Which country is [Island] part of?"
+4. Landlocked countries: "Which of these countries does NOT border [Country]?"
+5. Continents: "On which continent is [Country] located?"
+6. Capitals and borders: "Which capital city is closest to [Country]'s border?"
+7. Bodies of water: "Which sea/ocean borders [Country]?"
 
 Focus on:
-- Traditional dances and their countries of origin
-- Cultural festivals and where they're celebrated
-- Ancient ceremonies and rituals
-- Wedding and celebration customs
-- Folk traditions and their homelands
+- Direct neighboring countries
+- Regional geography
+- Border relationships
+- Continental locations
+- Geographic proximity
 
-Questions should test knowledge of which country or region practices each tradition.`,
+Examples:
+- "Which country does NOT border Germany?" (Make sure one option is NOT a neighbor)
+- "Which of these countries shares a border with Brazil?"
+- "What country lies directly south of France?"`,
+  
+  tradition: `Create {count} multiple choice questions about matching SPECIFIC cultural traditions to their countries of origin.
+
+Question format:
+"In which country is [SPECIFIC TRADITION] practiced?"
+OR
+"The tradition of [TRADITION NAME] originates from which country?"
+
+Focus on:
+- Traditional dances and their exact origin (e.g., "Haka war dance - New Zealand")
+- Specific festivals (e.g., "La Tomatina - Spain")
+- Wedding customs (e.g., "Breaking glass at weddings - Jewish tradition")
+- Coming-of-age ceremonies (e.g., "Quinceañera - Latin America")
+- Religious rituals (e.g., "Hanami cherry blossom viewing - Japan")
+- Folk traditions (e.g., "Sauna culture - Finland")
+- Traditional sports (e.g., "Sumo wrestling - Japan")
+
+Be SPECIFIC - use actual tradition names, not generic descriptions.
+Include traditions from diverse regions: Asia, Africa, Europe, Americas, Middle East, Oceania.`,
   
   language: `Create {count} multiple choice questions about basic phrases in world languages.
 
 Include:
-- Common greetings (hello, goodbye, thank you)
-- Basic expressions (yes, no, please, sorry)
-- Simple phrases in different languages (French, Spanish, Japanese, Arabic, German, Italian, Chinese, etc.)
-- Translations and meanings
-- Pronunciation hints when relevant
+- Common greetings in specific languages:
+  * "How do you say 'Hello' in Japanese?" → "Konnichiwa"
+  * "What does 'Bonjour' mean?" → "Hello/Good day"
+  
+- Basic expressions with translations:
+  * "Gracias" in Spanish means...
+  * How to say "Thank you" in Arabic...
+  
+- Multiple language comparisons:
+  * "Which language uses 'Namaste' as a greeting?"
+  * "In which language is 'Ciao' used?"
 
-Make questions accessible for beginners learning new languages.`,
+Languages to include: French, Spanish, Japanese, Arabic, German, Italian, Chinese (Mandarin), 
+Russian, Portuguese, Hindi, Korean, Dutch, Swedish, Turkish, Greek
+
+Make questions practical and beginner-friendly.`,
   
   history: `Create {count} multiple choice questions about world history and chronology.
 
 Topics:
-- Major historical events and their dates
-- Chronological order of important moments
-- Ancient civilizations and their time periods
-- Wars, revolutions, and their outcomes
-- Historical figures and their eras
-- Significant inventions and discoveries
-
-Questions can ask about dates, sequences, or historical facts.`,
+- Historical events with SPECIFIC DATES:
+  * "In which year did [event] occur?"
+  * "What happened in [year]?"
   
-  speed: `Create {count} quick, simple general knowledge questions for a fast-paced quiz.
+- Chronological ordering:
+  * "Which event happened FIRST?"
+  * "Put these events in chronological order"
+  
+- Historical periods:
+  * "During which century did [event] take place?"
+  * "What era was characterized by [description]?"
+  
+- Historical figures and their times:
+  * "When did [historical figure] live?"
+  * "Which event occurred during [person]'s lifetime?"
+
+- Major wars and revolutions with dates
+- Ancient civilizations and their time periods
+- Significant inventions and discoveries with years
+
+Be SPECIFIC with dates and sequences. Include global history, not just Western.`,
+  
+  speed: `Create {count} QUICK, SIMPLE general knowledge questions for a fast-paced speed quiz.
 
 Requirements:
-- Questions should be answerable in 5-10 seconds
-- Cover world cultures, geography, and famous landmarks
-- Keep options clear and straightforward
-- Mix easy and medium difficulty
-- Topics: capitals, flags, famous buildings, basic cultural facts
+- Questions answerable in 5-10 seconds
+- Clear, unambiguous answers
+- No complex reasoning needed
+- Mix of easy and medium difficulty
 
-Make questions fun and suitable for rapid-fire answering.`
+Question types:
+1. Capital cities: "What is the capital of [country]?"
+2. Famous landmarks: "Where is [landmark] located?"
+3. Flags: "Which country has a [color/symbol] flag?"
+4. Basic geography: "Which continent is [country] in?"
+5. Famous leaders: "Who is/was the leader of [country]?"
+6. Languages: "What language is spoken in [country]?"
+7. Currencies: "What is the currency of [country]?"
+8. Quick facts: "Which country is known for [thing]?"
+
+Keep it fun and rapid-fire suitable!`
 };
 
 export async function generateQuiz(config: QuizConfig): Promise<QuizQuestion[]> {
-  // Try API first, fallback immediately on error
   try {
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-pro',
+      model: 'gemini-1.5-flash', // Use stable model
       generationConfig: {
         temperature: 0.7,
         topP: 0.8,

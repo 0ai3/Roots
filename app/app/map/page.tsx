@@ -1,28 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import DashboardPageLayout from "../../components/DashboardPageLayout";
-import { useTheme } from "../../components/ThemeProvider";
 import WorldExplorerMap from "../../components/WorldExplorerMap";
 import { motion } from "framer-motion";
 import { MapPin, ArrowRight, Navigation, Route } from "lucide-react";
 import Image from "next/image";
 
 export default function MapPage() {
-  const { theme } = useTheme();
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [showBrowse, setShowBrowse] = useState(true);
 
-  useEffect(() => {
-    setIsDarkMode(theme === "dark");
-  }, [theme]);
-
   const getBgColor = () => {
-    return isDarkMode ? "bg-black" : "bg-white";
+    return "bg-black";
   };
 
   const getTextColor = () => {
-    return isDarkMode ? "text-white" : "text-slate-900";
+    return "text-white";
   };
 
   return (
@@ -30,11 +23,10 @@ export default function MapPage() {
       contentClassName={
         showBrowse ? "border-none bg-transparent p-0 shadow-none" : undefined
       }
-      isDarkMode={isDarkMode}
+      isDarkMode={true}
     >
-      {/* PageThemeToggle removed per request */}
       {showBrowse ? (
-        <div className={`min-h-screen ${getBgColor()}`}>
+        <div className="min-h-screen bg-black">
           {/* Hero Section */}
           <section className="relative min-h-[500px] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0">
@@ -46,11 +38,7 @@ export default function MapPage() {
                 priority
               />
               <div
-                className={`absolute inset-0 ${
-                  isDarkMode
-                    ? "bg-linear-to-br from-black/80 via-black/70 to-black/80"
-                    : "bg-linear-to-br from-black/60 via-black/50 to-black/60"
-                }`}
+                className={`absolute inset-0 bg-linear-to-br from-black/80 via-black/70 to-black/80`}
               />
             </div>
 
@@ -72,11 +60,7 @@ export default function MapPage() {
                 className="text-5xl md:text-6xl font-bold mb-6 leading-tight"
               >
                 Interactive{" "}
-                <span
-                  className={isDarkMode ? "text-lime-400" : "text-lime-300"}
-                >
-                  Map
-                </span>
+                <span className="text-lime-400">Map</span>
               </motion.h1>
 
               <motion.p
@@ -98,11 +82,7 @@ export default function MapPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowBrowse(false)}
-                  className={`px-8 py-4 rounded-xl font-semibold flex items-center gap-2 mx-auto transition-colors ${
-                    isDarkMode
-                      ? "bg-lime-400 text-black hover:bg-lime-300"
-                      : "bg-lime-500 text-white hover:bg-lime-600"
-                  }`}
+                  className="px-8 py-4 rounded-xl font-semibold flex items-center gap-2 bg-lime-400 text-black hover:bg-lime-300"
                 >
                   <Navigation className="w-5 h-5" />
                   Open Map
@@ -140,34 +120,22 @@ export default function MapPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
-                    className={`rounded-2xl p-6 border backdrop-blur-sm ${
-                      isDarkMode
-                        ? "bg-neutral-900/50 border-white/10"
-                        : "bg-white border-neutral-200 shadow-lg"
-                    }`}
+                    className={`rounded-2xl p-6 border backdrop-blur-sm bg-neutral-900/50 border-white/10`}
                   >
                     <div
-                      className={`p-3 rounded-xl w-fit mb-4 ${
-                        isDarkMode ? "bg-lime-400/20" : "bg-lime-100"
-                      }`}
+                      className={`p-3 rounded-xl w-fit mb-4 bg-lime-400/20`}
                     >
                       <feature.icon
-                        className={`w-6 h-6 ${
-                          isDarkMode ? "text-lime-400" : "text-lime-600"
-                        }`}
+                        className={`w-6 h-6 text-lime-400`}
                       />
                     </div>
                     <h3
-                      className={`font-bold text-lg mb-2 ${
-                        isDarkMode ? "text-white" : "text-neutral-900"
-                      }`}
+                      className={`font-bold text-lg mb-2 text-white`}
                     >
                       {feature.title}
                     </h3>
                     <p
-                      className={`text-sm ${
-                        isDarkMode ? "text-neutral-400" : "text-neutral-600"
-                      }`}
+                      className={`text-sm text-neutral-400`}
                     >
                       {feature.description}
                     </p>
@@ -185,7 +153,7 @@ export default function MapPage() {
             <button
               onClick={() => setShowBrowse(true)}
               className={`px-6 py-3 rounded-xl font-semibold transition-colors ${
-                isDarkMode
+                true
                   ? "bg-neutral-800 text-white hover:bg-neutral-700"
                   : "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
               }`}
@@ -196,14 +164,14 @@ export default function MapPage() {
           <div className="space-y-6 px-6">
             <div
               className={`rounded-3xl border p-6 ${
-                isDarkMode
+                true
                   ? "border-white/10 bg-white/5"
                   : "border-neutral-200 bg-neutral-50"
               }`}
             >
               <p
                 className={`text-xs uppercase tracking-wide ${
-                  isDarkMode ? "text-white/40" : "text-neutral-500"
+                  true ? "text-white/40" : "text-neutral-500"
                 }`}
               >
                 Live explorer
@@ -213,7 +181,7 @@ export default function MapPage() {
               </h1>
               <p
                 className={`mt-3 text-sm ${
-                  isDarkMode ? "text-white/70" : "text-neutral-600"
+                  true ? "text-white/70" : "text-neutral-600"
                 }`}
               >
                 Share your current position, follow yourself on the map, and
@@ -224,7 +192,7 @@ export default function MapPage() {
               <ul className="mt-4 grid gap-3 text-sm md:grid-cols-3">
                 <li
                   className={`rounded-2xl border p-3 ${
-                    isDarkMode
+                    true
                       ? "border-white/10 bg-slate-950/40 text-white/80"
                       : "border-neutral-200 bg-white text-neutral-700"
                   }`}
@@ -233,7 +201,7 @@ export default function MapPage() {
                 </li>
                 <li
                   className={`rounded-2xl border p-3 ${
-                    isDarkMode
+                    true
                       ? "border-white/10 bg-slate-950/40 text-white/80"
                       : "border-neutral-200 bg-white text-neutral-700"
                   }`}
@@ -243,7 +211,7 @@ export default function MapPage() {
                 </li>
                 <li
                   className={`rounded-2xl border p-3 ${
-                    isDarkMode
+                    true
                       ? "border-white/10 bg-slate-950/40 text-white/80"
                       : "border-neutral-200 bg-white text-neutral-700"
                   }`}

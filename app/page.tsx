@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -15,8 +14,6 @@ import {
   MapPin,
 } from "lucide-react";
 import Navbar from "./components/Navbar";
-import { useTheme } from "./components/ThemeProvider";
-import ThemeToggle from "./components/ThemeToggle";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -25,7 +22,6 @@ interface HeroSectionProps {
 }
 
 function HeroSection({ scrollY }: HeroSectionProps) {
-  const { theme } = useTheme();
   const parallaxY = scrollY * 0.5;
 
   return (
@@ -36,13 +32,7 @@ function HeroSection({ scrollY }: HeroSectionProps) {
           alt="Nature background"
           className="w-full h-[120vh] object-cover"
         />
-        <div
-          className={`absolute inset-0 ${
-            theme === "dark"
-              ? "bg-linear-to-b from-neutral-950/60 via-neutral-950/70 to-neutral-950"
-              : "bg-linear-to-b from-amber-50/60 via-orange-50/70 to-white"
-          }`}
-        />
+        <div className="absolute inset-0 bg-linear-to-b from-neutral-950/60 via-neutral-950/70 to-neutral-950" />
       </motion.div>
 
       <div className="relative z-10 w-full px-6 lg:px-12 pt-20">
@@ -53,68 +43,43 @@ function HeroSection({ scrollY }: HeroSectionProps) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <motion.div
-                className={`inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full border ${
-                  theme === "dark"
-                    ? "bg-lime-400/10 border-lime-400/20"
-                    : "bg-emerald-100/80 border-emerald-300/50"
-                }`}
-              >
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    theme === "dark" ? "bg-lime-400" : "bg-emerald-600"
-                  }`}
-                />
-                <span
-                  className={`text-sm ${
-                    theme === "dark" ? "text-lime-400" : "text-emerald-700"
-                  }`}
-                >
+              <motion.div className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full border bg-lime-400/10 border-lime-400/20">
+                <div className="w-2 h-2 rounded-full bg-lime-400" />
+                <span className="text-sm text-lime-400">
                   Discover Your Heritage
                 </span>
               </motion.div>
 
-              <h1
-                className={`mb-6 ${
-                  theme === "dark" ? "text-white" : "text-neutral-900"
-                }`}
-              >
+              <h1 className="mb-6 text-white">
                 Connect with
                 <br />
-                <span
-                  className={
-                    theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                  }
-                >
-                  Your Roots
-                </span>
+                <span className="text-lime-400">Your Roots</span>
               </h1>
 
-              <p
-                className={`text-lg mb-8 max-w-xl ${
-                  theme === "dark" ? "text-neutral-300" : "text-neutral-700"
-                }`}
-              >
+              <p className="text-lg mb-8 max-w-xl text-neutral-300">
                 Explore traditions, discover authentic cuisines, visit cultural
                 museums, and experience the world&rsquo;s rich heritage through
                 an interactive journey.
               </p>
 
               <div className="flex flex-wrap gap-4">
-                  <Link
-                    href="/login"
-                    aria-label="Start exploring - login"
-                    className={`px-8 py-4 rounded-full flex items-center gap-2 transition-colors ${
-                      theme === "dark"
-                        ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
-                        : "bg-emerald-600 text-white hover:bg-emerald-700"
-                    }`}
-                  >
-                    Start Exploring
-                    <ArrowRight className="w-5 h-5" />
-                  </Link>
+                <motion.button
+                  className="px-8 py-4 rounded-full flex items-center gap-2 bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Start Exploring
+                  <ArrowRight className="w-5 h-5" />
+                </motion.button>
 
-                {/* Watch Video button removed */}
+                <motion.button
+                  className="px-8 py-4 rounded-full backdrop-blur-sm border bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50 transition-colors flex items-center gap-2"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Play className="w-5 h-5" />
+                  Watch Video
+                </motion.button>
               </div>
 
               <div className="grid grid-cols-3 gap-6 mt-12">
@@ -124,22 +89,10 @@ function HeroSection({ scrollY }: HeroSectionProps) {
                   { label: "Attractions", value: "5K+" },
                 ].map((stat) => (
                   <div key={stat.label}>
-                    <div
-                      className={
-                        theme === "dark"
-                          ? "text-white text-2xl mb-1"
-                          : "text-neutral-900 text-2xl mb-1"
-                      }
-                    >
+                    <div className="text-white text-2xl mb-1">
                       {stat.value}
                     </div>
-                    <div
-                      className={`text-sm ${
-                        theme === "dark"
-                          ? "text-neutral-400"
-                          : "text-neutral-600"
-                      }`}
-                    >
+                    <div className="text-sm text-neutral-400">
                       {stat.label}
                     </div>
                   </div>
@@ -154,13 +107,9 @@ function HeroSection({ scrollY }: HeroSectionProps) {
               className="relative hidden lg:block"
             >
               <div className="relative">
-                <div
-                  className={`absolute -inset-4 rounded-3xl blur-2xl opacity-30 ${
-                    theme === "dark" ? "bg-lime-400" : "bg-emerald-500"
-                  }`}
-                />
+                <div className="absolute -inset-4 rounded-3xl blur-2xl opacity-30 bg-lime-400" />
                 <ImageWithFallback
-                  src="https://images.unsplash.com/photo-1761124739933-009df5603fbf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjdWx0dXJhbCUyMGZlc3RpdmFsJTIwY2VsZWJyYXRpb258ZW58MXx8fHwxNzYyODc1MTIwfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                  src="https://images.unsplash.com/photo-1761124739933-009df5603fbf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHhxjdWx0dXJhbCUyMGZlc3RpdmFsJTIwY2VsZWJyYXRpb258ZW58MXx8fHwxNzYyODc1MTIwfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
                   alt="Cultural celebration"
                   className="relative rounded-3xl shadow-2xl w-full h-[500px] object-cover"
                 />
@@ -172,24 +121,12 @@ function HeroSection({ scrollY }: HeroSectionProps) {
                     repeat: Infinity,
                     ease: "easeInOut",
                   }}
-                  className={`absolute bottom-8 -left-8 p-4 rounded-2xl backdrop-blur-lg border shadow-xl ${
-                    theme === "dark"
-                      ? "bg-neutral-900/90 border-neutral-700"
-                      : "bg-white/90 border-white/50"
-                  }`}
+                  className="absolute bottom-8 -left-8 p-4 rounded-2xl backdrop-blur-lg border shadow-xl bg-neutral-900/90 border-neutral-700"
                 >
-                  <div
-                    className={`text-sm mb-1 ${
-                      theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-                    }`}
-                  >
+                  <div className="text-sm mb-1 text-neutral-400">
                     Most Popular
                   </div>
-                  <div
-                    className={
-                      theme === "dark" ? "text-white" : "text-neutral-900"
-                    }
-                  >
+                  <div className="text-white">
                     Japanese Tea Ceremony
                   </div>
                 </motion.div>
@@ -204,15 +141,9 @@ function HeroSection({ scrollY }: HeroSectionProps) {
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 1.5, repeat: Infinity }}
       >
-        <div
-          className={`w-6 h-10 rounded-full border-2 flex items-start justify-center p-2 ${
-            theme === "dark" ? "border-neutral-600" : "border-neutral-400"
-          }`}
-        >
+        <div className="w-6 h-10 rounded-full border-2 flex items-start justify-center p-2 border-neutral-600">
           <motion.div
-            className={`w-1.5 h-1.5 rounded-full ${
-              theme === "dark" ? "bg-lime-400" : "bg-emerald-600"
-            }`}
+            className="w-1.5 h-1.5 rounded-full bg-lime-400"
             animate={{ y: [0, 12, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           />
@@ -223,8 +154,6 @@ function HeroSection({ scrollY }: HeroSectionProps) {
 }
 
 function FeaturesSection() {
-  const { theme } = useTheme();
-
   const features = [
     {
       icon: Utensils,
@@ -260,13 +189,7 @@ function FeaturesSection() {
   ];
 
   return (
-    <section
-      className={`relative py-24 px-6 lg:px-12 ${
-        theme === "dark"
-          ? "bg-neutral-950"
-          : "bg-linear-to-b from-white to-orange-50/30"
-      }`}
-    >
+    <section className="relative py-24 px-6 lg:px-12 bg-neutral-950">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -275,27 +198,13 @@ function FeaturesSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div
-            className={`inline-block px-4 py-2 rounded-full mb-4 ${
-              theme === "dark"
-                ? "bg-lime-400/10 text-lime-400"
-                : "bg-emerald-100 text-emerald-700"
-            }`}
-          >
+          <div className="inline-block px-4 py-2 rounded-full mb-4 bg-lime-400/10 text-lime-400">
             What We Offer
           </div>
-          <h2
-            className={`mb-4 ${
-              theme === "dark" ? "text-white" : "text-neutral-900"
-            }`}
-          >
+          <h2 className="mb-4 text-white">
             Your Gateway to Global Culture
           </h2>
-          <p
-            className={`max-w-2xl mx-auto ${
-              theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-            }`}
-          >
+          <p className="max-w-2xl mx-auto text-neutral-400">
             Immerse yourself in the world&rsquo;s rich cultural tapestry through
             our comprehensive platform
           </p>
@@ -312,63 +221,28 @@ function FeaturesSection() {
               whileHover={{ y: -8 }}
               className="group"
             >
-              <Link
-                href="/login"
-                className={`relative overflow-hidden rounded-3xl border transition-all block ${
-                  theme === "dark"
-                    ? "bg-neutral-900 border-neutral-800 hover:border-lime-400/30"
-                    : "bg-white border-neutral-200 hover:border-emerald-400/50 shadow-lg hover:shadow-xl"
-                }`}
-              >
+              <div className="relative overflow-hidden rounded-3xl border transition-all bg-neutral-900 border-neutral-800 hover:border-lime-400/30">
                 <div className="relative h-56 overflow-hidden">
                   <ImageWithFallback
                     src={feature.image}
                     alt={feature.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
-                  <div
-                    className={`absolute inset-0 ${
-                      theme === "dark"
-                        ? "bg-linear-to-t from-neutral-900 via-neutral-900/40 to-transparent"
-                        : "bg-linear-to-t from-white via-white/40 to-transparent"
-                    }`}
-                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-neutral-900 via-neutral-900/40 to-transparent" />
 
-                  <div
-                    className={`absolute top-4 right-4 w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-sm ${
-                      theme === "dark"
-                        ? "bg-lime-400/20 border border-lime-400/30"
-                        : "bg-white/90 border border-emerald-400/30"
-                    }`}
-                  >
-                    <feature.icon
-                      className={`w-6 h-6 ${
-                        theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                      }`}
-                    />
+                  <div className="absolute top-4 right-4 w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-sm bg-lime-400/20 border border-lime-400/30">
+                    <feature.icon className="w-6 h-6 text-lime-400" />
                   </div>
                 </div>
 
                 <div className="p-6">
-                  <h3
-                    className={`mb-3 ${
-                      theme === "dark" ? "text-white" : "text-neutral-900"
-                    }`}
-                  >
+                  <h3 className="mb-3 text-white">
                     {feature.title}
                   </h3>
-                  <p
-                    className={`mb-4 text-sm ${
-                      theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-                    }`}
-                  >
+                  <p className="mb-4 text-sm text-neutral-400">
                     {feature.description}
                   </p>
-                  <div
-                    className={`flex items-center gap-2 text-sm ${
-                      theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                    }`}
-                  >
+                  <div className="flex items-center gap-2 text-sm text-lime-400">
                     <span>Explore more</span>
                     <motion.span
                       animate={{ x: [0, 5, 0] }}
@@ -388,8 +262,6 @@ function FeaturesSection() {
 }
 
 function ExploreSection() {
-  const { theme } = useTheme();
-
   const regions = [
     {
       name: "Asia",
@@ -412,11 +284,7 @@ function ExploreSection() {
   ];
 
   return (
-    <section
-      className={`relative py-24 px-6 lg:px-12 ${
-        theme === "dark" ? "bg-neutral-900" : "bg-orange-50/50"
-      }`}
-    >
+    <section className="relative py-24 px-6 lg:px-12 bg-neutral-900">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -425,27 +293,13 @@ function ExploreSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div
-            className={`inline-block px-4 py-2 rounded-full mb-4 ${
-              theme === "dark"
-                ? "bg-lime-400/10 text-lime-400"
-                : "bg-emerald-100 text-emerald-700"
-            }`}
-          >
+          <div className="inline-block px-4 py-2 rounded-full mb-4 bg-lime-400/10 text-lime-400">
             Explore by Region
           </div>
-          <h2
-            className={`mb-4 ${
-              theme === "dark" ? "text-white" : "text-neutral-900"
-            }`}
-          >
+          <h2 className="mb-4 text-white">
             Discover Cultural Treasures
           </h2>
-          <p
-            className={`max-w-2xl mx-auto ${
-              theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-            }`}
-          >
+          <p className="max-w-2xl mx-auto text-neutral-400">
             Journey through diverse regions and uncover unique traditions,
             flavors, and stories
           </p>
@@ -462,41 +316,20 @@ function ExploreSection() {
               whileHover={{ y: -5 }}
               className="group cursor-pointer"
             >
-              <Link
-                href="/login"
-                className={`relative overflow-hidden rounded-2xl border ${
-                  theme === "dark"
-                    ? "bg-neutral-800 border-neutral-700 hover:border-lime-400/50"
-                    : "bg-white border-neutral-200 hover:border-emerald-400/50 shadow-md hover:shadow-xl"
-                } transition-all block`}
-              >
+              <div className="relative overflow-hidden rounded-2xl border bg-neutral-800 border-neutral-700 hover:border-lime-400/50 transition-all">
                 <div className="relative h-48 overflow-hidden">
                   <ImageWithFallback
                     src={region.image}
                     alt={region.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
-                  <div
-                    className={`absolute inset-0 ${
-                      theme === "dark"
-                        ? "bg-linear-to-t from-neutral-800 to-transparent"
-                        : "bg-linear-to-t from-white to-transparent"
-                    }`}
-                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-neutral-800 to-transparent" />
                 </div>
                 <div className="p-5">
-                  <h3
-                    className={`mb-2 ${
-                      theme === "dark" ? "text-white" : "text-neutral-900"
-                    }`}
-                  >
+                  <h3 className="mb-2 text-white">
                     {region.name}
                   </h3>
-                  <p
-                    className={`text-sm ${
-                      theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-                    }`}
-                  >
+                  <p className="text-sm text-neutral-400">
                     {region.traditions} traditions
                   </p>
                 </div>
@@ -505,13 +338,7 @@ function ExploreSection() {
           ))}
         </div>
 
-        <div
-          className={`rounded-3xl p-8 lg:p-12 ${
-            theme === "dark"
-              ? "bg-neutral-800/50 border border-neutral-700"
-              : "bg-linear-to-br from-emerald-50 to-orange-50 border border-emerald-200/50"
-          }`}
-        >
+        <div className="rounded-3xl p-8 lg:p-12 bg-neutral-800/50 border border-neutral-700">
           <div className="grid lg:grid-cols-3 gap-8">
             {[
               {
@@ -538,30 +365,14 @@ function ExploreSection() {
                 transition={{ delay: index * 0.1 }}
                 className="flex gap-4"
               >
-                <div
-                  className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-                    theme === "dark" ? "bg-lime-400" : "bg-emerald-600"
-                  }`}
-                >
-                  <item.icon
-                    className={`w-6 h-6 ${
-                      theme === "dark" ? "text-neutral-950" : "text-white"
-                    }`}
-                  />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-lime-400">
+                  <item.icon className="w-6 h-6 text-neutral-950" />
                 </div>
                 <div>
-                  <h3
-                    className={`mb-2 ${
-                      theme === "dark" ? "text-white" : "text-neutral-900"
-                    }`}
-                  >
+                  <h3 className="mb-2 text-white">
                     {item.title}
                   </h3>
-                  <p
-                    className={`text-sm ${
-                      theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-                    }`}
-                  >
+                  <p className="text-sm text-neutral-400">
                     {item.copy}
                   </p>
                 </div>
@@ -589,7 +400,6 @@ interface PlantItem {
 }
 
 function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
-  const { theme } = useTheme();
   const [viewportSize, setViewportSize] = useState<{
     width: number;
     height: number;
@@ -701,28 +511,14 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
   };
 
   return (
-    <section
-      className={`relative min-h-screen overflow-hidden ${
-        theme === "dark"
-          ? "bg-neutral-950"
-          : "bg-linear-to-b from-orange-50/30 to-white"
-      }`}
-    >
+    <section className="relative min-h-screen overflow-hidden bg-neutral-950">
       <div className="absolute inset-0">
         <ImageWithFallback
           src="https://images.unsplash.com/photo-1710596220294-3f88dfe02fd8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxncmVlbiUyMG5hdHVyZSUyMGdyb3d0aHxlbnwxfHx8fDE3NjI4ODczNTN8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
           alt="Nature background"
-          className={`w-full h-full object-cover ${
-            theme === "dark" ? "opacity-20" : "opacity-10"
-          }`}
+          className="w-full h-full object-cover opacity-20"
         />
-        <div
-          className={`absolute inset-0 ${
-            theme === "dark"
-              ? "bg-linear-to-b from-neutral-900 via-neutral-950/90 to-neutral-950"
-              : "bg-linear-to-b from-orange-50/50 via-white/90 to-white"
-          }`}
-        />
+        <div className="absolute inset-0 bg-linear-to-b from-neutral-900 via-neutral-950/90 to-neutral-950" />
       </div>
 
       <div className="relative z-20 flex flex-col items-center justify-center min-h-screen px-6 py-24">
@@ -733,37 +529,17 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
           transition={{ duration: 0.6 }}
           className="text-center mb-12 max-w-3xl"
         >
-          <div
-            className={`inline-block px-4 py-2 rounded-full mb-4 ${
-              theme === "dark"
-                ? "bg-lime-400/10 text-lime-400"
-                : "bg-emerald-100 text-emerald-700"
-            }`}
-          >
+          <div className="inline-block px-4 py-2 rounded-full mb-4 bg-lime-400/10 text-lime-400">
             Interactive Experience
           </div>
-          <h2
-            className={
-              theme === "dark" ? "text-white mb-4" : "text-neutral-900 mb-4"
-            }
-          >
+          <h2 className="text-white mb-4">
             A Living Garden of Cultures
           </h2>
-          <p
-            className={`mb-8 ${
-              theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-            }`}
-          >
+          <p className="mb-8 text-neutral-400">
             Move your cursor to interact with the living ecosystem of cultures.
             Each element represents a tradition swaying in the winds of time.
           </p>
-          <div
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm border text-sm ${
-              theme === "dark"
-                ? "bg-neutral-800/50 border-neutral-700 text-neutral-400"
-                : "bg-white/70 border-emerald-200 text-neutral-600"
-            }`}
-          >
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm border text-sm bg-neutral-800/50 border-neutral-700 text-neutral-400">
             Hover to reveal cultural connections
           </div>
         </motion.div>
@@ -797,13 +573,9 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
                         width: `${plant.width.toFixed(4)}px`,
                         height: `${plant.height.toFixed(4)}px`,
                         background:
-                          theme === "dark"
-                            ? `linear-gradient(to top, rgb(132, 204, 22, ${Number(
-                                (0.6 + strength * 0.4).toFixed(4)
-                              )}), transparent)`
-                            : `linear-gradient(to top, rgb(101, 163, 13, ${Number(
-                                (0.7 + strength * 0.3).toFixed(4)
-                              )}), transparent)`,
+                          `linear-gradient(to top, rgb(132, 204, 22, ${Number(
+                            (0.6 + strength * 0.4).toFixed(4)
+                          )}), transparent)`,
                       }}
                     />
                     {show && (
@@ -811,9 +583,7 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mb-2 px-3 py-1 backdrop-blur-sm border rounded-lg text-xs whitespace-nowrap pointer-events-auto ${
-                          theme === "dark"
-                            ? "bg-neutral-900/90 border-lime-400/30 text-lime-400"
-                            : "bg-white/90 border-lime-500/30 text-lime-700"
+                          "bg-neutral-900/90 border-lime-400/30 text-lime-400"
                         }`}
                       >
                         {plant.culture}
@@ -826,29 +596,17 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
                       className="w-3 h-3 rounded-full mb-1"
                       style={{
                         background:
-                          theme === "dark"
-                            ? `radial-gradient(circle, rgb(163, 230, 53, ${Number(
-                                (0.8 + strength * 0.2).toFixed(4)
-                              )}), rgb(132, 204, 22, ${Number(
-                                (0.6 + strength * 0.4).toFixed(4)
-                              )}))`
-                            : `radial-gradient(circle, rgb(132, 204, 22, ${Number(
-                                (0.8 + strength * 0.2).toFixed(4)
-                              )}), rgb(101, 163, 13, ${Number(
-                                (0.6 + strength * 0.4).toFixed(4)
-                              )}))`,
+                          `radial-gradient(circle, rgb(163, 230, 53, ${Number(
+                            (0.8 + strength * 0.2).toFixed(4)
+                          )}), rgb(132, 204, 22, ${Number(
+                            (0.6 + strength * 0.4).toFixed(4)
+                          )}))`,
                         boxShadow:
-                          theme === "dark"
-                            ? `0 0 ${Number(
-                                (10 + strength * 10).toFixed(4)
-                              )}px rgba(163, 230, 53, ${Number(
-                                (0.5 + strength * 0.5).toFixed(4)
-                              )})`
-                            : `0 0 ${Number(
-                                (10 + strength * 10).toFixed(4)
-                              )}px rgba(132, 204, 22, ${Number(
-                                (0.4 + strength * 0.4).toFixed(4)
-                              )})`,
+                          `0 0 ${Number(
+                            (10 + strength * 10).toFixed(4)
+                          )}px rgba(163, 230, 53, ${Number(
+                            (0.5 + strength * 0.5).toFixed(4)
+                          )})`,
                       }}
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{
@@ -863,13 +621,9 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
                         width: "2px",
                         height: `${plant.height}px`,
                         background:
-                          theme === "dark"
-                            ? `linear-gradient(to top, rgb(132, 204, 22, ${
-                                0.5 + strength * 0.3
-                              }), transparent)`
-                            : `linear-gradient(to top, rgb(101, 163, 13, ${
-                                0.6 + strength * 0.3
-                              }), transparent)`,
+                          `linear-gradient(to top, rgb(132, 204, 22, ${
+                            0.5 + strength * 0.3
+                          }), transparent)`,
                       }}
                     />
                     {show && (
@@ -877,9 +631,7 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full mb-2 px-3 py-1 backdrop-blur-sm border rounded-lg text-xs whitespace-nowrap pointer-events-auto ${
-                          theme === "dark"
-                            ? "bg-neutral-900/90 border-lime-400/30 text-lime-400"
-                            : "bg-white/90 border-lime-500/30 text-lime-700"
+                          "bg-neutral-900/90 border-lime-400/30 text-lime-400"
                         }`}
                       >
                         {plant.culture}
@@ -900,25 +652,17 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
           className="relative z-20 mt-auto"
         >
           <div className="flex flex-col sm:flex-row gap-4 items-center">
-            <Link
-              href="/login"
-              aria-label="Login to join community"
-              className={`px-8 py-4 rounded-full transition-colors inline-flex items-center justify-center ${
-                theme === "dark"
-                  ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
-                  : "bg-lime-600 text-white hover:bg-lime-700"
-              }`}
+            <motion.button
+              className="px-8 py-4 rounded-full bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               Join Community
-            </Link>
-            <Link
-              href="/app/contact"
-              aria-label="Learn more about Roots - contact"
-              className={`px-8 py-4 rounded-full backdrop-blur-sm border transition-colors inline-flex items-center justify-center ${
-                theme === "dark"
-                  ? "bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50"
-                  : "bg-white/50 text-neutral-900 border-neutral-300 hover:bg-neutral-100/50"
-              }`}
+            </motion.button>
+            <motion.button
+              className="px-8 py-4 rounded-full backdrop-blur-sm border bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               Learn More
             </Link>
@@ -926,34 +670,16 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
         </motion.div>
       </div>
 
-      <div
-        className={`absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t pointer-events-none z-30 ${
-          theme === "dark"
-            ? "from-neutral-950 to-transparent"
-            : "from-white to-transparent"
-        }`}
-      />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t pointer-events-none z-30 from-neutral-950 to-transparent" />
     </section>
   );
 }
 
 function CTASection() {
-  const { theme } = useTheme();
-
   return (
-    <section
-      className={`relative py-24 px-6 lg:px-12 overflow-hidden ${
-        theme === "dark" ? "bg-neutral-950" : "bg-white"
-      }`}
-    >
+    <section className="relative py-24 px-6 lg:px-12 overflow-hidden bg-neutral-950">
       <div className="max-w-7xl mx-auto">
-        <div
-          className={`relative rounded-3xl overflow-hidden ${
-            theme === "dark"
-              ? "bg-linear-to-br from-neutral-900 to-neutral-800 border border-neutral-700"
-              : "bg-linear-to-br from-emerald-600 to-orange-500"
-          }`}
-        >
+        <div className="relative rounded-3xl overflow-hidden bg-linear-to-br from-neutral-900 to-neutral-800 border border-neutral-700">
           <div className="absolute top-0 right-0 w-96 h-96 bg-linear-to-br from-lime-400/20 to-transparent rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-linear-to-tr from-orange-400/20 to-transparent rounded-full blur-3xl" />
 
@@ -965,18 +691,10 @@ function CTASection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
               >
-                <h2
-                  className={`mb-4 ${
-                    theme === "dark" ? "text-white" : "text-white"
-                  }`}
-                >
+                <h2 className="mb-4 text-white">
                   Start Your Cultural Journey Today
                 </h2>
-                <p
-                  className={`mb-8 text-lg ${
-                    theme === "dark" ? "text-neutral-300" : "text-white/90"
-                  }`}
-                >
+                <p className="mb-8 text-lg text-neutral-300">
                   Join thousands of curious minds exploring the world&rsquo;s
                   rich tapestry of traditions, cuisine, and heritage. Sign up
                   for free and begin your adventure.
@@ -984,37 +702,17 @@ function CTASection() {
 
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
-                    <div
-                      className={`flex items-center gap-3 px-5 py-4 rounded-full backdrop-blur-sm border ${
-                        theme === "dark"
-                          ? "bg-neutral-800/50 border-neutral-600"
-                          : "bg-white/20 border-white/30"
-                      }`}
-                    >
-                      <Mail
-                        className={`w-5 h-5 ${
-                          theme === "dark"
-                            ? "text-neutral-400"
-                            : "text-white/70"
-                        }`}
-                      />
+                    <div className="flex items-center gap-3 px-5 py-4 rounded-full backdrop-blur-sm border bg-neutral-800/50 border-neutral-600">
+                      <Mail className="w-5 h-5 text-neutral-400" />
                       <input
                         type="email"
                         placeholder="Enter your email"
-                        className={`flex-1 bg-transparent outline-none placeholder:${
-                          theme === "dark"
-                            ? "text-neutral-500"
-                            : "text-white/60"
-                        } ${theme === "dark" ? "text-white" : "text-white"}`}
+                        className="flex-1 bg-transparent outline-none placeholder:text-neutral-500 text-white"
                       />
                     </div>
                   </div>
                   <motion.button
-                    className={`px-8 py-4 rounded-full flex items-center justify-center gap-2 transition-colors ${
-                      theme === "dark"
-                        ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
-                        : "bg-white text-emerald-600 hover:bg-neutral-100"
-                    }`}
+                    className="px-8 py-4 rounded-full flex items-center justify-center gap-2 bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -1039,24 +737,12 @@ function CTASection() {
                 ].map((stat) => (
                   <div
                     key={stat.label}
-                    className={`p-6 rounded-2xl backdrop-blur-sm border ${
-                      theme === "dark"
-                        ? "bg-neutral-800/50 border-neutral-700"
-                        : "bg-white/20 border-white/30"
-                    }`}
+                    className="p-6 rounded-2xl backdrop-blur-sm border bg-neutral-800/50 border-neutral-700"
                   >
-                    <div
-                      className={`mb-2 ${
-                        theme === "dark" ? "text-lime-400" : "text-white"
-                      }`}
-                    >
+                    <div className="mb-2 text-lime-400">
                       {stat.value}
                     </div>
-                    <div
-                      className={`text-sm ${
-                        theme === "dark" ? "text-neutral-300" : "text-white/90"
-                      }`}
-                    >
+                    <div className="text-sm text-neutral-300">
                       {stat.label}
                     </div>
                   </div>
@@ -1070,11 +756,7 @@ function CTASection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className={`mt-16 pt-8 border-t text-center ${
-            theme === "dark"
-              ? "border-neutral-800 text-neutral-400"
-              : "border-neutral-200 text-neutral-600"
-          }`}
+          className="mt-16 pt-8 border-t text-center border-neutral-800 text-neutral-400"
         >
           <div className="flex flex-wrap justify-center gap-8 mb-6">
             {["About", "Features", "Community", "Cookies", "Terms"].map(
@@ -1082,11 +764,7 @@ function CTASection() {
                 <a
                   key={link}
                   href="/Cookies.html"
-                  className={`text-sm transition-colors ${
-                    theme === "dark"
-                      ? "hover:text-lime-400"
-                      : "hover:text-emerald-600"
-                  }`}
+                  className="text-sm transition-colors hover:text-lime-400"
                 >
                   {link}
                 </a>
@@ -1117,7 +795,6 @@ function ImageWithFallback({
   width,
   height,
 }: ImageWithFallbackProps) {
-  // If width/height not provided, use fill layout
   if (!width || !height) {
     return <Image src={src} alt={alt} fill className={className} />;
   }
@@ -1158,21 +835,18 @@ export default function App() {
 
   useEffect(() => {
     // Ensure InteractiveGarden only renders on the client after hydration
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // This is intentional to avoid SSR/hydration mismatches with dynamic content
     setMounted(true);
   }, []);
 
   return (
-    // <ThemeProvider>
     <div className="relative">
       <Navbar scrollY={scrollY} />
-      <ThemeToggle />
       <HeroSection scrollY={scrollY} />
       <FeaturesSection />
       <ExploreSection />
       {mounted && <InteractiveGarden mousePosition={mousePosition} />}
       <CTASection />
     </div>
-    // </ThemeProvider>
   );
 }

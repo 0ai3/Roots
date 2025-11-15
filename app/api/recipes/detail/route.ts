@@ -5,6 +5,9 @@ import {
   requestRecipeDetail,
 } from "@/app/lib/recipeDetailPlanner";
 
+const apiKey = process.env.GOOGLE_API_KEY;
+const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`;
+
 export async function POST(request: NextRequest) {
   try {
     const raw = await request.json();

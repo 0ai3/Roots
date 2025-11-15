@@ -1,27 +1,19 @@
 @import "tailwindcss";
 
+/* Force dark mode globally */
+:root {
+  color-scheme: dark;
+}
+
 .profile-light * {
-	color: #1f2937 !important; 
+	color: #ffffff !important; 
 }
 .profile-light input,
 .profile-light textarea,
 .profile-light select,
 .profile-light button {
-	color: #1f2937 !important;
-}
-.profile-light ::placeholder {
-	color: #6b7280 !important; 
-}
-
-.dark .profile-light * {
-	color: #ffffff !important; 
-}
-.dark .profile-light input,
-.dark .profile-light textarea,
-.dark .profile-light select,
-.dark .profile-light button {
 	color: #ffffff !important;
 }
-.dark .profile-light ::placeholder {
+.profile-light ::placeholder {
 	color: #ffffff !important; 
 }

@@ -123,8 +123,8 @@ IMPORTANT REQUIREMENTS:
 
 
   try {
-    // Use the correct Gemini API v1 endpoint
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    // Use stable Gemini 1.5 Flash model
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
     
     console.log("Calling Gemini API...");
     

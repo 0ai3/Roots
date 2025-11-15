@@ -90,14 +90,12 @@ function MessageBubble({
   onLogAttraction,
   visitedAttractions,
   t,
-  isDarkMode,
   savingAttractionId,
 }: {
   message: ChatMessage;
   onLogAttraction: (attraction: Attraction) => void | Promise<void>;
   visitedAttractions: VisitedMap;
   t: Translator;
-  isDarkMode: boolean;
   savingAttractionId?: string | null;
 }) {
   if (message.role === "assistant") {
@@ -109,7 +107,6 @@ function MessageBubble({
             onLogAttraction={onLogAttraction}
             visitedAttractions={visitedAttractions}
             t={t}
-            isDarkMode={isDarkMode}
             savingAttractionId={savingAttractionId}
           />
         );
@@ -127,18 +124,14 @@ function MessageBubble({
       <div
         className={`max-w-2xl rounded-2xl border px-5 py-4 backdrop-blur-sm shadow-lg ${
           message.role === "user"
-            ? "border-lime-400/30 bg-lime-400/10 text-lime-800 dark:text-lime-50"
-            : isDarkMode 
-              ? "border-white/10 bg-white/5 text-white/90"
-              : "border-slate-200 bg-slate-50 text-slate-900"
+            ? "border-lime-400/30 bg-lime-400/10 text-lime-50"
+            : "border-white/10 bg-white/5 text-white/90"
         }`}
       >
         <p className={`mb-2 text-xs uppercase tracking-wide ${
           message.role === "user" 
-            ? "text-lime-700 dark:text-lime-300" 
-            : isDarkMode 
-              ? "text-white/60" 
-              : "text-slate-600"
+            ? "text-lime-300" 
+            : "text-white/60"
         }`}>
           {message.role === "user" ? t("planner.roles.you") : t("planner.roles.guide")}
         </p>
@@ -153,14 +146,12 @@ function AssistantCard({
   onLogAttraction,
   visitedAttractions,
   t,
-  isDarkMode,
   savingAttractionId,
 }: {
   payload: AssistantPayload;
   onLogAttraction: (attraction: Attraction) => void | Promise<void>;
   visitedAttractions: VisitedMap;
   t: Translator;
-  isDarkMode: boolean;
   savingAttractionId?: string | null;
 }) {
   const tips = payload.tips?.filter(Boolean) ?? [];
@@ -170,16 +161,10 @@ function AssistantCard({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`rounded-2xl border p-6 backdrop-blur-sm shadow-xl ${
-        isDarkMode 
-          ? "border-lime-400/20 bg-black/50" 
-          : "border-lime-400/30 bg-slate-50"
-      }`}
+      className="rounded-2xl border p-6 backdrop-blur-sm shadow-xl border-lime-400/20 bg-black/50"
     >
       {payload.intro && (
-        <p className={`text-base leading-relaxed ${
-          isDarkMode ? "text-white/90" : "text-slate-900"
-        }`}>
+        <p className="text-base leading-relaxed text-white/90">
           {payload.intro}
         </p>
       )}
@@ -188,9 +173,7 @@ function AssistantCard({
         <div className="mt-6">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-2 h-2 rounded-full bg-lime-400" />
-            <p className={`text-xs uppercase tracking-wide ${
-              isDarkMode ? "text-white/60" : "text-slate-600"
-            }`}>
+            <p className="text-xs uppercase tracking-wide text-white/60">
               {t("planner.common.quickTips")}
             </p>
           </div>
@@ -199,11 +182,7 @@ function AssistantCard({
               <motion.span
                 key={tip}
                 whileHover={{ scale: 1.05 }}
-                className={`rounded-xl border px-3 py-2 text-sm ${
-                  isDarkMode 
-                    ? "border-white/10 bg-white/5 text-white/80" 
-                    : "border-slate-200 bg-white text-slate-700"
-                }`}
+                className="rounded-xl border px-3 py-2 text-sm border-white/10 bg-white/5 text-white/80"
               >
                 {tip}
               </motion.span>
@@ -216,9 +195,7 @@ function AssistantCard({
         <div className="mt-8 space-y-4">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-lime-400" />
-            <p className={`text-xs uppercase tracking-wide ${
-              isDarkMode ? "text-white/60" : "text-slate-600"
-            }`}>
+            <p className="text-xs uppercase tracking-wide text-white/60">
               {t("planner.attractions.recommendedTitle")}
             </p>
           </div>
@@ -228,27 +205,17 @@ function AssistantCard({
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
-              className={`rounded-2xl border p-5 backdrop-blur-sm ${
-                isDarkMode 
-                  ? "border-white/10 bg-white/5" 
-                  : "border-slate-200 bg-white"
-              }`}
+              className="rounded-2xl border p-5 backdrop-blur-sm border-white/10 bg-white/5"
             >
               <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
                 <div>
-                  <h3 className={`text-lg font-semibold ${
-                    isDarkMode ? "text-white" : "text-slate-900"
-                  }`}>
+                  <h3 className="text-lg font-semibold text-white">
                     {item.title}
                   </h3>
                   {item.neighborhood && (
                     <div className="flex items-center gap-1 mt-1">
-                      <MapPin className={`w-3 h-3 ${
-                        isDarkMode ? "text-white/40" : "text-slate-400"
-                      }`} />
-                      <p className={`text-xs ${
-                        isDarkMode ? "text-white/40" : "text-slate-500"
-                      }`}>
+                      <MapPin className="w-3 h-3 text-white/40" />
+                      <p className="text-xs text-white/40">
                         {item.neighborhood}
                       </p>
                     </div>
@@ -257,11 +224,7 @@ function AssistantCard({
                 {item.cost && (
                   <div className="flex items-center gap-1">
                     <DollarSign className="w-3 h-3 text-lime-500" />
-                    <span className={`rounded-full border px-3 py-1 text-xs ${
-                      isDarkMode 
-                        ? "border-lime-400/30 bg-lime-400/10 text-lime-300"
-                        : "border-lime-500/30 bg-lime-500/10 text-lime-700"
-                    }`}>
+                    <span className="rounded-full border px-3 py-1 text-xs border-lime-400/30 bg-lime-400/10 text-lime-300">
                       {item.cost}
                     </span>
                   </div>
@@ -269,9 +232,7 @@ function AssistantCard({
               </div>
 
               {item.description && (
-                <p className={`text-sm leading-relaxed mb-3 ${
-                  isDarkMode ? "text-white/80" : "text-slate-700"
-                }`}>
+                <p className="text-sm leading-relaxed mb-3 text-white/80">
                   {item.description}
                 </p>
               )}
@@ -282,7 +243,7 @@ function AssistantCard({
                   target="_blank"
                   rel="noreferrer"
                   whileHover={{ scale: 1.05 }}
-                  className="inline-flex items-center gap-2 text-sm font-medium text-lime-500 hover:text-lime-600 dark:text-lime-400 dark:hover:text-lime-300 transition-colors"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-lime-400 hover:text-lime-300 transition-colors"
                 >
                   <Compass className="w-4 h-4" />
                   {t("worldExplorer.attractions.openInMaps")}
@@ -290,12 +251,10 @@ function AssistantCard({
               )}
 
               {Array.isArray(item.notes) && item.notes.length > 0 && (
-                <ul className={`mt-4 space-y-2 text-sm ${
-                  isDarkMode ? "text-white/70" : "text-slate-600"
-                }`}>
+                <ul className="mt-4 space-y-2 text-sm text-white/70">
                   {item.notes.map((note) => (
                     <li key={note} className="flex gap-2">
-                      <span className="text-lime-500 dark:text-lime-400">•</span>
+                      <span className="text-lime-400">•</span>
                       <span>{note}</span>
                     </li>
                   ))}
@@ -313,12 +272,8 @@ function AssistantCard({
                 whileTap={{ scale: 0.95 }}
                 className={`mt-4 rounded-xl px-4 py-2 text-xs font-semibold uppercase tracking-wide transition-all flex items-center gap-2 ${
                   visitedAttractions[item.title]
-                    ? isDarkMode
-                      ? "border border-lime-400/40 text-lime-300 bg-lime-400/10"
-                      : "border border-lime-500/40 text-lime-700 bg-lime-500/10"
-                    : isDarkMode
-                    ? "border border-white/20 text-white/90 hover:border-lime-400 hover:text-lime-300 hover:bg-lime-400/10"
-                    : "border border-slate-300 text-slate-700 hover:border-lime-500 hover:text-lime-700 hover:bg-lime-500/10"
+                    ? "border border-lime-400/40 text-lime-300 bg-lime-400/10"
+                    : "border border-white/20 text-white/90 hover:border-lime-400 hover:text-lime-300 hover:bg-lime-400/10"
                 }`}
               >
                 <Heart className="w-3 h-3" />
@@ -334,9 +289,7 @@ function AssistantCard({
       )}
 
       {payload.closing && (
-        <p className={`mt-6 text-sm leading-relaxed ${
-          isDarkMode ? "text-white/70" : "text-slate-600"
-        }`}>
+        <p className="mt-6 text-sm leading-relaxed text-white/70">
           {payload.closing}
         </p>
       )}
@@ -349,85 +302,12 @@ function createMessageId() {
 }
 
 export default function AttractionPlanner({ initialPoints, initialUserId }: Props = {}) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  // Theme management
-  useEffect(() => {
-    const updateTheme = () => {
-      try {
-        const saved = localStorage.getItem("theme");
-        if (saved) {
-          const dark = saved === "dark";
-          setIsDarkMode(dark);
-          if (dark) {
-            document.documentElement.classList.add("dark");
-          } else {
-            document.documentElement.classList.remove("dark");
-          }
-        } else {
-          const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          setIsDarkMode(systemDark);
-          if (systemDark) {
-            document.documentElement.classList.add("dark");
-          }
-        }
-      } catch {
-        // ignore
-      }
-    };
-
-    updateTheme();
-
-    const handleThemeChange = (event: CustomEvent) => {
-      setIsDarkMode(event.detail.isDark);
-    };
-
-    window.addEventListener('theme-change', handleThemeChange as EventListener);
-    
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem("theme")) {
-        setIsDarkMode(e.matches);
-        if (e.matches) {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-        }
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
-
-    return () => {
-      window.removeEventListener('theme-change', handleThemeChange as EventListener);
-      mediaQuery.removeEventListener('change', handleSystemThemeChange);
-    };
-  }, []);
-
-  // Color utility functions
-  const getBgColor = () => {
-    return isDarkMode ? "bg-black" : "bg-white";
-  };
-
-  const getTextColor = () => {
-    return isDarkMode ? "text-white" : "text-slate-900";
-  };
-
-  const getMutedTextColor = () => {
-    return isDarkMode ? "text-white/70" : "text-slate-600";
-  };
-
-  const getBorderColor = () => {
-    return isDarkMode ? "border-white/10" : "border-slate-200";
-  };
-
-  const getCardBg = () => {
-    return isDarkMode ? "bg-white/5" : "bg-slate-50";
-  };
-
-  const getInputBg = () => {
-    return isDarkMode ? "bg-white/5" : "bg-white";
-  };
+  // Dark mode only colors
+  const getTextColor = () => "text-white";
+  const getMutedTextColor = () => "text-white/70";
+  const getBorderColor = () => "border-white/10";
+  const getCardBg = () => "bg-white/5";
+  const getInputBg = () => "bg-black/40";
 
   const { t } = useI18n();
   const samplePrompts = useMemo(
@@ -605,10 +485,8 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
   };
 
   return (
-    <section className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}>
+    <section className="min-h-screen bg-black text-white transition-colors duration-300">
       <div className="space-y-6 p-6">
-        {/* REMOVED THEME TOGGLE BUTTON - Using existing one from DashboardPageLayout */}
-
         {/* Points Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -758,11 +636,7 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
                   type="button"
                   onClick={() => setInput(prompt)}
                   whileHover={{ scale: 1.05 }}
-                  className={`rounded-xl border px-4 py-2 text-sm transition-all hover:border-lime-400 ${
-                    isDarkMode
-                      ? "border-white/20 bg-white/5 text-white/70 hover:text-white"
-                      : "border-slate-300 bg-white text-slate-700 hover:text-slate-900"
-                  }`}
+                  className="rounded-xl border px-4 py-2 text-sm transition-all border-white/20 bg-white/5 text-white/70 hover:text-white hover:border-lime-400"
                 >
                   {prompt}
                 </motion.button>
@@ -790,10 +664,8 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
           animate={{ opacity: 1, y: 0 }}
           className={`rounded-2xl border p-6 backdrop-blur-sm ${getBorderColor()} ${
             showSetupForm
-              ? isDarkMode ? "bg-black/50" : "bg-slate-100"
-              : isDarkMode 
-                ? "bg-linear-to-br from-black/50 to-lime-500/10" 
-                : "bg-linear-to-br from-slate-50 to-lime-100/30"
+              ? "bg-black/50"
+              : "bg-linear-to-br from-black/50 to-lime-500/10"
           }`}
         >
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -814,29 +686,17 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
             </div>
             {hasAssistantReply && (
               <div className="flex flex-wrap items-center gap-3">
-                <span className={`rounded-xl border px-3 py-1 text-xs ${
-                  isDarkMode 
-                    ? "border-white/20 bg-white/5 text-white/60" 
-                    : "border-slate-200 bg-slate-100 text-slate-600"
-                }`}>
+                <span className="rounded-xl border px-3 py-1 text-xs border-white/20 bg-white/5 text-white/60">
                   {location || t("planner.attractions.locationChip")}
                 </span>
-                <span className={`rounded-xl border px-3 py-1 text-xs ${
-                  isDarkMode 
-                    ? "border-white/20 bg-white/5 text-white/60" 
-                    : "border-slate-200 bg-slate-100 text-slate-600"
-                }`}>
+                <span className="rounded-xl border px-3 py-1 text-xs border-white/20 bg-white/5 text-white/60">
                   {budget || t("planner.attractions.budgetChip")}
                 </span>
                 <motion.button
                   type="button"
                   onClick={handleReset}
                   whileHover={{ scale: 1.05 }}
-                  className={`flex items-center gap-2 rounded-xl border px-3 py-1 text-xs transition-all hover:border-rose-400 ${
-                    isDarkMode
-                      ? "border-white/20 bg-white/5 text-white/60 hover:text-white"
-                      : "border-slate-200 bg-slate-100 text-slate-600 hover:text-slate-900"
-                  }`}
+                  className="flex items-center gap-2 rounded-xl border px-3 py-1 text-xs transition-all hover:border-rose-400 border-white/20 bg-white/5 text-white/60 hover:text-white"
                 >
                   <RotateCcw className="w-3 h-3" />
                   {t("planner.attractions.reset")}
@@ -860,7 +720,6 @@ export default function AttractionPlanner({ initialPoints, initialUserId }: Prop
                   onLogAttraction={handleLogAttraction}
                   visitedAttractions={visitedAttractions}
                   t={t}
-                  isDarkMode={isDarkMode}
                   savingAttractionId={savingAttractionId}
                 />
               ))}

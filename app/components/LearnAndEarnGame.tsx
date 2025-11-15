@@ -37,72 +37,13 @@ export default function LearnAndEarnGame({
   initialPoints,
   initialUserId,
 }: Props) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  // Theme management
-  useEffect(() => {
-    const updateTheme = () => {
-      try {
-        const saved = localStorage.getItem("theme");
-        if (saved) {
-          const dark = saved === "dark";
-          setIsDarkMode(dark);
-        } else {
-          const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          setIsDarkMode(systemDark);
-        }
-      } catch (_e) {
-        // ignore
-      }
-    };
-
-    updateTheme();
-
-    const handleThemeChange = (event: CustomEvent) => {
-      setIsDarkMode(event.detail.isDark);
-    };
-
-    window.addEventListener('theme-change', handleThemeChange as EventListener);
-    
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem("theme")) {
-        setIsDarkMode(e.matches);
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
-
-    return () => {
-      window.removeEventListener('theme-change', handleThemeChange as EventListener);
-      mediaQuery.removeEventListener('change', handleSystemThemeChange);
-    };
-  }, []);
-
-  // Color utility functions
-  const getBgColor = () => {
-    return isDarkMode ? "bg-black" : "bg-white";
-  };
-
-  const getTextColor = () => {
-    return isDarkMode ? "text-white" : "text-slate-900";
-  };
-
-  const getMutedTextColor = () => {
-    return isDarkMode ? "text-white/70" : "text-slate-600";
-  };
-
-  const getBorderColor = () => {
-    return isDarkMode ? "border-white/10" : "border-slate-200";
-  };
-
-  const getCardBg = () => {
-    return isDarkMode ? "bg-white/5" : "bg-slate-50";
-  };
-
-  const getInputBg = () => {
-    return isDarkMode ? "bg-black/40" : "bg-white";
-  };
+  // Color utility functions - dark mode only
+  const getBgColor = () => "bg-black";
+  const getTextColor = () => "text-white";
+  const getMutedTextColor = () => "text-white/70";
+  const getBorderColor = () => "border-white/10";
+  const getCardBg = () => "bg-white/5";
+  const getInputBg = () => "bg-black/40";
 
   const { addPoints } = useExperiencePoints({ initialPoints, initialUserId });
   const [countryInput, setCountryInput] = useState("");
@@ -277,11 +218,7 @@ export default function LearnAndEarnGame({
               </h2>
             </div>
             {lastAward !== null && (
-              <div className={`rounded-full border px-4 py-2 text-sm ${
-                isDarkMode 
-                  ? "border-emerald-300/50 bg-emerald-300/10 text-emerald-100" 
-                  : "border-emerald-500/50 bg-emerald-500/10 text-emerald-700"
-              }`}>
+              <div className="rounded-full border px-4 py-2 text-sm border-emerald-300/50 bg-emerald-300/10 text-emerald-100">
                 +{lastAward} experience points awarded
               </div>
             )}
@@ -296,12 +233,12 @@ export default function LearnAndEarnGame({
               value={countryInput}
               onChange={(event) => setCountryInput(event.target.value)}
               placeholder="e.g., Peru, Thailand, Brazil"
-              className={`flex-1 rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-amber-500 dark:focus:border-amber-300 focus:outline-none ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+              className={`flex-1 rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-amber-300 focus:outline-none ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
             />
             <button
               type="submit"
               disabled={isGenerating}
-              className="inline-flex items-center justify-center rounded-2xl bg-amber-500 dark:bg-amber-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-amber-600 dark:hover:bg-amber-300 disabled:cursor-not-allowed"
+              className="inline-flex items-center justify-center rounded-2xl bg-amber-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed"
             >
               {isGenerating ? (
                 <>
@@ -323,9 +260,7 @@ export default function LearnAndEarnGame({
                   setCountryInput(suggestion);
                   setGenerateError(null);
                 }}
-                className={`rounded-full border px-3 py-1 transition hover:border-amber-500 dark:hover:border-amber-300 hover:text-amber-600 dark:hover:text-amber-200 ${
-                  isDarkMode ? "border-white/15 text-white/70" : "border-slate-400 text-slate-600"
-                }`}
+                className="rounded-full border px-3 py-1 transition hover:border-amber-300 hover:text-amber-200 border-white/15 text-white/70"
               >
                 {suggestion}
               </button>
@@ -333,11 +268,7 @@ export default function LearnAndEarnGame({
           </div>
 
           {generateError && (
-            <p className={`mt-4 rounded-2xl border px-4 py-3 text-sm ${
-              isDarkMode 
-                ? "border-rose-400/40 bg-rose-400/10 text-rose-100" 
-                : "border-rose-400/40 bg-rose-400/10 text-rose-700"
-            }`}>
+            <p className="mt-4 rounded-2xl border px-4 py-3 text-sm border-rose-400/40 bg-rose-400/10 text-rose-100">
               {generateError}
             </p>
           )}
@@ -358,7 +289,7 @@ export default function LearnAndEarnGame({
 
           {isGenerating && (
             <div className={`flex items-center gap-3 text-sm ${getMutedTextColor()}`}>
-              <Loader2 className="h-5 w-5 animate-spin text-amber-500 dark:text-amber-300" />
+              <Loader2 className="h-5 w-5 animate-spin text-amber-300" />
               Crafting your learn & earn module...
             </div>
           )}
@@ -372,13 +303,9 @@ export default function LearnAndEarnGame({
                 <h3 className="text-2xl font-semibold">{moduleData.summary}</h3>
               </header>
 
-              <div className={`space-y-4 rounded-2xl border p-5 ${getBorderColor()} ${
-                isDarkMode ? "bg-slate-950/40" : "bg-slate-100"
-              }`}>
+              <div className="space-y-4 rounded-2xl border p-5 border-white/10 bg-slate-950/40">
                 {moduleData.reading.map((paragraph, index) => (
-                  <p key={index} className={`text-sm leading-relaxed ${
-                    isDarkMode ? "text-white/80" : "text-slate-700"
-                  }`}>
+                  <p key={index} className="text-sm leading-relaxed text-white/80">
                     {paragraph}
                   </p>
                 ))}
@@ -388,16 +315,14 @@ export default function LearnAndEarnGame({
                 <button
                   type="button"
                   onClick={handleStartQuiz}
-                  className="rounded-full bg-amber-500 dark:bg-amber-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-amber-600 dark:hover:bg-amber-300"
+                  className="rounded-full bg-amber-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-amber-300"
                 >
                   Start 10-question quiz for {currentCountry}
                 </button>
               )}
 
               {isQuizActive && currentQuestionData && (
-                <div className={`space-y-4 rounded-2xl border p-5 ${getBorderColor()} ${
-                  isDarkMode ? "bg-slate-950/40" : "bg-slate-100"
-                }`}>
+                <div className="space-y-4 rounded-2xl border p-5 border-white/10 bg-slate-950/40">
                   <div className={`flex items-center justify-between text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
                     <span>
                       Question {currentQuestion + 1} of {quizLength}
@@ -418,20 +343,12 @@ export default function LearnAndEarnGame({
                           disabled={showFeedback}
                           className={`w-full rounded-2xl border px-4 py-3 text-left text-sm transition ${
                             state === "correct"
-                              ? isDarkMode
-                                ? "border-emerald-300/70 bg-emerald-400/10 text-emerald-100"
-                                : "border-emerald-500/70 bg-emerald-500/10 text-emerald-700"
+                              ? "border-emerald-300/70 bg-emerald-400/10 text-emerald-100"
                               : state === "incorrect"
-                              ? isDarkMode
-                                ? "border-rose-300/70 bg-rose-400/10 text-rose-100"
-                                : "border-rose-500/70 bg-rose-500/10 text-rose-700"
+                              ? "border-rose-300/70 bg-rose-400/10 text-rose-100"
                               : state === "disabled"
-                              ? isDarkMode
-                                ? "border-white/5 bg-transparent text-white/40"
-                                : "border-slate-300 bg-transparent text-slate-400"
-                              : isDarkMode
-                              ? "border-white/15 bg-transparent hover:border-amber-200 hover:text-amber-100"
-                              : "border-slate-300 bg-transparent hover:border-amber-400 hover:text-amber-600"
+                              ? "border-white/5 bg-transparent text-white/40"
+                              : "border-white/15 bg-transparent hover:border-amber-200 hover:text-amber-100"
                           }`}
                         >
                           {option}
@@ -441,11 +358,7 @@ export default function LearnAndEarnGame({
                   </div>
 
                   {showFeedback && (
-                    <div className={`rounded-2xl border p-4 text-sm ${
-                      isDarkMode 
-                        ? "border-white/15 bg-white/5 text-white/80" 
-                        : "border-slate-200 bg-slate-100 text-slate-700"
-                    }`}>
+                    <div className="rounded-2xl border p-4 text-sm border-white/15 bg-white/5 text-white/80">
                       <p className="font-semibold">
                         {lastAnswerCorrect ? "Great memory!" : "Take another look"}
                       </p>
@@ -453,7 +366,7 @@ export default function LearnAndEarnGame({
                       <button
                         type="button"
                         onClick={handleNextQuestion}
-                        className="mt-4 rounded-full bg-amber-500 dark:bg-amber-400 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-950 transition hover:bg-amber-600 dark:hover:bg-amber-300"
+                        className="mt-4 rounded-full bg-amber-400 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-950 transition hover:bg-amber-300"
                       >
                         {currentQuestion + 1 === quizLength
                           ? "View results"
@@ -465,9 +378,7 @@ export default function LearnAndEarnGame({
               )}
 
               {isComplete && moduleData && (
-                <div className={`space-y-4 rounded-2xl border p-5 ${getBorderColor()} ${
-                  isDarkMode ? "bg-slate-950/40" : "bg-slate-100"
-                }`}>
+                <div className="space-y-4 rounded-2xl border p-5 border-white/10 bg-slate-950/40">
                   <header>
                     <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
                       Quiz complete
@@ -483,18 +394,14 @@ export default function LearnAndEarnGame({
                     <button
                       type="button"
                       onClick={handleStartQuiz}
-                      className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition hover:border-amber-500 dark:hover:border-amber-200 hover:text-amber-600 dark:hover:text-amber-100 ${
-                        isDarkMode ? "border-white/15 text-white" : "border-slate-400 text-slate-700"
-                      }`}
+                      className="rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition hover:border-amber-200 hover:text-amber-100 border-white/15 text-white"
                     >
                       Retake this quiz
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsComplete(false)}
-                      className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition hover:border-amber-500 dark:hover:border-amber-200 hover:text-amber-600 dark:hover:text-amber-100 ${
-                        isDarkMode ? "border-white/15 text-white" : "border-slate-400 text-slate-700"
-                      }`}
+                      className="rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition hover:border-amber-200 hover:text-amber-100 border-white/15 text-white"
                     >
                       Review the story
                     </button>

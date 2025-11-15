@@ -18,12 +18,9 @@ import {
   TrendingUp,
 } from "lucide-react";
 import DashboardPageLayout from "../../components/DashboardPageLayout";
-import PageThemeToggle from "../../components/PageThemeToggle";
 import LearnAndEarnGame from "../../components/LearnAndEarnGame";
-import { useTheme } from "../../components/ThemeProvider";
 
 export default function GamesPage() {
-  const { theme } = useTheme();
   const [showGame, setShowGame] = useState(false);
 
   if (showGame) {
@@ -32,15 +29,10 @@ export default function GamesPage() {
         <div className="flex justify-between items-center mb-6">
           <button
             onClick={() => setShowGame(false)}
-            className={`px-6 py-3 rounded-xl font-semibold transition-colors ${
-              theme === "dark"
-                ? "bg-neutral-800 text-white hover:bg-neutral-700"
-                : "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
-            }`}
+            className="px-6 py-3 rounded-xl font-semibold bg-neutral-800 text-white hover:bg-neutral-700 transition-colors"
           >
             ← Back to Games
           </button>
-          <PageThemeToggle />
         </div>
         <LearnAndEarnGame initialPoints={0} initialUserId={null} />
       </DashboardPageLayout>
@@ -50,11 +42,6 @@ export default function GamesPage() {
   return (
     <DashboardPageLayout>
       <div className="relative min-h-screen">
-        {/* Page Theme Toggle */}
-        <div className="fixed top-6 right-6 z-50">
-          <PageThemeToggle />
-        </div>
-
         {/* Hero Section */}
         <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
@@ -65,13 +52,7 @@ export default function GamesPage() {
               className="object-cover"
               priority
             />
-            <div
-              className={`absolute inset-0 ${
-                theme === "dark"
-                  ? "bg-linear-to-br from-black/80 via-black/60 to-transparent"
-                  : "bg-linear-to-br from-white/70 via-orange-50/80 to-transparent"
-              }`}
-            />
+            <div className="absolute inset-0 bg-linear-to-br from-black/80 via-black/60 to-transparent" />
           </div>
 
           <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 text-center">
@@ -79,22 +60,10 @@ export default function GamesPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-6 ${
-                theme === "dark"
-                  ? "bg-lime-400/10 border-lime-400/20"
-                  : "bg-emerald-100/80 border-emerald-300/50"
-              }`}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-lime-400/10 border-lime-400/20 mb-6"
             >
-              <Sparkles
-                className={`w-4 h-4 ${
-                  theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                }`}
-              />
-              <span
-                className={`text-sm font-medium ${
-                  theme === "dark" ? "text-lime-400" : "text-emerald-700"
-                }`}
-              >
+              <Sparkles className="w-4 h-4 text-lime-400" />
+              <span className="text-sm font-medium text-lime-400">
                 Learn Through Play
               </span>
             </motion.div>
@@ -103,27 +72,17 @@ export default function GamesPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className={`text-5xl md:text-7xl font-bold mb-6 leading-tight ${
-                theme === "dark" ? "text-white" : "text-neutral-900"
-              }`}
+              className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-white"
             >
               Cultural{" "}
-              <span
-                className={
-                  theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                }
-              >
-                Games
-              </span>
+              <span className="text-lime-400">Games</span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className={`text-xl mb-8 max-w-2xl mx-auto ${
-                theme === "dark" ? "text-white/90" : "text-neutral-700"
-              }`}
+              className="text-xl mb-8 max-w-2xl mx-auto text-white/90"
             >
               Master world cultures through interactive challenges, earn points,
               and compete with explorers worldwide
@@ -139,11 +98,7 @@ export default function GamesPage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowGame(true)}
-                className={`px-8 py-4 rounded-xl font-semibold flex items-center gap-2 transition-colors ${
-                  theme === "dark"
-                    ? "bg-lime-400 text-black hover:bg-lime-300"
-                    : "bg-emerald-600 text-white hover:bg-emerald-700"
-                }`}
+                className="px-8 py-4 rounded-xl font-semibold flex items-center gap-2 bg-lime-400 text-black hover:bg-lime-300 transition-colors"
               >
                 <Gamepad2 className="w-5 h-5" />
                 Start Playing
@@ -152,11 +107,7 @@ export default function GamesPage() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`px-8 py-4 rounded-xl font-semibold flex items-center gap-2 backdrop-blur-sm border transition-colors ${
-                  theme === "dark"
-                    ? "bg-white/10 text-white border-white/20 hover:bg-white/20"
-                    : "bg-white/50 text-neutral-900 border-neutral-300 hover:bg-white"
-                }`}
+                className="px-8 py-4 rounded-xl font-semibold flex items-center gap-2 backdrop-blur-sm border bg-white/10 text-white border-white/20 hover:bg-white/20 transition-colors"
               >
                 <Trophy className="w-5 h-5" />
                 View Leaderboard
@@ -166,226 +117,34 @@ export default function GamesPage() {
         </section>
 
         {/* Stats Section */}
-        <section className="relative z-20 -mt-20 mb-20">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                whileHover={{ y: -5 }}
-                className={`rounded-2xl p-6 shadow-xl border ${
-                  theme === "dark"
-                    ? "bg-neutral-900 border-neutral-800"
-                    : "bg-white border-neutral-200"
-                }`}
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      theme === "dark" ? "bg-lime-400/20" : "bg-lime-100"
-                    }`}
-                  >
-                    <Gamepad2
-                      className={`w-6 h-6 ${
-                        theme === "dark" ? "text-lime-400" : "text-lime-600"
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <p
-                      className={`text-sm ${
-                        theme === "dark"
-                          ? "text-neutral-400"
-                          : "text-neutral-600"
-                      }`}
-                    >
-                      Active Games
-                    </p>
-                    <p
-                      className={`text-2xl font-bold ${
-                        theme === "dark" ? "text-white" : "text-neutral-900"
-                      }`}
-                    >
-                      50+
-                    </p>
-                  </div>
-                </div>
-                <p
-                  className={`text-xs ${
-                    theme === "dark" ? "text-neutral-500" : "text-neutral-500"
-                  }`}
+        <section className="py-16 px-6 lg:px-12 bg-neutral-950">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[
+                { label: "Active Games", value: "50+", icon: Gamepad2, color: "lime" },
+                { label: "Players", value: "25K+", icon: Users, color: "blue" },
+                { label: "Countries", value: "195", icon: Globe, color: "purple" },
+                { label: "Total Rewards", value: "1M+", icon: Award, color: "orange" },
+              ].map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className="relative overflow-hidden rounded-3xl border bg-neutral-900 border-neutral-800 p-6 backdrop-blur"
                 >
-                  Interactive challenges available
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                whileHover={{ y: -5 }}
-                className={`rounded-2xl p-6 shadow-xl border ${
-                  theme === "dark"
-                    ? "bg-neutral-900 border-neutral-800"
-                    : "bg-white border-neutral-200"
-                }`}
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      theme === "dark" ? "bg-blue-400/20" : "bg-blue-100"
-                    }`}
-                  >
-                    <Users
-                      className={`w-6 h-6 ${
-                        theme === "dark" ? "text-blue-400" : "text-blue-600"
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <p
-                      className={`text-sm ${
-                        theme === "dark"
-                          ? "text-neutral-400"
-                          : "text-neutral-600"
-                      }`}
-                    >
-                      Players
-                    </p>
-                    <p
-                      className={`text-2xl font-bold ${
-                        theme === "dark" ? "text-white" : "text-neutral-900"
-                      }`}
-                    >
-                      25K+
-                    </p>
-                  </div>
-                </div>
-                <p
-                  className={`text-xs ${
-                    theme === "dark" ? "text-neutral-500" : "text-neutral-500"
-                  }`}
-                >
-                  Global community members
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-                whileHover={{ y: -5 }}
-                className={`rounded-2xl p-6 shadow-xl border ${
-                  theme === "dark"
-                    ? "bg-neutral-900 border-neutral-800"
-                    : "bg-white border-neutral-200"
-                }`}
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      theme === "dark" ? "bg-purple-400/20" : "bg-purple-100"
-                    }`}
-                  >
-                    <Globe
-                      className={`w-6 h-6 ${
-                        theme === "dark" ? "text-purple-400" : "text-purple-600"
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <p
-                      className={`text-sm ${
-                        theme === "dark"
-                          ? "text-neutral-400"
-                          : "text-neutral-600"
-                      }`}
-                    >
-                      Countries
-                    </p>
-                    <p
-                      className={`text-2xl font-bold ${
-                        theme === "dark" ? "text-white" : "text-neutral-900"
-                      }`}
-                    >
-                      195
-                    </p>
-                  </div>
-                </div>
-                <p
-                  className={`text-xs ${
-                    theme === "dark" ? "text-neutral-500" : "text-neutral-500"
-                  }`}
-                >
-                  Cultures to discover
-                </p>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 }}
-                whileHover={{ y: -5 }}
-                className={`rounded-2xl p-6 shadow-xl border ${
-                  theme === "dark"
-                    ? "bg-neutral-900 border-neutral-800"
-                    : "bg-white border-neutral-200"
-                }`}
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      theme === "dark" ? "bg-orange-400/20" : "bg-orange-100"
-                    }`}
-                  >
-                    <Award
-                      className={`w-6 h-6 ${
-                        theme === "dark" ? "text-orange-400" : "text-orange-600"
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <p
-                      className={`text-sm ${
-                        theme === "dark"
-                          ? "text-neutral-400"
-                          : "text-neutral-600"
-                      }`}
-                    >
-                      Total Rewards
-                    </p>
-                    <p
-                      className={`text-2xl font-bold ${
-                        theme === "dark" ? "text-white" : "text-neutral-900"
-                      }`}
-                    >
-                      1M+
-                    </p>
-                  </div>
-                </div>
-                <p
-                  className={`text-xs ${
-                    theme === "dark" ? "text-neutral-500" : "text-neutral-500"
-                  }`}
-                >
-                  Points earned by players
-                </p>
-              </motion.div>
+                  <stat.icon className={`w-8 h-8 mb-3 text-${stat.color}-400`} />
+                  <p className="text-3xl font-bold mb-1 text-white">{stat.value}</p>
+                  <p className="text-sm text-neutral-400">{stat.label}</p>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Featured Games Section */}
-        <section
-          className={`py-20 ${
-            theme === "dark" ? "bg-neutral-950" : "bg-neutral-50"
-          }`}
-        >
+        <section className="py-20 bg-neutral-950">
           <div className="max-w-7xl mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -393,25 +152,11 @@ export default function GamesPage() {
               viewport={{ once: true }}
               className="text-center mb-12"
             >
-              <h2
-                className={`text-4xl font-bold mb-4 ${
-                  theme === "dark" ? "text-white" : "text-neutral-900"
-                }`}
-              >
+              <h2 className="text-4xl font-bold mb-4 text-white">
                 Featured{" "}
-                <span
-                  className={
-                    theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                  }
-                >
-                  Challenges
-                </span>
+                <span className="text-lime-400">Challenges</span>
               </h2>
-              <p
-                className={`text-lg max-w-2xl mx-auto ${
-                  theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-                }`}
-              >
+              <p className="text-lg max-w-2xl mx-auto text-neutral-400">
                 Test your knowledge and earn points with our exciting cultural
                 games
               </p>
@@ -422,8 +167,7 @@ export default function GamesPage() {
                 {
                   icon: Brain,
                   title: "Cultural Quiz",
-                  description:
-                    "Answer questions about world cultures and traditions",
+                  description: "Answer questions about world cultures and traditions",
                   difficulty: "Medium",
                   points: "50-200",
                   color: "lime",
@@ -476,73 +220,33 @@ export default function GamesPage() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -5, scale: 1.02 }}
-                  className={`rounded-2xl p-6 shadow-lg border cursor-pointer group ${
-                    theme === "dark"
-                      ? "bg-neutral-900 border-neutral-800 hover:border-lime-400/50"
-                      : "bg-white border-neutral-200 hover:border-emerald-400/50"
-                  }`}
+                  className="rounded-2xl p-6 shadow-lg border bg-neutral-900 border-neutral-800 hover:border-lime-400/50 cursor-pointer group"
                   onClick={() => setShowGame(true)}
                 >
-                  <div
-                    className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${
-                      theme === "dark"
-                        ? `bg-${game.color}-400/20`
-                        : `bg-${game.color}-100`
-                    }`}
-                  >
-                    <game.icon
-                      className={`w-7 h-7 ${
-                        theme === "dark"
-                          ? `text-${game.color}-400`
-                          : `text-${game.color}-600`
-                      }`}
-                    />
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 bg-${game.color}-400/20`}>
+                    <game.icon className={`w-7 h-7 text-${game.color}-400`} />
                   </div>
-                  <h3
-                    className={`text-xl font-bold mb-2 ${
-                      theme === "dark" ? "text-white" : "text-neutral-900"
-                    }`}
-                  >
+                  <h3 className="text-xl font-bold mb-2 text-white">
                     {game.title}
                   </h3>
-                  <p
-                    className={`text-sm mb-4 ${
-                      theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-                    }`}
-                  >
+                  <p className="text-sm mb-4 text-neutral-400">
                     {game.description}
                   </p>
                   <div className="flex items-center justify-between">
-                    <span
-                      className={`text-xs px-3 py-1 rounded-full ${
-                        game.difficulty === "Easy"
-                          ? theme === "dark"
-                            ? "bg-green-400/20 text-green-400"
-                            : "bg-green-100 text-green-700"
-                          : game.difficulty === "Medium"
-                          ? theme === "dark"
-                            ? "bg-yellow-400/20 text-yellow-400"
-                            : "bg-yellow-100 text-yellow-700"
-                          : theme === "dark"
-                          ? "bg-red-400/20 text-red-400"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
+                    <span className={`text-xs px-3 py-1 rounded-full ${
+                      game.difficulty === "Easy"
+                        ? "bg-green-400/20 text-green-400"
+                        : game.difficulty === "Medium"
+                        ? "bg-yellow-400/20 text-yellow-400"
+                        : "bg-red-400/20 text-red-400"
+                    }`}>
                       {game.difficulty}
                     </span>
-                    <span
-                      className={`text-sm font-semibold ${
-                        theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                      }`}
-                    >
+                    <span className="text-sm font-semibold text-lime-400">
                       {game.points} pts
                     </span>
                   </div>
-                  <div
-                    className={`mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity ${
-                      theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                    }`}
-                  >
+                  <div className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity text-lime-400">
                     <span className="text-sm font-semibold">Play Now</span>
                     <ArrowRight className="w-4 h-4" />
                   </div>
@@ -561,26 +265,11 @@ export default function GamesPage() {
               viewport={{ once: true }}
               className="text-center mb-12"
             >
-              <h2
-                className={`text-4xl font-bold mb-4 ${
-                  theme === "dark" ? "text-white" : "text-neutral-900"
-                }`}
-              >
+              <h2 className="text-4xl font-bold mb-4 text-white">
                 Why Play{" "}
-                <span
-                  className={
-                    theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                  }
-                >
-                  Cultural Games
-                </span>
-                ?
+                <span className="text-lime-400">Cultural Games</span>?
               </h2>
-              <p
-                className={`text-lg max-w-2xl mx-auto ${
-                  theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-                }`}
-              >
+              <p className="text-lg max-w-2xl mx-auto text-neutral-400">
                 Learning about world cultures has never been this fun and
                 rewarding
               </p>
@@ -616,29 +305,13 @@ export default function GamesPage() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ scale: 1.05 }}
-                  className={`rounded-2xl p-6 shadow-lg border text-center ${
-                    theme === "dark"
-                      ? "bg-neutral-900 border-neutral-800"
-                      : "bg-white border-neutral-200"
-                  }`}
+                  className="rounded-2xl p-6 shadow-lg border bg-neutral-900 border-neutral-800 text-center"
                 >
-                  <benefit.icon
-                    className={`w-12 h-12 mx-auto mb-4 ${
-                      theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                    }`}
-                  />
-                  <h3
-                    className={`text-xl font-bold mb-2 ${
-                      theme === "dark" ? "text-white" : "text-neutral-900"
-                    }`}
-                  >
+                  <benefit.icon className="w-12 h-12 mx-auto mb-4 text-lime-400" />
+                  <h3 className="text-xl font-bold mb-2 text-white">
                     {benefit.title}
                   </h3>
-                  <p
-                    className={`text-sm ${
-                      theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-                    }`}
-                  >
+                  <p className="text-sm text-neutral-400">
                     {benefit.description}
                   </p>
                 </motion.div>
@@ -648,13 +321,7 @@ export default function GamesPage() {
         </section>
 
         {/* CTA Section */}
-        <section
-          className={`py-20 ${
-            theme === "dark"
-              ? "bg-linear-to-br from-lime-600 to-emerald-600"
-              : "bg-linear-to-br from-lime-500 to-emerald-500"
-          } text-white`}
-        >
+        <section className="py-20 bg-linear-to-br from-lime-600 to-emerald-600 text-white">
           <div className="max-w-4xl mx-auto px-6 text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -673,11 +340,7 @@ export default function GamesPage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowGame(true)}
-                className={`px-10 py-5 rounded-xl font-bold text-lg flex items-center gap-3 mx-auto transition-colors ${
-                  theme === "dark"
-                    ? "bg-white text-lime-600 hover:bg-neutral-100"
-                    : "bg-white text-emerald-600 hover:bg-neutral-100"
-                }`}
+                className="px-10 py-5 rounded-xl font-bold text-lg flex items-center gap-3 mx-auto bg-white text-lime-600 hover:bg-neutral-100 transition-colors"
               >
                 <Gamepad2 className="w-6 h-6" />
                 Play Now

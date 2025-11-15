@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import DashboardPageLayout from "../../../app/components/DashboardPageLayout";
-import PageThemeToggle from "../../../app/components/PageThemeToggle";
 import {
   MapPin,
   Utensils,
@@ -19,8 +18,6 @@ import {
   Camera,
   Award,
   Loader2,
-  Sun,
-  Moon,
   ArrowRight,
   Sparkles,
   Book,
@@ -75,75 +72,29 @@ type ValidationState = {
 
 export default function LogsPage() {
   const [showBrowse, setShowBrowse] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Theme management
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("theme");
-      if (saved) {
-        setIsDarkMode(saved === "dark");
-      } else {
-        setIsDarkMode(document.documentElement.classList.contains("dark"));
-      }
-    } catch {
-      // ignore
-    }
+  // Dark mode only colors
+  const getMutedTextColor = () => "text-white/70";
+  const getBorderColor = () => "border-white/10";
+  const getCardBg = () => "bg-white/5";
+  const getInputBg = () => "bg-slate-950/40";
 
-    const handleThemeChange = (event: CustomEvent<{ isDark: boolean }>) => {
-      setIsDarkMode(event.detail.isDark);
-    };
-
-    window.addEventListener('theme-change', handleThemeChange as EventListener);
-
-    return () => {
-      window.removeEventListener('theme-change', handleThemeChange as EventListener);
-    };
-  }, []);
-
-  // Color utility functions
-  const getBgColor = (opacity: string = "") => {
-    return isDarkMode ? `bg-black${opacity}` : `bg-white${opacity}`;
-  };
-
-  const getTextColor = () => {
-    return isDarkMode ? "text-white" : "text-slate-900";
-  };
-
-  const getMutedTextColor = () => {
-    return isDarkMode ? "text-white/70" : "text-slate-600";
-  };
-
-  const getBorderColor = () => {
-    return isDarkMode ? "border-white/10" : "border-slate-200";
-  };
-
-  const getCardBg = () => {
-    return isDarkMode ? "bg-white/5" : "bg-slate-50";
-  };
-
-  const getInputBg = () => {
-    return isDarkMode ? "bg-slate-950/40" : "bg-white";
-  };
-
-  // Accent color helpers: emerald in light mode, lime in dark mode
+  // Accent colors for dark mode
   const accent = {
-    bg500: isDarkMode ? "bg-lime-500" : "bg-emerald-500",
-    hover400: isDarkMode ? "hover:bg-lime-400" : "hover:bg-emerald-400",
-    text400: isDarkMode ? "text-lime-400" : "text-emerald-400",
-    border400_50: isDarkMode ? "border-lime-400/50" : "border-emerald-400/50",
-    bg50: isDarkMode ? "bg-lime-50" : "bg-emerald-50",
-    text900: isDarkMode ? "text-lime-900" : "text-emerald-900",
-    border400_40: isDarkMode ? "border-lime-400/40" : "border-emerald-400/40",
-    bg400_10: isDarkMode ? "bg-lime-400/10" : "bg-emerald-400/10",
-    text700: isDarkMode ? "text-lime-700" : "text-emerald-700",
-    hoverBorder400_50: isDarkMode
-      ? "hover:border-lime-400/50"
-      : "hover:border-emerald-400/50",
-    from500_20: isDarkMode ? "from-lime-500/20" : "from-emerald-500/20",
-    from400: isDarkMode ? "from-lime-400" : "from-emerald-400",
-    bg500_10: isDarkMode ? "bg-lime-500/10" : "bg-emerald-500/10",
-    border400_30: isDarkMode ? "border-lime-400/30" : "border-emerald-400/30",
+    bg500: "bg-lime-500",
+    hover400: "hover:bg-lime-400",
+    text400: "text-lime-400",
+    border400_50: "border-lime-400/50",
+    bg50: "bg-lime-50",
+    text900: "text-lime-900",
+    border400_40: "border-lime-400/40",
+    bg400_10: "bg-lime-400/10",
+    text700: "text-lime-700",
+    hoverBorder400_50: "hover:border-lime-400/50",
+    from500_20: "from-lime-500/20",
+    from400: "from-lime-400",
+    bg500_10: "bg-lime-500/10",
+    border400_30: "border-lime-400/30",
   };
 
   // ALL YOUR EXISTING STATE VARIABLES - KEEP EVERYTHING EXACTLY AS IS
@@ -536,20 +487,10 @@ export default function LogsPage() {
     switch (validation[field]) {
       case "validating":
         return (
-          <div
-            className={`h-5 w-5 animate-spin rounded-full border-2 ${
-              isDarkMode ? "border-white/20" : "border-slate-400"
-            } ${isDarkMode ? "border-t-lime-400" : "border-t-emerald-400"}`}
-          />
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-lime-400" />
         );
       case "valid":
-        return (
-          <CheckCircle
-            className={`h-5 w-5 ${
-              isDarkMode ? "text-lime-400" : "text-emerald-400"
-            }`}
-          />
-        );
+        return <CheckCircle className="h-5 w-5 text-lime-400" />;
       case "invalid":
         return <AlertCircle className="h-5 w-5 text-red-400" />;
       default:
@@ -562,10 +503,6 @@ export default function LogsPage() {
       {showBrowse ? (
         // Hero/Browse View
         <div className="relative min-h-screen">
-          <div className="fixed top-6 right-6 z-50">
-            <PageThemeToggle />
-          </div>
-
           {/* Hero Section */}
           <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0 z-0">
@@ -576,13 +513,7 @@ export default function LogsPage() {
                 className="object-cover"
                 priority
               />
-              <div
-                className={`absolute inset-0 ${
-                  isDarkMode
-                    ? "bg-linear-to-br from-black/80 via-black/60 to-transparent"
-                    : "bg-linear-to-br from-white/70 via-orange-50/80 to-transparent"
-                }`}
-              />
+              <div className="absolute inset-0 bg-linear-to-br from-black/80 via-black/60 to-transparent" />
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 text-center">
@@ -590,22 +521,10 @@ export default function LogsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-6 ${
-                  isDarkMode
-                    ? "bg-lime-400/10 border-lime-400/20"
-                    : "bg-emerald-100/80 border-emerald-300/50"
-                }`}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-6 bg-lime-400/10 border-lime-400/20"
               >
-                <Sparkles
-                  className={`w-4 h-4 ${
-                    isDarkMode ? "text-lime-400" : "text-emerald-600"
-                  }`}
-                />
-                <span
-                  className={`text-sm font-medium ${
-                    isDarkMode ? "text-lime-400" : "text-emerald-700"
-                  }`}
-                >
+                <Sparkles className="w-4 h-4 text-lime-400" />
+                <span className="text-sm font-medium text-lime-400">
                   Your Adventure Journal
                 </span>
               </motion.div>
@@ -614,25 +533,16 @@ export default function LogsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className={`text-5xl md:text-7xl font-bold mb-6 leading-tight ${
-                  isDarkMode ? "text-white" : "text-neutral-900"
-                }`}
+                className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-white"
               >
-                Travel{" "}
-                <span
-                  className={isDarkMode ? "text-lime-400" : "text-emerald-600"}
-                >
-                  Logs
-                </span>
+                Travel <span className="text-lime-400">Logs</span>
               </motion.h1>
 
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className={`text-xl mb-8 max-w-2xl mx-auto ${
-                  isDarkMode ? "text-white/90" : "text-neutral-700"
-                }`}
+                className="text-xl mb-8 max-w-2xl mx-auto text-white/90"
               >
                 Document your cultural adventures, track visited places, and
                 verify your experiences with AI-powered photo verification
@@ -648,11 +558,7 @@ export default function LogsPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowBrowse(false)}
-                  className={`px-8 py-4 rounded-xl font-semibold flex items-center gap-2 transition-colors ${
-                    isDarkMode
-                      ? "bg-lime-400 text-black hover:bg-lime-300"
-                      : "bg-emerald-600 text-white hover:bg-emerald-700"
-                  }`}
+                  className="px-8 py-4 rounded-xl font-semibold flex items-center gap-2 bg-lime-400 text-black hover:bg-lime-300 transition-colors"
                 >
                   <Book className="w-5 h-5" />
                   View My Logs
@@ -662,11 +568,7 @@ export default function LogsPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowBrowse(false)}
-                  className={`px-8 py-4 rounded-xl font-semibold flex items-center gap-2 backdrop-blur-sm border transition-colors ${
-                    isDarkMode
-                      ? "bg-white/10 text-white border-white/20 hover:bg-white/20"
-                      : "bg-white/50 text-neutral-900 border-neutral-300 hover:bg-white"
-                  }`}
+                  className="px-8 py-4 rounded-xl font-semibold flex items-center gap-2 backdrop-blur-sm border bg-white/10 text-white border-white/20 hover:bg-white/20 transition-colors"
                 >
                   <Camera className="w-5 h-5" />
                   Submit Verification
@@ -716,50 +618,22 @@ export default function LogsPage() {
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
                     whileHover={{ y: -5 }}
-                    className={`rounded-2xl p-6 shadow-xl border ${
-                      isDarkMode
-                        ? "bg-neutral-900 border-neutral-800"
-                        : "bg-white border-neutral-200"
-                    }`}
+                    className="rounded-2xl p-6 shadow-xl border bg-neutral-900 border-neutral-800"
                   >
                     <div className="flex items-center gap-4 mb-4">
-                      <div
-                        className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                          isDarkMode
-                            ? `bg-${stat.color}-400/20`
-                            : `bg-${stat.color}-100`
-                        }`}
-                      >
-                        <stat.icon
-                          className={`w-6 h-6 ${
-                            isDarkMode
-                              ? `text-${stat.color}-400`
-                              : `text-${stat.color}-600`
-                          }`}
-                        />
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-${stat.color}-400/20`}>
+                        <stat.icon className={`w-6 h-6 text-${stat.color}-400`} />
                       </div>
                       <div>
-                        <p
-                          className={`text-sm ${
-                            isDarkMode ? "text-neutral-400" : "text-neutral-600"
-                          }`}
-                        >
+                        <p className="text-sm text-neutral-400">
                           {stat.label}
                         </p>
-                        <p
-                          className={`text-2xl font-bold ${
-                            isDarkMode ? "text-white" : "text-neutral-900"
-                          }`}
-                        >
+                        <p className="text-2xl font-bold text-white">
                           {stat.value}
                         </p>
                       </div>
                     </div>
-                    <p
-                      className={`text-xs ${
-                        isDarkMode ? "text-neutral-500" : "text-neutral-500"
-                      }`}
-                    >
+                    <p className="text-xs text-neutral-500">
                       {stat.desc}
                     </p>
                   </motion.div>
@@ -769,22 +643,12 @@ export default function LogsPage() {
           </section>
         </div>
       ) : (
-        // Original Logs Interface
-        <div
-          className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}
-        >
+        // Original Logs Interface - All dark mode
+        <div className="min-h-screen bg-black text-white">
           <div className="flex justify-between items-center mb-6 px-6 pt-6">
-            <button
-              onClick={() => setShowBrowse(true)}
-              className={`px-6 py-3 rounded-xl font-semibold transition-colors ${
-                isDarkMode
-                  ? "bg-neutral-800 text-white hover:bg-neutral-700"
-                  : "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
-              }`}
-            >
+            <button onClick={() => setShowBrowse(true)} className="px-6 py-3 rounded-xl font-semibold bg-neutral-800 text-white hover:bg-neutral-700">
               ← Back to Overview
             </button>
-            <PageThemeToggle />
           </div>
           <div className="space-y-8 p-6">
             {/* Header */}
@@ -819,9 +683,7 @@ export default function LogsPage() {
                 className={`flex items-center gap-2 rounded-full px-6 py-3 font-semibold transition ${
                   activeTab === "logs"
                     ? `${accent.bg500} text-slate-950`
-                    : isDarkMode
-                    ? "bg-white/10 text-white hover:bg-white/20"
-                    : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+                    : "bg-white/10 text-white hover:bg-white/20"
                 }`}
               >
                 <Globe2 className="h-5 w-5" />
@@ -831,10 +693,8 @@ export default function LogsPage() {
                 onClick={() => setActiveTab("tasks")}
                 className={`flex items-center gap-2 rounded-full px-6 py-3 font-semibold transition ${
                   activeTab === "tasks"
-                    ? `${accent.bg500} text-slate-950`
-                    : isDarkMode
-                    ? "bg-white/10 text-white hover:bg-white/20"
-                    : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+                    ? `${accent.bg500} text-slate950`
+                    : "bg-white/10 text-white hover:bg-white/20"
                 }`}
               >
                 <Award className="h-5 w-5" />
@@ -1065,24 +925,12 @@ export default function LogsPage() {
                           </button>
                         </div>
                       ) : (
-                        <label
-                          className={`flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed ${
-                            isDarkMode ? "border-white/20" : "border-slate-300"
-                          } ${getInputBg()} transition ${
-                            accent.hoverBorder400_50
-                          }`}
-                        >
-                          <Upload
-                            className={`h-8 w-8 ${getMutedTextColor()}`}
-                          />
-                          <span
-                            className={`mt-2 text-sm ${getMutedTextColor()}`}
-                          >
+                        <label className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-slate-950/40 transition hover:border-lime-400/50">
+                          <Upload className="h-8 w-8 text-white/70" />
+                          <span className="mt-2 text-sm text-white/70">
                             Click to upload a photo
                           </span>
-                          <span
-                            className={`mt-1 text-xs ${getMutedTextColor()}`}
-                          >
+                          <span className="mt-1 text-xs text-white/70">
                             PNG, JPG up to 5MB
                           </span>
                           <input
@@ -1166,11 +1014,7 @@ export default function LogsPage() {
                           setValidation({ country: "idle", city: "idle" });
                           setValidationMessage("");
                         }}
-                        className={`rounded-full border ${getBorderColor()} px-6 py-2 font-semibold transition ${
-                          isDarkMode
-                            ? "text-white hover:bg-white/10"
-                            : "text-slate-800 hover:bg-slate-100"
-                        }`}
+                        className="rounded-full border border-white/10 px-6 py-2 font-semibold transition text-white hover:bg-white/10"
                       >
                         Cancel
                       </button>
@@ -1187,9 +1031,7 @@ export default function LogsPage() {
                       className={`rounded-full px-5 py-2 text-sm font-medium transition ${
                         filterType === type
                           ? `${accent.bg500} text-slate-950`
-                          : isDarkMode
-                          ? "bg-white/10 text-white hover:bg-white/20"
-                          : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+                          : "bg-white/10 text-white hover:bg-white/20"
                       }`}
                     >
                       {type === "all"
@@ -1219,9 +1061,7 @@ export default function LogsPage() {
                     {filteredLogs.map((log) => (
                       <div
                         key={log._id}
-                        className={`group rounded-3xl border ${getBorderColor()} ${getCardBg()} backdrop-blur transition hover:${
-                          isDarkMode ? "bg-white/10" : "bg-slate-100"
-                        } overflow-hidden`}
+                        className="group rounded-3xl border border-white/10 bg-white/5 backdrop-blur transition hover:bg-white/10 overflow-hidden"
                       >
                         {/* Image */}
                         {log.imageUrl ? (
@@ -1234,18 +1074,8 @@ export default function LogsPage() {
                             />
                           </div>
                         ) : (
-                          <div
-                            className={`flex h-48 w-full items-center justify-center ${
-                              isDarkMode
-                                ? "bg-linear-to-br from-slate-800/50 to-slate-900/50"
-                                : "bg-slate-200"
-                            }`}
-                          >
-                            <ImageIcon
-                              className={`h-16 w-16 ${
-                                isDarkMode ? "text-white/20" : "text-slate-400"
-                              }`}
-                            />
+                          <div className="flex h-48 w-full items-center justify-center bg-linear-to-br from-slate-800/50 to-slate-900/50">
+                            <ImageIcon className="h-16 w-16 text-white/20" />
                           </div>
                         )}
 
@@ -1311,11 +1141,7 @@ export default function LogsPage() {
                             <div className="mt-4">
                               <button
                                 onClick={() => toggleNotes(log._id)}
-                                className={`flex items-center gap-2 text-xs ${getMutedTextColor()} hover:${
-                                  isDarkMode
-                                    ? "text-white/80"
-                                    : "text-slate-800"
-                                } transition`}
+                                className="flex items-center gap-2 text-xs text-white/70 hover:text-white/80 transition"
                               >
                                 <FileText className="h-4 w-4" />
                                 <span>
@@ -1324,16 +1150,8 @@ export default function LogsPage() {
                                 </span>
                               </button>
                               {expandedNotes.has(log._id) && (
-                                <div
-                                  className={`mt-2 rounded-xl border ${getBorderColor()} ${
-                                    isDarkMode
-                                      ? "bg-slate-950/40"
-                                      : "bg-slate-100"
-                                  } p-3`}
-                                >
-                                  <p
-                                    className={`text-sm ${getMutedTextColor()} whitespace-pre-wrap`}
-                                  >
+                                <div className="mt-2 rounded-xl border border-white/10 bg-slate-950/40 p-3">
+                                  <p className="text-sm text-white/70 whitespace-pre-wrap">
                                     {log.notes}
                                   </p>
                                 </div>
@@ -1517,21 +1335,9 @@ export default function LogsPage() {
                               </button>
                             </div>
                           ) : (
-                            <label
-                              className={`flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed ${
-                                isDarkMode
-                                  ? "border-white/20"
-                                  : "border-slate-300"
-                              } ${getInputBg()} transition ${
-                                accent.hoverBorder400_50
-                              }`}
-                            >
-                              <Camera
-                                className={`h-8 w-8 ${getMutedTextColor()}`}
-                              />
-                              <span
-                                className={`mt-2 text-sm ${getMutedTextColor()}`}
-                              >
+                            <label className="flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-slate-950/40 transition hover:border-lime-400/50">
+                              <Camera className="h-8 w-8 text-white/70" />
+                              <span className="mt-2 text-sm text-white/70">
                                 Upload before photo
                               </span>
                               <input
@@ -1575,21 +1381,9 @@ export default function LogsPage() {
                             </button>
                           </div>
                         ) : (
-                          <label
-                            className={`flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed ${
-                              isDarkMode
-                                ? "border-white/20"
-                                : "border-slate-300"
-                            } ${getInputBg()} transition ${
-                              accent.hoverBorder400_50
-                            }`}
-                          >
-                            <Camera
-                              className={`h-8 w-8 ${getMutedTextColor()}`}
-                            />
-                            <span
-                              className={`mt-2 text-sm ${getMutedTextColor()}`}
-                            >
+                          <label className="flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-slate-950/40 transition hover:border-lime-400/50">
+                            <Camera className="h-8 w-8 text-white/70" />
+                            <span className="mt-2 text-sm text-white/70">
                               Upload{" "}
                               {taskFormData.type === "recipe"
                                 ? "after"
@@ -1631,11 +1425,7 @@ export default function LogsPage() {
                           setBeforePreview(null);
                           setAfterPreview(null);
                         }}
-                        className={`rounded-full border ${getBorderColor()} px-6 py-2 font-semibold transition ${
-                          isDarkMode
-                            ? "text-white hover:bg-white/10"
-                            : "text-slate-800 hover:bg-slate-100"
-                        }`}
+                        className="rounded-full border border-white/10 px-6 py-2 font-semibold transition text-white hover:bg-white/10"
                       >
                         Cancel
                       </button>

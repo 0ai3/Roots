@@ -17,7 +17,6 @@ import {
 import DashboardPageLayout from "../../components/DashboardPageLayout";
 import AttractionPlanner from "../../components/AttractionPlanner";
 import Image from "next/image";
-import { useTheme } from "../../components/ThemeProvider";
 
 type Attraction = {
   id: string;
@@ -40,8 +39,6 @@ type Favorite = {
 };
 
 function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
-  const { theme } = useTheme();
-
   return (
     <section className="relative min-h-[60vh] flex items-center overflow-hidden">
       <div className="absolute inset-0">
@@ -52,13 +49,7 @@ function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
           className="object-cover"
           priority
         />
-        <div
-          className={`absolute inset-0 ${
-            theme === "dark"
-              ? "bg-linear-to-b from-neutral-950/80 via-neutral-950/70 to-neutral-950"
-              : "bg-linear-to-b from-white/60 via-orange-50/80 to-white"
-          }`}
-        />
+        <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/80 via-neutral-950/70 to-neutral-950" />
       </div>
 
       <div className="relative z-10 w-full px-6 lg:px-12 py-20">
@@ -69,62 +60,26 @@ function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
             transition={{ duration: 0.8 }}
             className="max-w-3xl"
           >
-            
-
-            <h1
-              className={`text-5xl lg:text-6xl font-bold mb-6 ${
-                theme === "dark" ? "text-white" : "text-neutral-900"
-              }`}
-            >
+            <h1 className="text-5xl lg:text-6xl font-bold mb-6 text-white">
               Discover{" "}
-              <span
-                className={
-                  theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                }
-              >
-                Global Attractions
-              </span>
+              <span className="text-lime-400">Global Attractions</span>
             </h1>
 
-            <p
-              className={`text-lg mb-8 ${
-                theme === "dark" ? "text-neutral-300" : "text-neutral-700"
-              }`}
-            >
+            <p className="text-lg mb-8 text-neutral-300">
               Experience the world&apos;s most iconic landmarks, historical
               sites, and cultural treasures. From ancient wonders to modern
               marvels, plan your perfect cultural journey.
             </p>
 
-            <div className="flex flex-wrap gap-4">
-              <motion.button
-                onClick={onPlanClick}
-                className={`px-8 py-4 rounded-full flex items-center gap-2 transition-colors ${
-                  theme === "dark"
-                    ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
-                    : "bg-emerald-600 text-white hover:bg-emerald-700"
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Compass className="w-5 h-5" />
-                Plan Your Visit
-              </motion.button>
-
-              <motion.button
-                onClick={() => (window.location.href = "/app/map")} 
-                className={`px-8 py-4 rounded-full backdrop-blur-sm border transition-colors flex items-center gap-2 ${
-                  theme === "dark"
-                    ? "bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50"
-                    : "bg-white/70 text-neutral-900 border-neutral-300 hover:bg-white"
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Globe2 className="w-5 h-5" />
-                Explore Map
-              </motion.button>
-            </div>
+            <motion.button
+              onClick={onPlanClick}
+              className="px-8 py-4 rounded-full flex items-center gap-2 bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Compass className="w-5 h-5" />
+              Plan Your Visit
+            </motion.button>
           </motion.div>
         </div>
       </div>
@@ -133,8 +88,6 @@ function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
 }
 
 function StatsSection() {
-  const { theme } = useTheme();
-
   const stats = [
     { label: "Attractions", value: "5K+", icon: MapPin, color: "blue" },
     { label: "Countries", value: "195", icon: Globe2, color: "purple" },
@@ -143,11 +96,7 @@ function StatsSection() {
   ];
 
   return (
-    <section
-      className={`py-16 px-6 lg:px-12 ${
-        theme === "dark" ? "bg-neutral-950" : "bg-white"
-      }`}
-    >
+    <section className="py-16 px-6 lg:px-12 bg-neutral-950">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
@@ -157,11 +106,7 @@ function StatsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className={`relative overflow-hidden rounded-3xl border p-6 backdrop-blur ${
-                theme === "dark"
-                  ? "bg-neutral-900 border-neutral-800"
-                  : "bg-slate-50 border-slate-200"
-              }`}
+              className="relative overflow-hidden rounded-3xl border p-6 backdrop-blur bg-neutral-900 border-neutral-800"
             >
               <stat.icon
                 className={`w-8 h-8 mb-3 ${
@@ -174,20 +119,10 @@ function StatsSection() {
                     : "text-yellow-400"
                 }`}
               />
-              <p
-                className={`text-3xl font-bold mb-1 ${
-                  theme === "dark" ? "text-white" : "text-neutral-900"
-                }`}
-              >
+              <p className="text-3xl font-bold mb-1 text-white">
                 {stat.value}
               </p>
-              <p
-                className={`text-sm ${
-                  theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-                }`}
-              >
-                {stat.label}
-              </p>
+              <p className="text-sm text-neutral-400">{stat.label}</p>
             </motion.div>
           ))}
         </div>
@@ -201,7 +136,6 @@ function FeaturedAttractionsSection({
 }: {
   onLoadAttractions?: (count: number) => void;
 }) {
-  const { theme } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [attractions, setAttractions] = useState<Attraction[]>([]);
@@ -209,7 +143,7 @@ function FeaturedAttractionsSection({
   const [loading, setLoading] = useState(true);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
-  const [radius, setRadius] = useState(5000); // Default 5km in meters
+  const [radius, setRadius] = useState(5000);
   const [userId] = useState<string | null>(null);
 
   const fetchAttractions = useCallback(async (lat: number, lon: number, rad: number) => {
@@ -239,7 +173,6 @@ function FeaturedAttractionsSection({
   }, [onLoadAttractions]);
 
   useEffect(() => {
-    // Get user's location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -274,8 +207,8 @@ function FeaturedAttractionsSection({
     if (userId) {
       fetchFavorites();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
-
 
   const fetchFavorites = async () => {
     try {
@@ -294,7 +227,6 @@ function FeaturedAttractionsSection({
 
   const toggleFavorite = async (attraction: Attraction) => {
     if (!userId) {
-      // Redirect to login instead of showing alert
       window.location.href = '/login';
       return;
     }
@@ -355,13 +287,7 @@ function FeaturedAttractionsSection({
   });
 
   return (
-    <section
-      className={`py-24 px-6 lg:px-12 ${
-        theme === "dark"
-          ? "bg-neutral-900"
-          : "bg-linear-to-b from-white to-orange-50/30"
-      }`}
-    >
+    <section className="py-24 px-6 lg:px-12 bg-neutral-900">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -370,40 +296,21 @@ function FeaturedAttractionsSection({
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div
-            className={`inline-block px-4 py-2 rounded-full mb-4 ${
-              theme === "dark"
-                ? "bg-lime-400/10 text-lime-400"
-                : "bg-emerald-100 text-emerald-700"
-            }`}
-          >
+          <div className="inline-block px-4 py-2 rounded-full mb-4 bg-lime-400/20 text-lime-400 border border-lime-400/30">
             Featured Destinations
           </div>
-          <h2
-            className={`text-4xl font-bold mb-4 ${
-              theme === "dark" ? "text-white" : "text-neutral-900"
-            }`}
-          >
+          <h2 className="text-4xl font-bold mb-4 text-white">
             Popular Attractions Worldwide
           </h2>
-          <p
-            className={`max-w-2xl mx-auto ${
-              theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-            }`}
-          >
+          <p className="max-w-2xl mx-auto text-neutral-400">
             Explore the most visited and beloved cultural landmarks across the
             globe
           </p>
         </motion.div>
 
-        {/* Search and Filter */}
         <div className="mb-12 space-y-6">
           {userLocation && (
-            <div
-              className={`flex items-center justify-center gap-2 text-sm ${
-                theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-              }`}
-            >
+            <div className="flex items-center justify-center gap-2 text-sm text-neutral-400">
               <MapPinned className="w-4 h-4" />
               <span>
                 Showing attractions near your location ({radius / 1000}km radius)
@@ -413,33 +320,18 @@ function FeaturedAttractionsSection({
           )}
 
           <div className="relative max-w-2xl mx-auto">
-            <Search
-              className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                theme === "dark" ? "text-neutral-400" : "text-neutral-500"
-              }`}
-            />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-500" />
             <input
               type="text"
               placeholder="Search nearby attractions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full pl-12 pr-4 py-4 rounded-2xl border transition-all ${
-                theme === "dark"
-                  ? "bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500"
-                  : "bg-white border-neutral-200 text-neutral-900 placeholder:text-neutral-400"
-              } focus:border-${
-                theme === "dark" ? "lime-400" : "emerald-400"
-              } focus:outline-none`}
+              className="w-full pl-12 pr-4 py-4 rounded-2xl border bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-400/50 focus:outline-none transition-all"
             />
           </div>
 
-          {/* Range Slider */}
           <div className="max-w-2xl mx-auto">
-            <label
-              className={`block text-sm font-medium mb-2 ${
-                theme === "dark" ? "text-neutral-300" : "text-neutral-700"
-              }`}
-            >
+            <label className="block text-sm font-medium mb-2 text-neutral-300">
               Search Radius: {radius / 1000}km
             </label>
             <input
@@ -451,18 +343,12 @@ function FeaturedAttractionsSection({
               onChange={(e) => setRadius(Number(e.target.value))}
               className="w-full h-2 rounded-lg appearance-none cursor-pointer"
               style={{
-                background: theme === "dark"
-                  ? "linear-gradient(to right, #a3e635 0%, #a3e635 " + ((radius - 1000) / 49000 * 100) + "%, #404040 " + ((radius - 1000) / 49000 * 100) + "%, #404040 100%)"
-                  : "linear-gradient(to right, #059669 0%, #059669 " + ((radius - 1000) / 49000 * 100) + "%, #e5e7eb " + ((radius - 1000) / 49000 * 100) + "%, #e5e7eb 100%)"
+                background: `linear-gradient(to right, #84cc16 0%, #84cc16 ${((radius - 1000) / 49000) * 100}%, #404040 ${((radius - 1000) / 49000) * 100}%, #404040 100%)`
               }}
             />
             <div className="flex justify-between text-xs mt-1">
-              <span className={theme === "dark" ? "text-neutral-500" : "text-neutral-500"}>
-                1km
-              </span>
-              <span className={theme === "dark" ? "text-neutral-500" : "text-neutral-500"}>
-                50km
-              </span>
+              <span className="text-neutral-500">1km</span>
+              <span className="text-neutral-500">50km</span>
             </div>
           </div>
 
@@ -473,12 +359,8 @@ function FeaturedAttractionsSection({
                 onClick={() => setSelectedCategory(category)}
                 className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${
                   selectedCategory === category
-                    ? theme === "dark"
-                      ? "bg-lime-400 text-neutral-950"
-                      : "bg-emerald-600 text-white"
-                    : theme === "dark"
-                    ? "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    ? "bg-lime-400 text-neutral-950"
+                    : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
                 }`}
               >
                 {category}
@@ -487,42 +369,22 @@ function FeaturedAttractionsSection({
           </div>
         </div>
 
-        {/* Loading State */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2
-              className={`w-12 h-12 animate-spin mb-4 ${
-                theme === "dark" ? "text-lime-400" : "text-emerald-600"
-              }`}
-            />
-            <p
-              className={theme === "dark" ? "text-neutral-400" : "text-neutral-600"}
-            >
-              Loading nearby attractions...
-            </p>
+            <Loader2 className="w-12 h-12 animate-spin mb-4 text-lime-400" />
+            <p className="text-neutral-400">Loading nearby attractions...</p>
           </div>
         )}
 
-        {/* Error State */}
         {locationError && !loading && (
-          <div
-            className={`text-center py-20 px-6 rounded-3xl border ${
-              theme === "dark"
-                ? "bg-red-500/10 border-red-500/30 text-red-400"
-                : "bg-red-50 border-red-200 text-red-700"
-            }`}
-          >
+          <div className="text-center py-20 px-6 rounded-3xl border bg-red-950/20 border-red-900/30 text-red-400">
             <MapPin className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-semibold mb-2">Unable to Load Attractions</p>
             <p className="text-sm mb-4">{locationError}</p>
             {userLocation && (
               <button
                 onClick={() => fetchAttractions(userLocation.lat, userLocation.lon, radius)}
-                className={`px-6 py-2 rounded-full text-sm font-semibold transition ${
-                  theme === "dark"
-                    ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
-                    : "bg-emerald-600 text-white hover:bg-emerald-700"
-                }`}
+                className="px-6 py-2 rounded-full text-sm font-semibold transition bg-lime-400 text-neutral-950 hover:bg-lime-300"
               >
                 Try Again
               </button>
@@ -530,13 +392,8 @@ function FeaturedAttractionsSection({
           </div>
         )}
 
-        {/* Empty State */}
         {!loading && !locationError && filteredAttractions.length === 0 && (
-          <div
-            className={`text-center py-20 px-6 ${
-              theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-            }`}
-          >
+          <div className="text-center py-20 px-6 text-neutral-400">
             <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-semibold mb-2">No attractions found</p>
             <p className="text-sm">
@@ -545,162 +402,103 @@ function FeaturedAttractionsSection({
           </div>
         )}
 
-        {/* Attractions Grid */}
         {!loading && !locationError && filteredAttractions.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredAttractions.map((attraction, index) => (
-            <motion.div
-              key={attraction.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              whileHover={{ y: -8 }}
-              className="group"
-            >
-              <div
-                className={`relative overflow-hidden rounded-3xl border transition-all ${
-                  theme === "dark"
-                    ? "bg-neutral-900 border-neutral-800 hover:border-lime-400/30"
-                    : "bg-white border-neutral-200 hover:border-emerald-400/50 shadow-lg hover:shadow-xl"
-                }`}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredAttractions.map((attraction, index) => (
+              <motion.div
+                key={attraction.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                whileHover={{ y: -8 }}
+                className="group"
               >
-                <div className="relative h-64 overflow-hidden">
-                  <Image
-                    src={attraction.image}
-                    alt={attraction.title}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div
-                    className={`absolute inset-0 ${
-                      theme === "dark"
-                        ? "bg-linear-to-t from-neutral-900 via-neutral-900/40 to-transparent"
-                        : "bg-linear-to-t from-white via-white/40 to-transparent"
-                    }`}
-                  />
+                <div className="relative overflow-hidden rounded-3xl border transition-all bg-neutral-900 border-neutral-800 hover:border-lime-400/30">
+                  <div className="relative h-64 overflow-hidden">
+                    <Image
+                      src={attraction.image}
+                      alt={attraction.title}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/40 to-transparent" />
 
-                  <div className="absolute top-4 right-4 flex gap-2">
-                    <button
-                      onClick={() => toggleFavorite(attraction)}
-                      className={`w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition ${
-                        favoriteIds.has(attraction.id)
-                          ? theme === "dark"
-                            ? "bg-red-500/80 hover:bg-red-600/80"
-                            : "bg-red-500/90 hover:bg-red-600/90"
-                          : theme === "dark"
-                          ? "bg-neutral-900/80 hover:bg-lime-400/20"
-                          : "bg-white/90 hover:bg-emerald-100"
-                      }`}
-                    >
-                      <Heart
-                        className={`w-5 h-5 ${
+                    <div className="absolute top-4 right-4 flex gap-2">
+                      <button
+                        onClick={() => toggleFavorite(attraction)}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition ${
                           favoriteIds.has(attraction.id)
-                            ? "text-white fill-white"
-                            : theme === "dark"
-                            ? "text-white"
-                            : "text-neutral-700"
-                        }`}
-                      />
-                    </button>
-                  </div>
-
-                  <div
-                    className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm ${
-                      theme === "dark"
-                        ? "bg-lime-400/20 border border-lime-400/30 text-lime-300"
-                        : "bg-emerald-100/90 border border-emerald-300/50 text-emerald-700"
-                    }`}
-                  >
-                    {attraction.category}
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3
-                        className={`text-xl font-bold mb-1 ${
-                          theme === "dark" ? "text-white" : "text-neutral-900"
+                            ? "bg-red-500/80 hover:bg-red-600/80"
+                            : "bg-neutral-900/80 hover:bg-lime-400/20"
                         }`}
                       >
-                        {attraction.title}
-                      </h3>
-                      <div className="flex items-center gap-1 text-sm">
-                        <MapPin
-                          className={`w-4 h-4 ${
-                            theme === "dark"
-                              ? "text-lime-400"
-                              : "text-emerald-600"
+                        <Heart
+                          className={`w-5 h-5 ${
+                            favoriteIds.has(attraction.id)
+                              ? "text-white fill-white"
+                              : "text-white"
                           }`}
                         />
-                        <span
-                          className={
-                            theme === "dark"
-                              ? "text-neutral-400"
-                              : "text-neutral-600"
-                          }
-                        >
-                          {attraction.location}
-                        </span>
-                      </div>
+                      </button>
+                    </div>
+
+                    <div className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm bg-lime-400/20 border border-lime-400/30 text-lime-300">
+                      {attraction.category}
                     </div>
                   </div>
 
-                  <p
-                    className={`text-sm mb-4 ${
-                      theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-                    }`}
-                  >
-                    {attraction.description}
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                        <span
-                          className={`text-sm font-semibold ${
-                            theme === "dark" ? "text-white" : "text-neutral-900"
-                          }`}
-                        >
-                          {typeof attraction.rating === 'number' 
-                            ? attraction.rating.toFixed(1) 
-                            : attraction.rating}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <TrendingUp className="w-4 h-4 text-blue-400" />
-                        <span
-                          className={`text-sm ${
-                            theme === "dark"
-                              ? "text-neutral-400"
-                              : "text-neutral-600"
-                          }`}
-                        >
-                          {attraction.visitors}
-                        </span>
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold mb-1 text-white">
+                          {attraction.title}
+                        </h3>
+                        <div className="flex items-center gap-1 text-sm">
+                          <MapPin className="w-4 h-4 text-lime-400" />
+                          <span className="text-neutral-400">
+                            {attraction.location}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className={`flex items-center gap-2 text-sm font-semibold ${
-                        theme === "dark"
-                          ? "text-lime-400 hover:text-lime-300"
-                          : "text-emerald-600 hover:text-emerald-700"
-                      }`}
-                    >
-                      Explore
-                      <ArrowRight className="w-4 h-4" />
-                    </motion.button>
+                    <p className="text-sm mb-4 text-neutral-400">
+                      {attraction.description}
+                    </p>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                          <span className="text-sm font-semibold text-white">
+                            {typeof attraction.rating === 'number' 
+                              ? attraction.rating.toFixed(1) 
+                              : attraction.rating}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <TrendingUp className="w-4 h-4 text-blue-400" />
+                          <span className="text-sm text-neutral-400">
+                            {attraction.visitors}
+                          </span>
+                        </div>
+                      </div>
+
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center gap-2 text-sm font-semibold text-lime-400 hover:text-lime-300"
+                      >
+                        Explore
+                        <ArrowRight className="w-4 h-4" />
+                      </motion.button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </div>
         )}
       </div>
     </section>
@@ -708,7 +506,6 @@ function FeaturedAttractionsSection({
 }
 
 export default function AttractionsPage() {
-  const { theme } = useTheme();
   const [showPlanner, setShowPlanner] = useState(false);
 
   const scrollToPlanningSection = () => {
@@ -720,49 +517,28 @@ export default function AttractionsPage() {
 
   return (
     <DashboardPageLayout>
-      {/* Theme controlled by global ThemeToggle */}
-
       {!showPlanner ? (
         <>
           <HeroSection onPlanClick={scrollToPlanningSection} />
           <StatsSection />
           <FeaturedAttractionsSection />
 
-          {/* CTA to Planner */}
           <section
             id="planning-cta-section"
-            className={`py-24 px-6 lg:px-12 ${
-              theme === "dark" ? "bg-neutral-950" : "bg-white"
-            }`}
+            className="py-24 px-6 lg:px-12 bg-neutral-950"
           >
             <div className="max-w-4xl mx-auto text-center">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className={`rounded-3xl border p-12 ${
-                  theme === "dark"
-                    ? "bg-linear-to-br from-neutral-900 to-neutral-800 border-neutral-700"
-                    : "bg-linear-to-br from-emerald-50 to-orange-50 border-emerald-200"
-                }`}
+                className="rounded-3xl border p-12 bg-gradient-to-br from-neutral-900 to-neutral-800 border-neutral-700"
               >
-                <Compass
-                  className={`w-16 h-16 mx-auto mb-6 ${
-                    theme === "dark" ? "text-lime-400" : "text-emerald-600"
-                  }`}
-                />
-                <h2
-                  className={`text-3xl font-bold mb-4 ${
-                    theme === "dark" ? "text-white" : "text-neutral-900"
-                  }`}
-                >
+                <Compass className="w-16 h-16 mx-auto mb-6 text-lime-400" />
+                <h2 className="text-3xl font-bold mb-4 text-white">
                   Ready to Plan Your Adventure?
                 </h2>
-                <p
-                  className={`text-lg mb-8 ${
-                    theme === "dark" ? "text-neutral-300" : "text-neutral-700"
-                  }`}
-                >
+                <p className="text-lg mb-8 text-neutral-300">
                   Use our AI-powered planner to create a personalized itinerary
                   based on your preferences, budget, and interests
                 </p>
@@ -770,11 +546,7 @@ export default function AttractionsPage() {
                   onClick={() => setShowPlanner(true)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className={`px-8 py-4 rounded-full flex items-center gap-2 mx-auto transition-colors ${
-                    theme === "dark"
-                      ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
-                      : "bg-emerald-600 text-white hover:bg-emerald-700"
-                  }`}
+                  className="px-8 py-4 rounded-full flex items-center gap-2 mx-auto transition-colors bg-lime-400 text-neutral-950 hover:bg-lime-300"
                 >
                   Start Planning
                   <ArrowRight className="w-5 h-5" />
@@ -787,19 +559,13 @@ export default function AttractionsPage() {
         <div className="space-y-6">
           <button
             onClick={() => setShowPlanner(false)}
-            className={`flex items-center gap-2 text-sm font-medium ${
-              theme === "dark"
-                ? "text-lime-400 hover:text-lime-300"
-                : "text-emerald-600 hover:text-emerald-700"
-            }`}
+            className="flex items-center gap-2 text-sm font-medium text-lime-400 hover:text-lime-300"
           >
             ← Back to Attractions
           </button>
           <AttractionPlanner initialPoints={0} initialUserId={null} />
         </div>
-      )} 
-       
+      )}
     </DashboardPageLayout>
-
   );
 }

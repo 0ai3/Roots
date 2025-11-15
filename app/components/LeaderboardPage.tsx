@@ -2,10 +2,8 @@
 
 import useSWR from "swr";
 import DashboardPageLayout from "./DashboardPageLayout";
-import { useTheme } from "./ThemeProvider";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { motion } from "framer-motion";
-import { Trophy, Medal, Crown, Star } from "lucide-react";
 import {
   Trophy,
   Medal,
@@ -38,37 +36,7 @@ const fetcher = (url: string) =>
 type Translator = ReturnType<typeof useI18n>["t"];
 
 export default function LeaderboardPage() {
-  const { theme } = useTheme();
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [showBrowse, setShowBrowse] = useState(true);
-
-  // Theme management
-  useEffect(() => {
-    const updateTheme = () => {
-      try {
-        const saved = localStorage.getItem("theme");
-        if (saved) {
-          const dark = saved === "dark";
-          setIsDarkMode(dark);
-          if (dark) {
-            document.documentElement.classList.add("dark");
-          } else {
-            document.documentElement.classList.remove("dark");
-          }
-        } else {
-          // Fallback to system preference
-          const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          setIsDarkMode(systemDark);
-          if (systemDark) {
-            document.documentElement.classList.add("dark");
-          }
-        }
-      } catch {
-        setError("Failed to load leaderboard");
-      }
-    };
-    setIsDarkMode(theme === "dark");
-  }, [theme]);
 
   const { userId } = useExperiencePoints();
   const { data, isLoading } = useSWR("/api/leaderboard", fetcher, {
@@ -81,36 +49,21 @@ export default function LeaderboardPage() {
     ? entries.find((entry) => entry.userId === userId)
     : undefined;
 
-  // Color utility functions
-  const getBgColor = () => {
-    return isDarkMode ? "bg-black" : "bg-white";
-  };
-
-  const getTextColor = () => {
-    return isDarkMode ? "text-white" : "text-slate-900";
-  };
-
-  const getMutedTextColor = () => {
-    return isDarkMode ? "text-white/70" : "text-slate-600";
-  };
-
-  const getBorderColor = () => {
-    return isDarkMode ? "border-white/10" : "border-slate-200";
-  };
-
-  const getCardBg = () => {
-    return isDarkMode ? "bg-white/5" : "bg-slate-50";
-  };
+  // Dark mode only colors
+  const getBgColor = () => "bg-black";
+  const getTextColor = () => "text-white";
+  const getMutedTextColor = () => "text-white/70";
+  const getBorderColor = () => "border-white/10";
+  const getCardBg = () => "bg-white/5";
 
   return (
     <DashboardPageLayout
       title={t("leaderboard.title")}
       description={t("leaderboard.description")}
-      isDarkMode={isDarkMode}
+      isDarkMode={true}
     >
-      {/* PageThemeToggle removed per request */}
       {showBrowse ? (
-        <div className={`min-h-screen ${getBgColor()}`}>
+        <div className="min-h-screen bg-black">
           {/* Hero Section */}
           <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0">
@@ -122,11 +75,7 @@ export default function LeaderboardPage() {
                 priority
               />
               <div
-                className={`absolute inset-0 ${
-                  isDarkMode
-                    ? "bg-linear-to-br from-black/80 via-black/70 to-black/80"
-                    : "bg-linear-to-br from-black/60 via-black/50 to-black/60"
-                }`}
+                className={`absolute inset-0 bg-linear-to-br from-black/80 via-black/70 to-black/80`}
               />
             </div>
 
@@ -148,11 +97,7 @@ export default function LeaderboardPage() {
                 className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
               >
                 Global{" "}
-                <span
-                  className={isDarkMode ? "text-lime-400" : "text-lime-300"}
-                >
-                  Leaderboard
-                </span>
+                <span className="text-lime-400">Leaderboard</span>
               </motion.h1>
 
               <motion.p
@@ -175,11 +120,7 @@ export default function LeaderboardPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowBrowse(false)}
-                  className={`px-8 py-4 rounded-xl font-semibold flex items-center gap-2 transition-colors ${
-                    isDarkMode
-                      ? "bg-lime-400 text-black hover:bg-lime-300"
-                      : "bg-lime-500 text-white hover:bg-lime-600"
-                  }`}
+                  className="px-8 py-4 rounded-xl font-semibold flex items-center gap-2 bg-lime-400 text-black hover:bg-lime-300"
                 >
                   <Trophy className="w-5 h-5" />
                   View Rankings
@@ -231,55 +172,37 @@ export default function LeaderboardPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: i * 0.1 }}
                     className={`rounded-2xl p-6 backdrop-blur-sm border ${
-                      isDarkMode
-                        ? "bg-neutral-900/90 border-white/10"
-                        : "bg-white border-neutral-200 shadow-lg"
+                      "bg-white border-neutral-200 shadow-lg"
                     }`}
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div
                         className={`p-3 rounded-xl ${
                           stat.color === "lime"
-                            ? isDarkMode
-                              ? "bg-lime-400/20"
-                              : "bg-lime-100"
+                            ? "bg-lime-400/20"
                             : stat.color === "yellow"
-                            ? isDarkMode
-                              ? "bg-yellow-400/20"
-                              : "bg-yellow-100"
+                            ? "bg-yellow-400/20"
                             : stat.color === "orange"
-                            ? isDarkMode
-                              ? "bg-orange-400/20"
-                              : "bg-orange-100"
-                            : isDarkMode
-                            ? "bg-blue-400/20"
-                            : "bg-blue-100"
+                            ? "bg-orange-400/20"
+                            : "bg-blue-400/20"
                         }`}
                       >
                         <stat.icon
                           className={`w-6 h-6 ${
                             stat.color === "lime"
-                              ? isDarkMode
-                                ? "text-lime-400"
-                                : "text-lime-600"
+                              ? "text-lime-400"
                               : stat.color === "yellow"
-                              ? isDarkMode
-                                ? "text-yellow-400"
-                                : "text-yellow-600"
+                              ? "text-yellow-400"
                               : stat.color === "orange"
-                              ? isDarkMode
-                                ? "text-orange-400"
-                                : "text-orange-600"
-                              : isDarkMode
-                              ? "text-blue-400"
-                              : "text-blue-600"
+                              ? "text-orange-400"
+                              : "text-blue-400"
                           }`}
                         />
                       </div>
                       <div className="text-right">
                         <p
                           className={`text-3xl font-bold ${
-                            isDarkMode ? "text-white" : "text-neutral-900"
+                            "text-neutral-900"
                           }`}
                         >
                           {stat.value}
@@ -288,7 +211,7 @@ export default function LeaderboardPage() {
                     </div>
                     <p
                       className={`text-xs ${
-                        isDarkMode ? "text-neutral-500" : "text-neutral-500"
+                        "text-neutral-500"
                       }`}
                     >
                       {stat.desc}
@@ -310,13 +233,13 @@ export default function LeaderboardPage() {
               >
                 <h2
                   className={`text-4xl font-bold mb-4 ${
-                    isDarkMode ? "text-white" : "text-neutral-900"
+                    "text-white"
                   }`}
                 >
                   Top{" "}
                   <span
                     className={
-                      isDarkMode ? "text-lime-400" : "text-emerald-600"
+                      "text-lime-400"
                     }
                   >
                     Champions
@@ -324,7 +247,7 @@ export default function LeaderboardPage() {
                 </h2>
                 <p
                   className={`text-lg ${
-                    isDarkMode ? "text-neutral-400" : "text-neutral-600"
+                    "text-neutral-400"
                   }`}
                 >
                   Leading the cultural exploration movement
@@ -340,20 +263,18 @@ export default function LeaderboardPage() {
                     viewport={{ once: true }}
                     transition={{ delay: 0.1 }}
                     className={`rounded-2xl p-6 text-center border backdrop-blur-sm ${
-                      isDarkMode
-                        ? "bg-neutral-900/50 border-gray-400/20"
-                        : "bg-white border-gray-300 shadow-lg"
+                      "bg-white border-gray-300 shadow-lg"
                     } md:mt-8`}
                   >
                     <div className="relative inline-block mb-4">
                       <div
                         className={`w-20 h-20 rounded-full flex items-center justify-center ${
-                          isDarkMode ? "bg-gray-400/20" : "bg-gray-100"
+                          "bg-gray-100"
                         }`}
                       >
                         <Medal
                           className={`w-10 h-10 ${
-                            isDarkMode ? "text-gray-300" : "text-gray-600"
+                            "text-gray-600"
                           }`}
                         />
                       </div>
@@ -363,21 +284,21 @@ export default function LeaderboardPage() {
                     </div>
                     <h3
                       className={`font-bold text-lg mb-2 ${
-                        isDarkMode ? "text-white" : "text-neutral-900"
+                        "text-white"
                       }`}
                     >
                       {entries[1].name}
                     </h3>
                     <p
                       className={`text-2xl font-bold mb-1 ${
-                        isDarkMode ? "text-gray-300" : "text-gray-600"
+                        "text-gray-600"
                       }`}
                     >
                       {entries[1].points.toLocaleString()}
                     </p>
                     <p
                       className={`text-sm ${
-                        isDarkMode ? "text-neutral-500" : "text-neutral-500"
+                        "text-neutral-500"
                       }`}
                     >
                       points
@@ -390,20 +311,18 @@ export default function LeaderboardPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     className={`rounded-2xl p-6 text-center border backdrop-blur-sm ${
-                      isDarkMode
-                        ? "bg-linear-to-br from-yellow-500/10 to-amber-500/5 border-yellow-500/30"
-                        : "bg-linear-to-br from-yellow-50 to-amber-50 border-yellow-300 shadow-xl"
+                      "bg-linear-to-br from-yellow-50 to-amber-50 border-yellow-300 shadow-xl"
                     }`}
                   >
                     <div className="relative inline-block mb-4">
                       <div
                         className={`w-24 h-24 rounded-full flex items-center justify-center ${
-                          isDarkMode ? "bg-yellow-400/20" : "bg-yellow-100"
+                          "bg-yellow-100"
                         }`}
                       >
                         <Crown
                           className={`w-12 h-12 ${
-                            isDarkMode ? "text-yellow-400" : "text-yellow-600"
+                            "text-yellow-600"
                           }`}
                         />
                       </div>
@@ -413,21 +332,21 @@ export default function LeaderboardPage() {
                     </div>
                     <h3
                       className={`font-bold text-xl mb-2 ${
-                        isDarkMode ? "text-white" : "text-neutral-900"
+                        "text-white"
                       }`}
                     >
                       {entries[0].name}
                     </h3>
                     <p
                       className={`text-3xl font-bold mb-1 ${
-                        isDarkMode ? "text-yellow-400" : "text-yellow-600"
+                        "text-yellow-600"
                       }`}
                     >
                       {entries[0].points.toLocaleString()}
                     </p>
                     <p
                       className={`text-sm ${
-                        isDarkMode ? "text-yellow-300/70" : "text-yellow-700"
+                        "text-yellow-700"
                       }`}
                     >
                       points
@@ -441,20 +360,18 @@ export default function LeaderboardPage() {
                     viewport={{ once: true }}
                     transition={{ delay: 0.2 }}
                     className={`rounded-2xl p-6 text-center border backdrop-blur-sm ${
-                      isDarkMode
-                        ? "bg-neutral-900/50 border-amber-600/20"
-                        : "bg-white border-amber-300 shadow-lg"
+                      "bg-white border-amber-300 shadow-lg"
                     } md:mt-8`}
                   >
                     <div className="relative inline-block mb-4">
                       <div
                         className={`w-20 h-20 rounded-full flex items-center justify-center ${
-                          isDarkMode ? "bg-amber-600/20" : "bg-amber-100"
+                          "bg-amber-100"
                         }`}
                       >
                         <Medal
                           className={`w-10 h-10 ${
-                            isDarkMode ? "text-amber-600" : "text-amber-600"
+                            "text-amber-600"
                           }`}
                         />
                       </div>
@@ -464,21 +381,21 @@ export default function LeaderboardPage() {
                     </div>
                     <h3
                       className={`font-bold text-lg mb-2 ${
-                        isDarkMode ? "text-white" : "text-neutral-900"
+                        "text-white"
                       }`}
                     >
                       {entries[2].name}
                     </h3>
                     <p
                       className={`text-2xl font-bold mb-1 ${
-                        isDarkMode ? "text-amber-500" : "text-amber-600"
+                        "text-amber-600"
                       }`}
                     >
                       {entries[2].points.toLocaleString()}
                     </p>
                     <p
                       className={`text-sm ${
-                        isDarkMode ? "text-neutral-500" : "text-neutral-500"
+                        "text-neutral-500"
                       }`}
                     >
                       points
@@ -493,9 +410,7 @@ export default function LeaderboardPage() {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowBrowse(false)}
                   className={`px-8 py-4 rounded-xl font-semibold inline-flex items-center gap-2 ${
-                    isDarkMode
-                      ? "bg-neutral-800 text-white hover:bg-neutral-700"
-                      : "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
+                    "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
                   }`}
                 >
                   View Full Leaderboard
@@ -513,9 +428,7 @@ export default function LeaderboardPage() {
             <button
               onClick={() => setShowBrowse(true)}
               className={`px-6 py-3 rounded-xl font-semibold transition-colors ${
-                isDarkMode
-                  ? "bg-neutral-800 text-white hover:bg-neutral-700"
-                  : "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
+                "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
               }`}
             >
               ← Back to Overview
@@ -561,7 +474,7 @@ export default function LeaderboardPage() {
             <LeaderboardTable
               entries={entries}
               isLoading={isLoading}
-              isDarkMode={isDarkMode}
+              isDarkMode={true}
               t={t}
             />
           </div>

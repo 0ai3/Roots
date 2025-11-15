@@ -22,10 +22,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
     try {
       const saved = localStorage.getItem("theme") as Theme | null;
-      return saved || "light";
+      if (saved) {
+        if (saved === "dark") {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+        return saved;
+      }
     } catch {
-      return "light";
+      // Ignore
     }
+    return "light";
   });
 
   const setTheme = useCallback((newTheme: Theme) => {
