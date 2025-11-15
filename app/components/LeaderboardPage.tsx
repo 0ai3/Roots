@@ -4,7 +4,7 @@ import useSWR from "swr";
 import DashboardPageLayout from "./DashboardPageLayout";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { motion } from "framer-motion";
-import { Trophy, Medal, Crown, Star, Sun, Moon } from "lucide-react";
+import { Trophy, Medal, Crown, Star} from "lucide-react";
 import { useState, useEffect } from "react";
 import { useI18n } from "@/app/hooks/useI18n";
 

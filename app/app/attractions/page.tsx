@@ -13,93 +13,33 @@ import {
   Search,
   Filter,
   Heart,
-  Share2,
+  Target,
+  Loader2,
+  MapPinned,
 } from "lucide-react";
 import DashboardPageLayout from "../../components/DashboardPageLayout";
 import AttractionPlanner from "../../components/AttractionPlanner";
 import Image from "next/image";
 import { useTheme } from "../../components/ThemeProvider";
+import { getStoredUserId } from "@/app/lib/userId";
 
-// Sample featured attractions data
-const featuredAttractions = [
-  {
-    id: 1,
-    title: "Eiffel Tower",
-    location: "Paris, France",
-    category: "Landmark",
-    rating: 4.8,
-    visitors: "7M+",
-    image:
-      "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800&auto=format&fit=crop",
-    description: "Iconic iron lattice tower on the Champ de Mars",
-  },
-  {
-    id: 2,
-    title: "Colosseum",
-    location: "Rome, Italy",
-    category: "Historical",
-    rating: 4.9,
-    visitors: "6M+",
-    image:
-      "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800&auto=format&fit=crop",
-    description: "Ancient amphitheatre in the centre of Rome",
-  },
-  {
-    id: 3,
-    title: "Machu Picchu",
-    location: "Cusco, Peru",
-    category: "Archaeological",
-    rating: 4.9,
-    visitors: "1.5M+",
-    image:
-      "https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&auto=format&fit=crop",
-    description: "15th-century Inca citadel in the Andes",
-  },
-  {
-    id: 4,
-    title: "Taj Mahal",
-    location: "Agra, India",
-    category: "Monument",
-    rating: 4.7,
-    visitors: "8M+",
-    image:
-      "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&auto=format&fit=crop",
-    description: "Ivory-white marble mausoleum on the Yamuna river",
-  },
-  {
-    id: 5,
-    title: "Great Wall",
-    location: "Beijing, China",
-    category: "Historical",
-    rating: 4.6,
-    visitors: "10M+",
-    image:
-      "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=800&auto=format&fit=crop",
-    description: "Ancient fortification across northern China",
-  },
-  {
-    id: 6,
-    title: "Sagrada Familia",
-    location: "Barcelona, Spain",
-    category: "Architecture",
-    rating: 4.8,
-    visitors: "4.5M+",
-    image:
-      "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&auto=format&fit=crop",
-    description: "Gaudí's unfinished masterpiece basilica",
-  },
-];
+type Attraction = {
+  id: string;
+  title: string;
+  location: string;
+  category: string;
+  rating: number;
+  visitors: string;
+  image: string;
+  description: string;
+  coordinates?: {
+    lat: number;
+    lon: number;
+  };
+  distance?: number;
+};
 
-const categories = [
-  "All",
-  "Landmark",
-  "Historical",
-  "Monument",
-  "Archaeological",
-  "Architecture",
-];
-
-function HeroSection() {
+function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
   const { theme } = useTheme();
 
   return (
@@ -158,6 +98,7 @@ function HeroSection() {
 
             <div className="flex flex-wrap gap-4">
               <motion.button
+                onClick={onPlanClick}
                 className={`px-8 py-4 rounded-full flex items-center gap-2 transition-colors ${
                   theme === "dark"
                     ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
@@ -171,6 +112,7 @@ function HeroSection() {
               </motion.button>
 
               <motion.button
+                onClick={() => (window.location.href = "/app/map")} 
                 className={`px-8 py-4 rounded-full backdrop-blur-sm border transition-colors flex items-center gap-2 ${
                   theme === "dark"
                     ? "bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50"
@@ -254,12 +196,187 @@ function StatsSection() {
   );
 }
 
-function FeaturedAttractionsSection() {
+function FeaturedAttractionsSection({
+  onLoadAttractions,
+}: {
+  onLoadAttractions?: (count: number) => void;
+}) {
   const { theme } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [attractions, setAttractions] = useState<Attraction[]>([]);
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [radius, setRadius] = useState(5000); // Default 5km in meters
+  const [userId, setUserId] = useState<string | null>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
-  const filteredAttractions = featuredAttractions.filter((attraction) => {
+  useEffect(() => {
+    // Check authentication via API since cookie is httpOnly
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+          const data = await response.json();
+          console.log('User authenticated:', data);
+          // The user ID is the cookie value itself
+          const cookieResponse = await fetch('/api/profile');
+          if (cookieResponse.ok) {
+            const profileData = await cookieResponse.json();
+            setUserId(profileData.profile?.userId || null);
+          }
+        } else {
+          console.log('User not authenticated');
+          setUserId(null);
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        setUserId(null);
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
+    
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    // Get user's location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const coords = {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+          };
+          setUserLocation(coords);
+          fetchAttractions(coords.lat, coords.lon, radius);
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          setLocationError(
+            "Unable to get your location. Please enable location services."
+          );
+          setLoading(false);
+        }
+      );
+    } else {
+      setLocationError("Geolocation is not supported by your browser.");
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userLocation) {
+      fetchAttractions(userLocation.lat, userLocation.lon, radius);
+    }
+  }, [radius]);
+
+  useEffect(() => {
+    if (userId) {
+      fetchFavorites();
+    }
+  }, [userId]);
+
+  const fetchAttractions = async (lat: number, lon: number, rad: number) => {
+    setLoading(true);
+    setLocationError(null);
+    try {
+      const response = await fetch(
+        `/api/attractions/nearby?lat=${lat}&lon=${lon}&radius=${rad}`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setAttractions(data.attractions || []);
+        onLoadAttractions?.(data.attractions?.length || 0);
+      } else {
+        const errorMsg = data.details 
+          ? `${data.error} (${data.details})` 
+          : data.error || "Failed to fetch attractions";
+        setLocationError(errorMsg);
+        console.error("API error:", data);
+      }
+    } catch (error) {
+      console.error("Fetch attractions error:", error);
+      setLocationError("Failed to load nearby attractions. Please check your internet connection.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchFavorites = async () => {
+    try {
+      const response = await fetch("/api/attractions/favorites");
+      if (response.ok) {
+        const data = await response.json();
+        const ids = new Set<string>(
+          data.favorites.map((fav: any) => fav.attractionId as string)
+        );
+        setFavoriteIds(ids);
+      }
+    } catch (error) {
+      console.error("Fetch favorites error:", error);
+    }
+  };
+
+  const toggleFavorite = async (attraction: Attraction) => {
+    if (!userId) {
+      // Redirect to login instead of showing alert
+      window.location.href = '/login';
+      return;
+    }
+
+    const isFavorited = favoriteIds.has(attraction.id);
+
+    try {
+      if (isFavorited) {
+        const response = await fetch("/api/attractions/favorites", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ attractionId: attraction.id }),
+        });
+
+        if (response.ok) {
+          setFavoriteIds((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(attraction.id);
+            return newSet;
+          });
+        } else {
+          const data = await response.json();
+          if (response.status === 401) {
+            window.location.href = '/login';
+          }
+        }
+      } else {
+        const response = await fetch("/api/attractions/favorites", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ attraction }),
+        });
+
+        if (response.ok) {
+          setFavoriteIds((prev) => new Set(prev).add(attraction.id));
+        } else {
+          const data = await response.json();
+          if (response.status === 401) {
+            window.location.href = '/login';
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Toggle favorite error:", error);
+    }
+  };
+
+  const categories = [
+    "All",
+    ...Array.from(new Set(attractions.map((a) => a.category))),
+  ];
+
+  const filteredAttractions = attractions.filter((attraction) => {
     const matchesCategory =
       selectedCategory === "All" || attraction.category === selectedCategory;
     const matchesSearch =
@@ -312,6 +429,20 @@ function FeaturedAttractionsSection() {
 
         {/* Search and Filter */}
         <div className="mb-12 space-y-6">
+          {userLocation && (
+            <div
+              className={`flex items-center justify-center gap-2 text-sm ${
+                theme === "dark" ? "text-neutral-400" : "text-neutral-600"
+              }`}
+            >
+              <MapPinned className="w-4 h-4" />
+              <span>
+                Showing attractions near your location ({radius / 1000}km radius)
+                {userId && <span className="ml-2 text-xs">• Logged in ✓</span>}
+              </span>
+            </div>
+          )}
+
           <div className="relative max-w-2xl mx-auto">
             <Search
               className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
@@ -320,7 +451,7 @@ function FeaturedAttractionsSection() {
             />
             <input
               type="text"
-              placeholder="Search attractions, cities, or countries..."
+              placeholder="Search nearby attractions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className={`w-full pl-12 pr-4 py-4 rounded-2xl border transition-all ${
@@ -331,6 +462,39 @@ function FeaturedAttractionsSection() {
                 theme === "dark" ? "lime-400" : "emerald-400"
               } focus:outline-none`}
             />
+          </div>
+
+          {/* Range Slider */}
+          <div className="max-w-2xl mx-auto">
+            <label
+              className={`block text-sm font-medium mb-2 ${
+                theme === "dark" ? "text-neutral-300" : "text-neutral-700"
+              }`}
+            >
+              Search Radius: {radius / 1000}km
+            </label>
+            <input
+              type="range"
+              min="1000"
+              max="50000"
+              step="1000"
+              value={radius}
+              onChange={(e) => setRadius(Number(e.target.value))}
+              className="w-full h-2 rounded-lg appearance-none cursor-pointer"
+              style={{
+                background: theme === "dark"
+                  ? "linear-gradient(to right, #a3e635 0%, #a3e635 " + ((radius - 1000) / 49000 * 100) + "%, #404040 " + ((radius - 1000) / 49000 * 100) + "%, #404040 100%)"
+                  : "linear-gradient(to right, #059669 0%, #059669 " + ((radius - 1000) / 49000 * 100) + "%, #e5e7eb " + ((radius - 1000) / 49000 * 100) + "%, #e5e7eb 100%)"
+              }}
+            />
+            <div className="flex justify-between text-xs mt-1">
+              <span className={theme === "dark" ? "text-neutral-500" : "text-neutral-500"}>
+                1km
+              </span>
+              <span className={theme === "dark" ? "text-neutral-500" : "text-neutral-500"}>
+                50km
+              </span>
+            </div>
           </div>
 
           <div className="flex flex-wrap justify-center gap-3">
@@ -354,7 +518,66 @@ function FeaturedAttractionsSection() {
           </div>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2
+              className={`w-12 h-12 animate-spin mb-4 ${
+                theme === "dark" ? "text-lime-400" : "text-emerald-600"
+              }`}
+            />
+            <p
+              className={theme === "dark" ? "text-neutral-400" : "text-neutral-600"}
+            >
+              Loading nearby attractions...
+            </p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {locationError && !loading && (
+          <div
+            className={`text-center py-20 px-6 rounded-3xl border ${
+              theme === "dark"
+                ? "bg-red-500/10 border-red-500/30 text-red-400"
+                : "bg-red-50 border-red-200 text-red-700"
+            }`}
+          >
+            <MapPin className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p className="text-lg font-semibold mb-2">Unable to Load Attractions</p>
+            <p className="text-sm mb-4">{locationError}</p>
+            {userLocation && (
+              <button
+                onClick={() => fetchAttractions(userLocation.lat, userLocation.lon, radius)}
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition ${
+                  theme === "dark"
+                    ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
+                    : "bg-emerald-600 text-white hover:bg-emerald-700"
+                }`}
+              >
+                Try Again
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !locationError && filteredAttractions.length === 0 && (
+          <div
+            className={`text-center py-20 px-6 ${
+              theme === "dark" ? "text-neutral-400" : "text-neutral-600"
+            }`}
+          >
+            <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p className="text-lg font-semibold mb-2">No attractions found</p>
+            <p className="text-sm">
+              Try adjusting your search radius or search terms
+            </p>
+          </div>
+        )}
+
         {/* Attractions Grid */}
+        {!loading && !locationError && filteredAttractions.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredAttractions.map((attraction, index) => (
             <motion.div
@@ -390,28 +613,24 @@ function FeaturedAttractionsSection() {
 
                   <div className="absolute top-4 right-4 flex gap-2">
                     <button
+                      onClick={() => toggleFavorite(attraction)}
                       className={`w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition ${
-                        theme === "dark"
+                        favoriteIds.has(attraction.id)
+                          ? theme === "dark"
+                            ? "bg-red-500/80 hover:bg-red-600/80"
+                            : "bg-red-500/90 hover:bg-red-600/90"
+                          : theme === "dark"
                           ? "bg-neutral-900/80 hover:bg-lime-400/20"
                           : "bg-white/90 hover:bg-emerald-100"
                       }`}
                     >
                       <Heart
                         className={`w-5 h-5 ${
-                          theme === "dark" ? "text-white" : "text-neutral-700"
-                        }`}
-                      />
-                    </button>
-                    <button
-                      className={`w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition ${
-                        theme === "dark"
-                          ? "bg-neutral-900/80 hover:bg-lime-400/20"
-                          : "bg-white/90 hover:bg-emerald-100"
-                      }`}
-                    >
-                      <Share2
-                        className={`w-5 h-5 ${
-                          theme === "dark" ? "text-white" : "text-neutral-700"
+                          favoriteIds.has(attraction.id)
+                            ? "text-white fill-white"
+                            : theme === "dark"
+                            ? "text-white"
+                            : "text-neutral-700"
                         }`}
                       />
                     </button>
@@ -476,7 +695,9 @@ function FeaturedAttractionsSection() {
                             theme === "dark" ? "text-white" : "text-neutral-900"
                           }`}
                         >
-                          {attraction.rating}
+                          {typeof attraction.rating === 'number' 
+                            ? attraction.rating.toFixed(1) 
+                            : attraction.rating}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
@@ -511,6 +732,7 @@ function FeaturedAttractionsSection() {
             </motion.div>
           ))}
         </div>
+        )}
       </div>
     </section>
   );
@@ -520,18 +742,26 @@ export default function AttractionsPage() {
   const { theme } = useTheme();
   const [showPlanner, setShowPlanner] = useState(false);
 
+  const scrollToPlanningSection = () => {
+    const planningSection = document.getElementById('planning-cta-section');
+    if (planningSection) {
+      planningSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
   return (
     <DashboardPageLayout>
       {/* Theme controlled by global ThemeToggle */}
 
       {!showPlanner ? (
         <>
-          <HeroSection />
+          <HeroSection onPlanClick={scrollToPlanningSection} />
           <StatsSection />
           <FeaturedAttractionsSection />
 
           {/* CTA to Planner */}
           <section
+            id="planning-cta-section"
             className={`py-24 px-6 lg:px-12 ${
               theme === "dark" ? "bg-neutral-950" : "bg-white"
             }`}

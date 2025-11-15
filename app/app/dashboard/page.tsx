@@ -271,10 +271,14 @@ export default function DashboardPage() {
               className="text-center mb-12"
             >
               <h2 className="text-4xl font-bold text-neutral-900 dark:text-white mb-4">
-                Quick <span className="text-lime-600 dark:text-lime-400">Actions</span>
+                Quick{" "}
+                <span className="text-lime-600 dark:text-lime-400">
+                  Actions
+                </span>
               </h2>
               <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
-                Jump into your favorite activities and continue your cultural journey
+                Jump into your favorite activities and continue your cultural
+                journey
               </p>
             </motion.div>
 
@@ -311,7 +315,8 @@ export default function DashboardPage() {
                 {
                   icon: Star,
                   title: "Featured Recipes",
-                  description: "Discover authentic dishes from around the world",
+                  description:
+                    "Discover authentic dishes from around the world",
                   color: "orange",
                   href: "/app/recipes",
                 },
@@ -366,7 +371,10 @@ export default function DashboardPage() {
               className="text-center mb-12"
             >
               <h2 className="text-4xl font-bold text-neutral-900 dark:text-white mb-4">
-                Recent <span className="text-emerald-600 dark:text-emerald-400">Achievements</span>
+                Recent{" "}
+                <span className="text-emerald-600 dark:text-emerald-400">
+                  Achievements
+                </span>
               </h2>
               <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
                 Celebrate your milestones and cultural discoveries
