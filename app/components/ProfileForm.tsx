@@ -4,7 +4,8 @@ import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { setStoredUserId } from "../lib/userId";
 import { useI18n } from "@/app/hooks/useI18n";
-import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { CheckCircle, AlertCircle, Loader2, MapPin, Heart, ExternalLink } from "lucide-react";
+import Image from "next/image";
 
 type Props = {
   initialPoints?: number;
@@ -35,6 +36,20 @@ type ProfileMeta = {
   createdAt: string | null;
   updatedAt: string | null;
   email: string;
+};
+
+type FavoriteAttraction = {
+  attractionId: string;
+  attraction: {
+    id: string;
+    title: string;
+    location: string;
+    category: string;
+    rating: number;
+    image: string;
+    description: string;
+  };
+  createdAt: string;
 };
 
 const EMPTY_FORM: ProfileFields = {
@@ -160,6 +175,8 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
   const [homeCountryValidation, setHomeCountryValidation] = useState<
     "idle" | "validating" | "valid" | "invalid"
   >("idle");
+  const [favorites, setFavorites] = useState<FavoriteAttraction[]>([]);
+  const [loadingFavorites, setLoadingFavorites] = useState(false);
 
   useEffect(() => {
     let isActive = true;
@@ -222,6 +239,40 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
       isActive = false;
     };
   }, [t]);
+
+  // Load favorites
+  useEffect(() => {
+    const loadFavorites = async () => {
+      setLoadingFavorites(true);
+      try {
+        const response = await fetch("/api/attractions/favorites");
+        if (response.ok) {
+          const data = await response.json();
+          setFavorites(data.favorites || []);
+        }
+      } catch (error) {
+        console.error("Error loading favorites:", error);
+      } finally {
+        setLoadingFavorites(false);
+      }
+    };
+    loadFavorites();
+  }, []);
+
+  const removeFavorite = async (attractionId: string) => {
+    try {
+      const response = await fetch("/api/attractions/favorites", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ attractionId }),
+      });
+      if (response.ok) {
+        setFavorites((prev) => prev.filter((fav) => fav.attractionId !== attractionId));
+      }
+    } catch (error) {
+      console.error("Error removing favorite:", error);
+    }
+  };
 
   // Validate home country
   useEffect(() => {
@@ -570,6 +621,78 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
             </p>
           </div>
         </form>
+
+        {/* Favorite Attractions Section */}
+        <div className={`space-y-4 rounded-3xl border p-6 backdrop-blur ${getBorderColor()} ${getCardBg()}`}>
+          <div className="flex items-center gap-2 mb-4">
+            <Heart className={`w-5 h-5 ${isDarkMode ? "text-lime-400 fill-lime-400" : "text-emerald-600 fill-emerald-600"}`} />
+            <h3 className={`text-xl font-semibold ${getTextColor()}`}>
+              Favorite Attractions
+            </h3>
+          </div>
+
+          {loadingFavorites ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className={`w-8 h-8 animate-spin ${getMutedTextColor()}`} />
+            </div>
+          ) : favorites.length === 0 ? (
+            <div className={`text-center py-8 ${getMutedTextColor()}`}>
+              <MapPin className="w-12 h-12 mx-auto mb-2 opacity-30" />
+              <p className="text-sm">No favorite attractions yet</p>
+              <p className="text-xs mt-1">Visit the Attractions page to add favorites</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {favorites.map((fav) => (
+                <div
+                  key={fav.attractionId}
+                  className={`group relative overflow-hidden rounded-2xl border ${getBorderColor()} ${
+                    isDarkMode ? "hover:border-lime-400/30" : "hover:border-emerald-400/50"
+                  } transition-all`}
+                >
+                  <div className="relative h-40 overflow-hidden">
+                    <Image
+                      src={fav.attraction.image}
+                      alt={fav.attraction.title}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className={`absolute inset-0 ${
+                      isDarkMode
+                        ? "bg-linear-to-t from-neutral-900 via-neutral-900/40 to-transparent"
+                        : "bg-linear-to-t from-white via-white/40 to-transparent"
+                    }`} />
+                    <button
+                      onClick={() => removeFavorite(fav.attractionId)}
+                      className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm transition ${
+                        isDarkMode
+                          ? "bg-red-500/80 hover:bg-red-600/90"
+                          : "bg-red-500/90 hover:bg-red-600"
+                      }`}
+                      title="Remove from favorites"
+                    >
+                      <Heart className="w-4 h-4 text-white fill-white" />
+                    </button>
+                  </div>
+                  <div className={`p-4 ${getInputBg()}`}>
+                    <h4 className={`font-semibold mb-1 ${getTextColor()} text-sm line-clamp-1`}>
+                      {fav.attraction.title}
+                    </h4>
+                    <div className="flex items-center gap-1 mb-2">
+                      <MapPin className={`w-3 h-3 ${isDarkMode ? "text-lime-400" : "text-emerald-600"}`} />
+                      <span className={`text-xs ${getMutedTextColor()} line-clamp-1`}>
+                        {fav.attraction.location}
+                      </span>
+                    </div>
+                    <p className={`text-xs ${getMutedTextColor()} line-clamp-2`}>
+                      {fav.attraction.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
