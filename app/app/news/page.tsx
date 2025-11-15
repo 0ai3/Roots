@@ -95,7 +95,7 @@ export default function NewsPage() {
     }
   };
 
-  const getCategoryIcon = (category: string) => {
+  const getCategoryIcon = () => {
     return <Sparkles className="h-5 w-5" />;
   };
   return (
@@ -268,7 +268,7 @@ export default function NewsPage() {
                     >
                       <div className="flex items-start gap-3">
                         <div className="rounded-full bg-blue-500/20 p-2 text-blue-400">
-                          {getCategoryIcon(item.category)}
+                          {getCategoryIcon()}
                         </div>
                         <div className="flex-1">
                           <span className="text-xs uppercase tracking-wide text-white/40">

@@ -1,156 +1,120 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-
-type LearnEarnModulePayload = {
-  country: string;
-  summary: string;
-  reading: string[];
-  quiz: {
-    id: string;
-    question: string;
-    options: string[];
-    answer: number;
-    explanation: string;
-  }[];
-};
-
-function buildPrompt(country: string) {
-  return `Create a concise "Learn & Earn" cultural module for travelers who want to understand ${country}. Return ONLY valid JSON with this shape:
-{
-  "country": "${country}",
-  "summary": "One sentence describing the tradition or theme",
-  "reading": ["Paragraph 1", "Paragraph 2", "Paragraph 3", "Paragraph 4"],
-  "quiz": [
-    {
-      "id": "quiz-1",
-      "question": "Question text",
-      "options": ["A", "B", "C", "D"],
-      "answer": 0,
-      "explanation": "Why the answer is correct"
-    }
-  ]
-}
-Requirements:
-- reading should highlight cultural rituals, etiquette, or creative scenes tied to ${country}. 3-5 short paragraphs, each under 80 words.
-- quiz must contain exactly 10 questions.
-- each question needs 4 distinct options and "answer" is the zero-based index of the correct option.
-- explanations should be one sentence reinforcing the paragraph details.
-- Keep tone factual and travel-focused.
-Return ONLY the JSON (no markdown, no commentary).`;
-}
-
-function extractJson(text: string) {
-  const trimmed = text.trim();
-  const codeMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  const payload = codeMatch ? codeMatch[1] : trimmed;
-  const start = payload.indexOf("{");
-  const end = payload.lastIndexOf("}");
-  if (start === -1 || end === -1) {
-    throw new Error("Gemini response did not contain JSON");
-  }
-  return payload.slice(start, end + 1);
-}
-
-function parseJsonPayload(payload: string) {
+export async function POST(req: Request) {
   try {
-    return JSON.parse(payload);
-  } catch {
-    const sanitized = payload
-      .replace(/,\s*([}\]])/g, "$1")
-      .replace(/\u0000/g, "");
-    return JSON.parse(sanitized);
-  }
-}
+    const body = await req.json();
+    const { type, difficulty, questionCount } = body;
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json().catch(() => ({}));
-    const country = String(body?.country ?? "").trim();
-    if (!country) {
-      return NextResponse.json(
-        { error: "Please provide a country name." },
-        { status: 400 }
-      );
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not configured");
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "Gemini API key is not configured." },
-        { status: 500 }
-      );
-    }
-
-    const prompt = buildPrompt(country);
-    const url = `https://generativelanguage.googleapis.com/v1/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [{ text: prompt }],
-          },
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 2048,
-        },
-      }),
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-pro',
+      generationConfig: {
+        temperature: 0.7,
+        topP: 0.8,
+        topK: 40,
+        maxOutputTokens: 2048,
+      }
     });
 
-    if (!response.ok) {
-      const details = await response.text();
-      throw new Error(`Gemini error ${response.status}: ${details}`);
+    // Build prompt based on type
+    const prompts: Record<string, string> = {
+      cultural: `Create ${questionCount} multiple choice quiz questions about world cultures and traditions. Topics: festivals, customs, traditions, cultural practices.`,
+      geography: `Create ${questionCount} geography quiz questions about countries, capitals, landmarks, and geographic features.`,
+      tradition: `Create ${questionCount} questions matching cultural practices to their origins.`,
+      language: `Create ${questionCount} questions about basic phrases in different languages.`,
+      history: `Create ${questionCount} questions about world history and chronology.`,
+      speed: `Create ${questionCount} quick general knowledge questions about cultures and geography.`
+    };
+
+    const basePrompt = prompts[type as keyof typeof prompts] || prompts.cultural;
+    
+    const pointsRange = difficulty === 'easy' ? '20-100' : 
+                       difficulty === 'medium' ? '50-200' : '100-400';
+
+    const fullPrompt = `${basePrompt}
+
+CRITICAL FORMATTING RULES:
+1. Return ONLY a valid JSON array
+2. Start with [ and end with ]
+3. Use double quotes for all strings
+4. No trailing commas
+5. No markdown, no code blocks
+
+Difficulty: ${difficulty}
+Points range: ${pointsRange}
+
+JSON structure:
+[
+  {
+    "question": "Question text?",
+    "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+    "correctAnswer": 0,
+    "explanation": "Explanation text",
+    "points": 50
+  }
+]
+
+Generate exactly ${questionCount} questions. Return only the JSON array:`;
+
+    const result = await model.generateContent(fullPrompt);
+    const response = await result.response;
+    
+    if (!response) {
+      throw new Error("No response from Gemini API");
     }
 
-    const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) {
+    let text;
+    try {
+      text = response.text();
+    } catch (error) {
+      console.error("Error getting text from response:", error);
+      throw new Error("Failed to get text from Gemini response");
+    }
+
+    if (!text || text.trim().length === 0) {
+      console.error("Empty text from Gemini");
       throw new Error("Gemini returned an empty response");
     }
 
-    const jsonPayload = extractJson(text);
-    const module = parseJsonPayload(jsonPayload) as LearnEarnModulePayload;
-
-    if (!module?.quiz || !Array.isArray(module.quiz) || module.quiz.length !== 10) {
-      throw new Error("Gemini did not return 10 quiz questions");
+    // Clean the response
+    text = text.trim();
+    text = text.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
+    
+    // Extract JSON
+    const startIndex = text.indexOf('[');
+    const endIndex = text.lastIndexOf(']');
+    
+    if (startIndex === -1 || endIndex === -1) {
+      console.error("No valid JSON array in response:", text.substring(0, 200));
+      throw new Error("Invalid JSON format in Gemini response");
     }
-    module.quiz.forEach((question, index) => {
-      if (
-        !question ||
-        typeof question.question !== "string" ||
-        !Array.isArray(question.options) ||
-        question.options.length !== 4 ||
-        typeof question.answer !== "number" ||
-        question.answer < 0 ||
-        question.answer > 3
-      ) {
-        throw new Error(`Invalid quiz question returned at index ${index}`);
-      }
-    });
-    const readingLength = module.reading?.length ?? 0;
-    if (!module.reading || readingLength < 3) {
-      throw new Error("Gemini did not return enough reading paragraphs");
+    
+    const jsonText = text.substring(startIndex, endIndex + 1);
+    
+    // Fix common JSON issues
+    const cleanedJson = jsonText
+      .replace(/,\s*}/g, '}')
+      .replace(/,\s*]/g, ']')
+      .replace(/\n/g, ' ')
+      .replace(/\r/g, '');
+
+    const jsonPayload = JSON.parse(cleanedJson);
+
+    if (!Array.isArray(jsonPayload)) {
+      throw new Error("Response is not a valid array");
     }
 
-    module.summary = module.summary?.trim() ?? `Cultural insights from ${module.country}`;
-    module.country = module.country?.trim() || country;
+    return NextResponse.json({ questions: jsonPayload });
 
-    return NextResponse.json({ module });
   } catch (error) {
     console.error("Learn & Earn generator error:", error);
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Unable to generate the module.",
-      },
+      { error: error instanceof Error ? error.message : "Failed to generate content" },
       { status: 500 }
     );
   }

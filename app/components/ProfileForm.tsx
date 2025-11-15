@@ -4,7 +4,7 @@ import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { setStoredUserId } from "../lib/userId";
 import { useI18n } from "@/app/hooks/useI18n";
-import { CheckCircle, AlertCircle, Loader2, MapPin, Heart, ExternalLink } from "lucide-react";
+import { Loader2, MapPin, Heart, CheckCircle, AlertCircle } from "lucide-react";
 import Image from "next/image";
 
 type Props = {
@@ -390,7 +390,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
       setStatusMessage(t("profile.status.success"));
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : t("profile.status.error");
+        error instanceof Error ? error.message : t("profile.errors.save");
       setErrorMessage(message);
     } finally {
       setIsSaving(false);

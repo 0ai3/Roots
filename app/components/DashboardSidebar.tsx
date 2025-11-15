@@ -23,10 +23,6 @@ import {
   X as XIcon,
 } from "lucide-react";
 
-type Props = {
-  borderClassName?: string;
-};
-
 const navLinks = [
   { label: "nav.dashboard", href: "/app/dashboard", icon: Home },
   { label: "nav.profile", href: "/app/profile", icon: User },
@@ -41,7 +37,18 @@ const navLinks = [
   { label: "nav.leaderboard", href: "/app/leaderboard", icon: Trophy },
 ];
 
-export default function DashboardSidebar({ borderClassName }: Props) {
+interface ProfileData {
+  name?: string;
+  email?: string;
+  location?: string;
+  homeCountry?: string;
+  favoriteMuseums?: string;
+  favoriteRecipes?: string;
+  bio?: string;
+  socialHandle?: string;
+}
+
+export default function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -53,7 +60,7 @@ export default function DashboardSidebar({ borderClassName }: Props) {
   const [location, setLocation] = useState("");
   const [isSavingLocation, setIsSavingLocation] = useState(false);
   const [hasLocation, setHasLocation] = useState(true);
-  const profileDataRef = useRef<any>(null);
+  const profileDataRef = useRef<ProfileData | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load location from profile
@@ -63,7 +70,7 @@ export default function DashboardSidebar({ borderClassName }: Props) {
         const response = await fetch("/api/profile");
         if (response.ok) {
           const data = await response.json();
-          const profile = data.profile || {};
+          const profile: ProfileData = data.profile || {};
           profileDataRef.current = profile;
           const loc = profile.location || "";
           setLocation(loc);
@@ -96,25 +103,25 @@ export default function DashboardSidebar({ borderClassName }: Props) {
       } else {
         setIsDarkLocal(document.documentElement.classList.contains("dark"));
       }
-    } catch (e) {
+    } catch (_e) {
       // ignore
     }
 
-    const handler = (ev: Event) => {
+    const handleThemeChange = (ev: Event) => {
       try {
         const detail = (ev as CustomEvent).detail;
         if (detail && typeof detail.isDark === "boolean") {
           setIsDarkLocal(detail.isDark);
           return;
         }
-      } catch (e) {
-        // ignore
+      } catch {
+        console.error("Failed to update theme");
       }
       try {
         const saved = localStorage.getItem("theme");
         setIsDarkLocal(saved === "dark");
-      } catch (e) {
-        // ignore
+      } catch {
+        console.error("Failed to update theme");
       }
     };
 
@@ -122,10 +129,10 @@ export default function DashboardSidebar({ borderClassName }: Props) {
       if (e.key === "theme") setIsDarkLocal(e.newValue === "dark");
     };
 
-    window.addEventListener("theme-change", handler as EventListener);
+    window.addEventListener('theme-change', handleThemeChange as EventListener);
     window.addEventListener("storage", storageHandler);
     return () => {
-      window.removeEventListener("theme-change", handler as EventListener);
+      window.removeEventListener('theme-change', handleThemeChange as EventListener);
       window.removeEventListener("storage", storageHandler);
     };
   }, []);
@@ -215,8 +222,8 @@ export default function DashboardSidebar({ borderClassName }: Props) {
       await fetch("/api/auth/logout", { method: "POST" });
       setStoredUserId(null);
       router.push("/");
-    } catch (error) {
-      console.error("Logout failed", error);
+    } catch {
+      console.error("Logout failed");
     } finally {
       setIsLoggingOut(false);
     }

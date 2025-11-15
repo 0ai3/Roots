@@ -36,7 +36,7 @@ export default function ChatInterface() {
           const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           setIsDarkMode(systemDark);
         }
-      } catch (e) {
+      } catch {
         // ignore
       }
     };

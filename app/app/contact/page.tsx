@@ -30,7 +30,7 @@ export default function ContactPage() {
       setLastName("");
       setEmail("");
       setMessage("");
-    } catch (err) {
+    } catch {
       setSending(false);
       setResult("error");
     }

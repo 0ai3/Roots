@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import DashboardPageLayout from "../../components/DashboardPageLayout";
+import { Ticket, Clock, Sparkles, Gift, Coffee, Utensils, Building2, Loader2, CheckCircle, X } from "lucide-react";
 import PageThemeToggle from "../../components/PageThemeToggle";
 import { useTheme } from "../../components/ThemeProvider";
 import {
@@ -68,6 +69,28 @@ export default function OffertsPage() {
 
   // Theme management
   useEffect(() => {
+    const updateTheme = () => {
+      try {
+        const saved = localStorage.getItem("theme");
+        if (saved) {
+          const dark = saved === "dark";
+          setIsDarkMode(dark);
+          if (dark) {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
+        } else {
+          const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          setIsDarkMode(systemDark);
+          if (systemDark) {
+            document.documentElement.classList.add("dark");
+          }
+        }
+      } catch {
+        // ignore
+      }
+    };
     setIsDarkMode(theme === "dark");
   }, [theme]);
 

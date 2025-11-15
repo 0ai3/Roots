@@ -1,77 +1,70 @@
 "use client";
-
-import {
+import React, {
   createContext,
   useContext,
   useState,
-  useEffect,
   ReactNode,
+  useCallback,
+  useMemo,
 } from "react";
 
 type Theme = "light" | "dark";
 
 interface ThemeContextType {
   theme: Theme;
+  setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
-  setTheme: (t: Theme) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>(() => {
+    try {
+      const saved = localStorage.getItem("theme") as Theme | null;
+      return saved || "light";
+    } catch {
+      return "light";
+    }
+  });
 
-  useEffect(() => {
-    const saved = localStorage.getItem("theme") as Theme | null;
-    if (saved) setTheme(saved);
+  const setTheme = useCallback((newTheme: Theme) => {
+    setThemeState(newTheme);
+    try {
+      localStorage.setItem("theme", newTheme);
+      if (newTheme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    } catch {
+      // Ignore
+    }
+    try {
+      window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: newTheme } }));
+    } catch {
+      // Ignore
+    }
   }, []);
 
-  const toggleTheme = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    localStorage.setItem("theme", next);
-    try {
-      // Notify any non-React components listening for theme changes
-      window.dispatchEvent(new CustomEvent("theme-change", { detail: { isDark: next === "dark" } }));
-    } catch (e) {
-      // ignore in non-browser environments
-    }
-  };
+  const toggleTheme = useCallback(() => {
+    setTheme(theme === "light" ? "dark" : "light");
+  }, [theme, setTheme]);
 
-  // allow consumers to set the theme explicitly
-  const setThemeExplicit = (t: Theme) => {
-    setTheme(t);
-    localStorage.setItem("theme", t);
-    try {
-      window.dispatchEvent(new CustomEvent("theme-change", { detail: { isDark: t === "dark" } }));
-    } catch (e) {
-      // ignore
-    }
-  };
-
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-  }, [theme]);
+  const value = useMemo(
+    () => ({ theme, setTheme, toggleTheme }),
+    [theme, setTheme, toggleTheme]
+  );
 
   return (
-    <ThemeContext.Provider
-      value={{ theme, toggleTheme, setTheme: setThemeExplicit }}
-    >
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 }
 
-// Keep the HTML class in sync with the theme for Tailwind's `dark:` variants
-
 export function useTheme() {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error("useTheme must be used within a ThemeProvider");
-  return ctx;
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error("useTheme must be used within ThemeProvider");
+  }
+  return context;
 }

@@ -1,6 +1,5 @@
 "use client";
-import Footer from "@/app/components/Footer";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   MapPin,
@@ -11,9 +10,7 @@ import {
   Globe2,
   ArrowRight,
   Search,
-  Filter,
   Heart,
-  Target,
   Loader2,
   MapPinned,
 } from "lucide-react";
@@ -21,7 +18,6 @@ import DashboardPageLayout from "../../components/DashboardPageLayout";
 import AttractionPlanner from "../../components/AttractionPlanner";
 import Image from "next/image";
 import { useTheme } from "../../components/ThemeProvider";
-import { getStoredUserId } from "@/app/lib/userId";
 
 type Attraction = {
   id: string;
@@ -37,6 +33,10 @@ type Attraction = {
     lon: number;
   };
   distance?: number;
+};
+
+type Favorite = {
+  attractionId: string;
 };
 
 function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
@@ -210,37 +210,33 @@ function FeaturedAttractionsSection({
   const [locationError, setLocationError] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [radius, setRadius] = useState(5000); // Default 5km in meters
-  const [userId, setUserId] = useState<string | null>(null);
-  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [userId] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Check authentication via API since cookie is httpOnly
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/auth/me');
-        if (response.ok) {
-          const data = await response.json();
-          console.log('User authenticated:', data);
-          // The user ID is the cookie value itself
-          const cookieResponse = await fetch('/api/profile');
-          if (cookieResponse.ok) {
-            const profileData = await cookieResponse.json();
-            setUserId(profileData.profile?.userId || null);
-          }
-        } else {
-          console.log('User not authenticated');
-          setUserId(null);
-        }
-      } catch (error) {
-        console.error('Auth check error:', error);
-        setUserId(null);
-      } finally {
-        setCheckingAuth(false);
+  const fetchAttractions = useCallback(async (lat: number, lon: number, rad: number) => {
+    setLoading(true);
+    setLocationError(null);
+    try {
+      const response = await fetch(
+        `/api/attractions/nearby?lat=${lat}&lon=${lon}&radius=${rad}`
+      );
+      const _data = await response.json();
+      if (response.ok) {
+        setAttractions(_data.attractions || []);
+        onLoadAttractions?.(_data.attractions?.length || 0);
+      } else {
+        const errorMsg = _data.details
+          ? `${_data.error} (${_data.details})`
+          : _data.error || "Failed to fetch attractions";
+        setLocationError(errorMsg);
+        console.error("API error:", _data);
       }
-    };
-    
-    checkAuth();
-  }, []);
+    } catch (error) {
+      console.error("Fetch attractions error:", error);
+      setLocationError("Failed to load nearby attractions. Please check your internet connection.");
+    } finally {
+      setLoading(false);
+    }
+  }, [onLoadAttractions]);
 
   useEffect(() => {
     // Get user's location
@@ -266,13 +262,13 @@ function FeaturedAttractionsSection({
       setLocationError("Geolocation is not supported by your browser.");
       setLoading(false);
     }
-  }, []);
+  }, [radius, fetchAttractions]);
 
   useEffect(() => {
     if (userLocation) {
       fetchAttractions(userLocation.lat, userLocation.lon, radius);
     }
-  }, [radius]);
+  }, [radius, userLocation, fetchAttractions]);
 
   useEffect(() => {
     if (userId) {
@@ -280,31 +276,6 @@ function FeaturedAttractionsSection({
     }
   }, [userId]);
 
-  const fetchAttractions = async (lat: number, lon: number, rad: number) => {
-    setLoading(true);
-    setLocationError(null);
-    try {
-      const response = await fetch(
-        `/api/attractions/nearby?lat=${lat}&lon=${lon}&radius=${rad}`
-      );
-      const data = await response.json();
-      if (response.ok) {
-        setAttractions(data.attractions || []);
-        onLoadAttractions?.(data.attractions?.length || 0);
-      } else {
-        const errorMsg = data.details 
-          ? `${data.error} (${data.details})` 
-          : data.error || "Failed to fetch attractions";
-        setLocationError(errorMsg);
-        console.error("API error:", data);
-      }
-    } catch (error) {
-      console.error("Fetch attractions error:", error);
-      setLocationError("Failed to load nearby attractions. Please check your internet connection.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchFavorites = async () => {
     try {
@@ -312,7 +283,7 @@ function FeaturedAttractionsSection({
       if (response.ok) {
         const data = await response.json();
         const ids = new Set<string>(
-          data.favorites.map((fav: any) => fav.attractionId as string)
+          data.favorites.map((fav: Favorite) => fav.attractionId)
         );
         setFavoriteIds(ids);
       }
@@ -345,7 +316,6 @@ function FeaturedAttractionsSection({
             return newSet;
           });
         } else {
-          const data = await response.json();
           if (response.status === 401) {
             window.location.href = '/login';
           }
@@ -360,7 +330,6 @@ function FeaturedAttractionsSection({
         if (response.ok) {
           setFavoriteIds((prev) => new Set(prev).add(attraction.id));
         } else {
-          const data = await response.json();
           if (response.status === 401) {
             window.location.href = '/login';
           }

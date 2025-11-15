@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   getStoredUserId,
   USER_ID_EVENT,
@@ -118,8 +118,9 @@ export function useExperiencePoints(options?: ExperiencePointsOptions) {
   useEffect(() => {
     const previousUserId = previousUserIdRef.current;
     previousUserIdRef.current = userId;
+    
     if (previousUserId && !userId) {
-      setPoints(0);
+      setTimeout(() => setPoints(0), 0);
     }
   }, [userId]);
 

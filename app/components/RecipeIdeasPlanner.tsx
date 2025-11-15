@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { useI18n } from "@/app/hooks/useI18n";
 import { Loader2 } from "lucide-react";
@@ -94,10 +94,6 @@ function parseAssistantContent(raw: string): AssistantPayload | null {
   return null;
 }
 
-function createMessageId() {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
 function buildSpeechScript(detail: RecipeDetail) {
   const parts: string[] = [];
   if (detail.name) {
@@ -138,6 +134,8 @@ function MessageBubble({
   onSelectRecipe,
   recipeDetails,
   onListenToRecipe,
+  onPauseRecipeAudio,
+  onSeekRecipeAudio,
   isDarkMode,
 }: {
   message: ChatMessage;
@@ -147,6 +145,8 @@ function MessageBubble({
   onSelectRecipe: (recipe: RecipeSuggestion) => void;
   recipeDetails: RecipeDetailMap;
   onListenToRecipe: (recipeName: string) => void;
+  onPauseRecipeAudio: (recipeName: string) => void;
+  onSeekRecipeAudio: (recipeName: string, time: number) => void;
   isDarkMode: boolean;
 }) {
   if (message.role === "assistant") {
@@ -161,6 +161,8 @@ function MessageBubble({
           onSelectRecipe={onSelectRecipe}
           recipeDetails={recipeDetails}
           onListenToRecipe={onListenToRecipe}
+          onPauseRecipeAudio={onPauseRecipeAudio}
+          onSeekRecipeAudio={onSeekRecipeAudio}
           isDarkMode={isDarkMode}
         />
       );
@@ -201,6 +203,8 @@ function AssistantCard({
   onSelectRecipe,
   recipeDetails,
   onListenToRecipe,
+  onPauseRecipeAudio,
+  onSeekRecipeAudio,
   isDarkMode,
 }: {
   payload: AssistantPayload;
@@ -210,6 +214,8 @@ function AssistantCard({
   onSelectRecipe: (recipe: RecipeSuggestion) => void;
   recipeDetails: RecipeDetailMap;
   onListenToRecipe: (recipeName: string) => void;
+  onPauseRecipeAudio: (recipeName: string) => void;
+  onSeekRecipeAudio: (recipeName: string, time: number) => void;
   isDarkMode: boolean;
 }) {
   const tips = payload.tips?.filter(Boolean) ?? [];
@@ -387,8 +393,8 @@ function AssistantCard({
                   <RecipeDetailPanel
                     detail={detailState.detail}
                     onListen={() => onListenToRecipe(recipe.name)}
-                    onPause={() => handlePauseRecipeAudio(recipe.name)}
-                    onSeek={(value) => (recipe.name, value)}
+                    onPause={() => onPauseRecipeAudio(recipe.name)}
+                    onSeek={(value) => onSeekRecipeAudio(recipe.name, value)}
                     audioState={{
                       isGenerating: Boolean(detailState.isSpeaking),
                       isPlaying: Boolean(detailState.isAudioPlaying),
@@ -637,14 +643,14 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
           const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           setIsDarkMode(systemDark);
         }
-      } catch (e) {
+      } catch {
         // ignore
       }
     };
 
     updateTheme();
 
-    const handleThemeChange = (event: CustomEvent) => {
+    const handleThemeChange = (event: CustomEvent<{ isDark: boolean }>) => {
       setIsDarkMode(event.detail.isDark);
     };
 
@@ -713,7 +719,6 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
   const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
   const audioCleanupRefs = useRef<Record<string, (() => void) | undefined>>({});
   const audioUrlRefs = useRef<Record<string, string | null>>({});
-  const isUnmountedRef = useRef(false);
   const { points, addPoints } = useExperiencePoints({ initialPoints, initialUserId });
   const updateRecipeDetailState = (
     name: string,
@@ -748,35 +753,41 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
     addPoints(2);
   };
 
-  const destroyAudio = (name: string) => {
-    const cleanup = audioCleanupRefs.current[name];
-    if (cleanup) {
-      cleanup();
-      delete audioCleanupRefs.current[name];
+  const destroyAudio = useCallback((recipeName?: string) => {
+    if (recipeName) {
+      const audio = audioRefs.current[recipeName];
+      if (audio) {
+        audio.pause();
+        audio.src = "";
+        audio.load();
+      }
+      delete audioRefs.current[recipeName];
+    } else {
+      if (audioRefs.current) {
+        Object.values(audioRefs.current).forEach((audio) => {
+          if (audio) {
+            audio.pause();
+            audio.src = "";
+            audio.load();
+          }
+        });
+        audioRefs.current = {};
+      }
     }
-    const storedUrl = audioUrlRefs.current[name];
-    if (storedUrl) {
-      URL.revokeObjectURL(storedUrl);
-      delete audioUrlRefs.current[name];
-    }
-    audioRefs.current[name] = null;
-    if (!isUnmountedRef.current) {
-      updateRecipeDetailState(name, (prev) => ({
-        ...(prev ?? { status: "idle" as const }),
-        audioUrl: null,
-        audioDuration: undefined,
-        audioCurrentTime: undefined,
-        isAudioPlaying: false,
-      }));
-    }
-  };
+  }, []);
 
   useEffect(() => {
+    const currentAudioRefs = audioRefs.current;
     return () => {
-      isUnmountedRef.current = true;
-      Object.keys(audioRefs.current).forEach((name) => {
-        destroyAudio(name);
-      });
+      if (currentAudioRefs) {
+        Object.values(currentAudioRefs).forEach((audio) => {
+          if (audio) {
+            audio.pause();
+            audio.src = "";
+            audio.load();
+          }
+        });
+      }
     };
   }, []);
 
@@ -952,7 +963,7 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
         audioDuration: 0,
       }));
     } catch (err) {
-      destroyAudio(recipeName);
+      destroyAudio();
       const message =
         err instanceof Error ? err.message : t("planner.recipes.audioError");
       updateRecipeDetailState(recipeName, (prev) => ({
@@ -963,85 +974,6 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
       }));
     }
   };
-
-  const handlePauseRecipeAudio = (recipeName: string) => {
-    const audio = audioRefs.current[recipeName];
-    if (!audio) {
-      return;
-    }
-    audio.pause();
-  };
-
-  const handleSeekRecipeAudio = (recipeName: string, value: number) => {
-    const audio = audioRefs.current[recipeName];
-    if (!audio) {
-      updateRecipeDetailState(recipeName, (prev) => ({
-        ...(prev ?? { status: "idle" as const }),
-        audioCurrentTime: value,
-      }));
-      return;
-    }
-    audio.currentTime = value;
-    updateRecipeDetailState(recipeName, (prev) => ({
-      ...(prev ?? { status: "idle" as const }),
-      audioCurrentTime: value,
-    }));
-  };
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!canSubmit) {
-      return;
-    }
-
-    const userMessage: ChatMessage = {
-      id: createMessageId(),
-      role: "user",
-      content: input.trim(),
-    };
-
-    const nextMessages = [...messages, userMessage];
-    setMessages(nextMessages);
-    setInput("");
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch("/api/recipes/suggest", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          country,
-          zone,
-          dietaryFocus,
-          notes,
-          limit: 3,
-          messages: nextMessages.map(({ role, content }) => ({ role, content })),
-        }),
-      });
-
-      const data = (await response.json().catch(() => null)) ?? {};
-
-      if (!response.ok) {
-        throw new Error(data?.error ?? t("planner.errors.unreachable"));
-      }
-
-      if (!data?.reply) {
-        throw new Error(t("planner.errors.empty"));
-      }
-
-      setMessages((prev) => [
-        ...prev,
-        { id: createMessageId(), role: "assistant", content: data.reply },
-      ]);
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : t("planner.errors.generic");
-      setError(message);
-    } finally {
-      setIsLoading(false);
-    }
-  }
 
   const handleReset = () => {
     setMessages([]);
@@ -1054,6 +986,83 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
     setIsLoading(false);
     setCookedRecipes({});
     setRecipeDetails({});
+    destroyAudio(); // Call without parameter to destroy all audio
+  };
+
+  // Define these functions before they're used in AssistantCard
+  const handlePauseRecipeAudio = useCallback((recipeName: string) => {
+    const audio = audioRefs.current[recipeName];
+    if (audio) {
+      audio.pause();
+      updateRecipeDetailState(recipeName, (prev) => ({
+        ...(prev ?? { status: "idle" as const }),
+        isAudioPlaying: false,
+      }));
+    }
+  }, []);
+
+  const handleSeekRecipeAudio = useCallback((recipeName: string, time: number) => {
+    const audio = audioRefs.current[recipeName];
+    if (audio) {
+      audio.currentTime = time;
+    }
+  }, []);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!canSubmit) {
+      return;
+    }
+
+    const userMessage: ChatMessage = {
+      id: `user-${Date.now()}`,
+      role: "user",
+      content: input.trim(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setError(null);
+    setIsLoading(true);
+
+    const payload = {
+      country: country.trim(),
+      zone: zone.trim(),
+      dietaryFocus: dietaryFocus.trim() || undefined,
+      notes: notes.trim() || undefined,
+      userMessage: userMessage.content,
+      conversationHistory: messages.map((msg) => ({
+        role: msg.role,
+        content: msg.content,
+      })),
+    };
+
+    try {
+      const response = await fetch("/api/recipes/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = (await response.json().catch(() => null)) ?? {};
+      if (!response.ok || !data?.content) {
+        throw new Error(data?.error ?? t("planner.recipes.chatError"));
+      }
+
+      const assistantMessage: ChatMessage = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: data.content,
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : t("planner.recipes.chatError");
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -1240,6 +1249,8 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
                   onSelectRecipe={handleSelectRecipeDetail}
                   recipeDetails={recipeDetails}
                   onListenToRecipe={handleListenToRecipe}
+                  onPauseRecipeAudio={handlePauseRecipeAudio}
+                  onSeekRecipeAudio={handleSeekRecipeAudio}
                   isDarkMode={isDarkMode}
                 />
               ))}

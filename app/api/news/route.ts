@@ -1,5 +1,5 @@
 // app/api/news/route.ts - Fixed Gemini API endpoint
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { cookies } from "next/headers";
 import { getDb } from "@/app/lib/mongo";
@@ -18,6 +18,35 @@ function buildUserFilters(userId: string) {
   filters.push({ userId });
   filters.push({ profileId: userId });
   return filters;
+}
+
+interface Profile {
+  location?: string;
+  homeCountry?: string;
+}
+
+interface ImportantLaw {
+  title: string;
+  description: string;
+  severity: string;
+  comparison: string;
+  officialSource: string;
+  sourceUrl: string;
+}
+
+interface NewsData {
+  location: string;
+  date: string;
+  culturalNews: Array<{
+    title: string;
+    summary: string;
+    category: string;
+    date: string;
+    source: string;
+    url: string;
+  }>;
+  importantLaws: ImportantLaw[];
+  culturalTips: string[];
 }
 
 async function fetchNewsFromGemini(location: string, homeCountry: string) {
@@ -172,11 +201,11 @@ IMPORTANT REQUIREMENTS:
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const cookieStore = await cookies();
     const userId = cookieStore.get("roots_user")?.value?.trim();
-    
+
     if (!userId) {
       return NextResponse.json(
         { error: "Not authenticated." },
@@ -185,17 +214,17 @@ export async function GET(request: NextRequest) {
     }
 
     const db = await getDb();
-    
+
     // Get user's profile using the same filter logic as profile API
     const filters = buildUserFilters(userId);
-    let profile: any = null;
+    let profile: Profile | null = null;
     
     for (const filter of filters) {
       const doc = await db.collection(PROFILE_COLLECTION).findOne(filter, {
         projection: { location: 1, homeCountry: 1 },
       });
       if (doc) {
-        profile = doc;
+        profile = doc as Profile;
         break;
       }
     }
@@ -246,7 +275,7 @@ export async function GET(request: NextRequest) {
       }
       
       // Check if it looks like generic fallback content
-      const hasGenericContent = newsData.importantLaws.some((law: any) => 
+      const hasGenericContent = newsData.importantLaws.some((law: ImportantLaw) => 
         law.title.includes("Research") || 
         law.title.includes("API Service") ||
         law.description.includes("recommend researching") ||

@@ -27,8 +27,8 @@ import {
   Book,
   TrendingUp,
 } from "lucide-react";
+import { MapPin, Utensils, Star, Trash2, Plus, Globe2, Upload, X, Image as ImageIcon, AlertCircle, CheckCircle, FileText, Camera, Award, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { motion } from "framer-motion";
 
 type LogEntry = {
   _id: string;
@@ -83,6 +83,17 @@ export default function LogsPage() {
   useEffect(() => {
     setIsDarkMode(theme === "dark");
   }, [theme]);
+    try {
+      const saved = localStorage.getItem("theme");
+      if (saved) {
+        setIsDarkMode(saved === "dark");
+      } else {
+        setIsDarkMode(document.documentElement.classList.contains("dark"));
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Theme is controlled by the global ThemeToggle provider (via ThemeProvider)
 
@@ -251,6 +262,9 @@ export default function LogsPage() {
           (c: any) =>
             c.name.common.toLowerCase() === country.toLowerCase() ||
             c.name.official.toLowerCase() === country.toLowerCase()
+        const exactMatch = data.some((c: { name: { common: string; official: string } }) =>
+          c.name.common.toLowerCase() === country.toLowerCase() ||
+          c.name.official.toLowerCase() === country.toLowerCase()
         );
 
         if (exactMatch || data.length > 0) {

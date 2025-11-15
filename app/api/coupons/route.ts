@@ -125,9 +125,9 @@ export async function POST(request: NextRequest) {
     const redemption: {
       userId: string;
       couponId: ObjectId;
-      couponTitle: any;
-      couponDiscount: any;
-      couponCategory: any;
+      couponTitle: string;
+      couponDiscount: string;
+      couponCategory: string;
       barcode: string;
       redeemedAt: Date;
       expiresAt: Date;
