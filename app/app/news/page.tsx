@@ -1,4 +1,5 @@
 "use client";
+import DashboardPageLayout from "@/app/components/DashboardPageLayout";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -90,7 +91,6 @@ export default function NewsPage() {
   const getCategoryIcon = (category: string) => {
     return <Sparkles className="h-5 w-5" />;
   };
-
   return (
     <DashboardPageLayout>
       <div className="space-y-8">

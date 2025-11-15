@@ -12,6 +12,7 @@ import {
   Moon,
 } from "lucide-react";
 import DashboardSidebar from "./DashboardSidebar";
+import { useI18n } from "@/app/hooks/useI18n";
 
 type Role = "client" | "admin";
 
@@ -29,6 +30,7 @@ type Props = {
 
 export default function DashboardContent({ user }: Props) {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const { t } = useI18n();
 
   useEffect(() => {
     try {
@@ -67,8 +69,10 @@ export default function DashboardContent({ user }: Props) {
   };
   const greetingName = useMemo(() => {
     const trimmed = user.name?.trim();
-    return trimmed && trimmed.length > 0 ? trimmed : "User";
-  }, [user.name]);
+    return trimmed && trimmed.length > 0
+      ? trimmed
+      : t("dashboard.content.userFallback");
+  }, [user.name, t]);
 
   const themeClasses = isDarkMode
     ? "bg-gradient-to-br from-neutral-950 to-neutral-900 text-white"
@@ -102,8 +106,7 @@ export default function DashboardContent({ user }: Props) {
                   }`}
                 />
                 <p className="text-sm opacity-80">
-                  Signed in as{" "}
-                  <span className="font-semibold">{user.email}</span>
+                  {t("dashboard.content.signedInAs", { email: user.email })}
                 </p>
               </div>
               <motion.button
@@ -117,12 +120,10 @@ export default function DashboardContent({ user }: Props) {
                     : "bg-white/70 text-neutral-700 border-neutral-300 hover:bg-white"
                 }`}
               >
-                {isDarkMode ? (
-                  <Sun className="w-4 h-4" />
-                ) : (
-                  <Moon className="w-4 h-4" />
-                )}
-                {isDarkMode ? "Light Mode" : "Dark Mode"}
+                {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                {isDarkMode
+                  ? t("dashboard.content.lightMode")
+                  : t("dashboard.content.darkMode")}
               </motion.button>
             </div>
           </motion.div>
@@ -146,35 +147,29 @@ export default function DashboardContent({ user }: Props) {
                           : "bg-emerald-100/80 border-emerald-300/50"
                       }`}
                     >
-                      <div
-                        className={`w-2 h-2 rounded-full ${
-                          isDarkMode ? "bg-lime-400" : "bg-emerald-600"
-                        }`}
-                      />
-                      <span
-                        className={`text-sm ${
-                          isDarkMode ? "text-lime-400" : "text-emerald-700"
-                        }`}
-                      >
-                        Your Cultural Journey
+                      <div className={`w-2 h-2 rounded-full ${
+                        isDarkMode ? "bg-lime-400" : "bg-emerald-600"
+                      }`} />
+                      <span className={`text-sm ${
+                        isDarkMode ? "text-lime-400" : "text-emerald-700"
+                      }`}>
+                        {t("dashboard.content.culturalJourney")}
                       </span>
                     </motion.div>
 
                     <h1 className="text-4xl font-bold leading-tight">
-                      Welcome back,{" "}
+                      {t("dashboard.content.welcome")}{" "}
                       <span
                         className={
-                          isDarkMode ? "text-lime-400" : "text-emerald-600"
-                        }
+                        isDarkMode ? "text-lime-400" : "text-emerald-600"
+                      }
                       >
                         {greetingName}
                       </span>
                     </h1>
 
                     <p className="text-lg opacity-80 leading-relaxed">
-                      Continue exploring traditions, discovering authentic
-                      cuisines, and visiting cultural heritage sites. Your
-                      journey through the world's rich tapestry continues here.
+                      {t("dashboard.content.welcomeBody")}
                     </p>
                   </div>
 
@@ -187,7 +182,7 @@ export default function DashboardContent({ user }: Props) {
                       }`}
                     >
                       <dt className="text-xs font-semibold uppercase tracking-wider opacity-60 mb-2">
-                        Member Since
+                        {t("dashboard.content.memberSince")}
                       </dt>
                       <dd className="text-lg font-semibold">
                         {new Date(user.createdAt).toLocaleDateString("en-US", {
@@ -205,7 +200,7 @@ export default function DashboardContent({ user }: Props) {
                       }`}
                     >
                       <dt className="text-xs font-semibold uppercase tracking-wider opacity-60 mb-2">
-                        Role
+                        {t("dashboard.content.roleLabel")}
                       </dt>
                       <dd
                         className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium ${
@@ -240,13 +235,13 @@ export default function DashboardContent({ user }: Props) {
                       }`}
                     >
                       <dt className="text-xs font-semibold uppercase tracking-wider opacity-60 mb-2">
-                        Experience Points
+                        {t("dashboard.content.pointsLabel")}
                       </dt>
                       <dd className="text-2xl font-bold mb-1">
                         {user.points.toLocaleString()}
                       </dd>
                       <p className="text-xs opacity-60">
-                        From cultural discoveries
+                        {t("dashboard.content.pointsSubtitle")}
                       </p>
                     </motion.div>
                   </div>
@@ -257,7 +252,7 @@ export default function DashboardContent({ user }: Props) {
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold text-lg flex items-center gap-2">
                       <Compass className="w-5 h-5" />
-                      Explore Map
+                      {t("dashboard.content.mapHeading")}
                     </h3>
                   </div>
                   <motion.div
@@ -272,7 +267,7 @@ export default function DashboardContent({ user }: Props) {
                       } pointer-events-none z-10`}
                     />
                     <iframe
-                      title="Roots Map"
+                      title={t("dashboard.content.mapHeading")}
                       src="https://www.openstreetmap.org/export/embed.html?bbox=-73.99%2C40.70%2C-73.90%2C40.80&layer=mapnik"
                       className="h-full w-full relative z-0"
                       loading="lazy"
@@ -309,13 +304,13 @@ export default function DashboardContent({ user }: Props) {
                     />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold">Cultural Explorer</h2>
+                    <h2 className="text-xl font-semibold">
+                      {t("dashboard.content.explorerTitle")}
+                    </h2>
                   </div>
                 </div>
                 <p className="opacity-80 leading-relaxed mb-6">
-                  Access the complete Roots experience. Discover authentic
-                  recipes, explore cultural landmarks, and track your journey
-                  through the world's heritage.
+                  {t("dashboard.content.explorerBody")}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {[Utensils, Building2, Palette, MapPin].map((Icon, index) => (
@@ -381,53 +376,45 @@ export default function DashboardContent({ user }: Props) {
                     </div>
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold">System Access</h2>
+                    <h2 className="text-xl font-semibold">
+                      {t("dashboard.content.adminTitle")}
+                    </h2>
                   </div>
                 </div>
 
                 {user.role === "admin" ? (
                   <div>
                     <p className="opacity-80 leading-relaxed mb-6">
-                      You have elevated administrative privileges. Guide and
-                      nurture our growing community while maintaining platform
-                      integrity.
+                      {t("dashboard.content.adminBody")}
                     </p>
                     <div className="flex gap-2">
-                      <span
-                        className={`text-xs px-3 py-1.5 rounded-full font-medium ${
-                          isDarkMode
-                            ? "bg-amber-400/20 text-amber-300"
-                            : "bg-amber-100 text-amber-800"
-                        }`}
-                      >
-                        Community Management
+                      <span className={`text-xs px-3 py-1.5 rounded-full font-medium ${
+                        isDarkMode
+                          ? "bg-amber-400/20 text-amber-300"
+                          : "bg-amber-100 text-amber-800"
+                      }`}>
+                        {t("dashboard.content.adminBadgeCommunity")}
                       </span>
-                      <span
-                        className={`text-xs px-3 py-1.5 rounded-full font-medium ${
-                          isDarkMode
-                            ? "bg-amber-400/20 text-amber-300"
-                            : "bg-amber-100 text-amber-800"
-                        }`}
-                      >
-                        Content Curation
+                      <span className={`text-xs px-3 py-1.5 rounded-full font-medium ${
+                        isDarkMode
+                          ? "bg-amber-400/20 text-amber-300"
+                          : "bg-amber-100 text-amber-800"
+                      }`}>
+                        {t("dashboard.content.adminBadgeContent")}
                       </span>
                     </div>
                   </div>
                 ) : (
                   <div>
                     <p className="opacity-80 leading-relaxed mb-6">
-                      Administrative capabilities are reserved for platform
-                      stewards. Focus on your cultural exploration journey for
-                      now.
+                      {t("dashboard.content.adminLimitedBody")}
                     </p>
-                    <div
-                      className={`text-sm px-4 py-3 rounded-xl backdrop-blur-sm border ${
-                        isDarkMode
-                          ? "bg-neutral-800/50 border-neutral-700 text-neutral-400"
-                          : "bg-white/50 border-neutral-300 text-neutral-600"
-                      }`}
-                    >
-                      Available through platform stewardship
+                    <div className={`text-sm px-4 py-3 rounded-xl backdrop-blur-sm border ${
+                      isDarkMode
+                        ? "bg-neutral-800/50 border-neutral-700 text-neutral-400"
+                        : "bg-white/50 border-neutral-300 text-neutral-600"
+                    }`}>
+                      {t("dashboard.content.adminLimitedNote")}
                     </div>
                   </div>
                 )}

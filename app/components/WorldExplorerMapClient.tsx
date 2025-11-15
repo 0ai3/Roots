@@ -3,15 +3,19 @@
 import "leaflet/dist/leaflet.css";
 
 import L, { LatLngBoundsExpression } from "leaflet";
-import { useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import {
   MapContainer,
   Marker,
+  Popup,
   TileLayer,
   useMap,
+  useMapEvents,
 } from "react-leaflet";
 import { motion } from "framer-motion";
-import { Compass, Navigation, Globe, MapPin } from "lucide-react";
+import { Compass, Navigation, Globe, MapPin, Search, Sparkles } from "lucide-react";
+import { useI18n } from "@/app/hooks/useI18n";
+import type { CityAttraction } from "@/app/types/cityAttractions";
 
 type Bounds = LatLngBoundsExpression;
 
@@ -42,6 +46,17 @@ const WORLD_BOUNDS: Bounds = [
   [-60, -180],
   [85, 180],
 ];
+const CITY_ATTRACTION_LIMIT = 8;
+
+const ATTRACTION_FOCUS_SUGGESTIONS = [
+  "Museums",
+  "Parks & gardens",
+  "Street food",
+  "Architecture",
+  "Family-friendly",
+  "Nightlife",
+  "History tours",
+] as const;
 
 const atlas: Continent[] = [
   {
@@ -456,6 +471,8 @@ const atlas: Continent[] = [
   },
 ];
 
+const MIN_ATTRACTION_ZOOM = 6;
+
 function MapViewport({
   bounds,
   freeMode,
@@ -478,20 +495,117 @@ function MapViewport({
   return null;
 }
 
+function MapViewTracker({
+  onChange,
+}: {
+  onChange: (view: { center: [number, number]; zoom: number }) => void;
+}) {
+  useMapEvents({
+    load(event) {
+      const map = event.target;
+      const center = map.getCenter();
+      onChange({ center: [center.lat, center.lng], zoom: map.getZoom() });
+    },
+    moveend(event) {
+      const map = event.target;
+      const center = map.getCenter();
+      onChange({ center: [center.lat, center.lng], zoom: map.getZoom() });
+    },
+    zoomend(event) {
+      const map = event.target;
+      const center = map.getCenter();
+      onChange({ center: [center.lat, center.lng], zoom: map.getZoom() });
+    },
+  });
+  return null;
+}
+
 function CityMarkers({ city, freeMode }: { city?: City | null; freeMode: boolean }) {
   if (!city || freeMode) {
     return null;
   }
-  return <Marker position={city.coords} />;
+  return (
+    <Marker position={city.coords}>
+      <Popup>
+        <div className="text-sm font-semibold">{city.name}</div>
+      </Popup>
+    </Marker>
+  );
 }
 
 function normalizeCityBounds(coords: [number, number]): Bounds {
   const [lat, lng] = coords;
-  const delta = 1.5;
+  const delta = 0.7;
   return [
     [lat - delta, lng - delta],
     [lat + delta, lng + delta],
   ];
+}
+
+function attractionBounds(attractions: CityAttraction[]): Bounds | null {
+  const validPoints = attractions.filter(
+    (item) =>
+      Number.isFinite(item.latitude) && Number.isFinite(item.longitude)
+  );
+
+  if (validPoints.length === 0) {
+    return null;
+  }
+
+  const latitudes = validPoints.map((item) => item.latitude);
+  const longitudes = validPoints.map((item) => item.longitude);
+
+  const padding = 0.2;
+  return [
+    [Math.min(...latitudes) - padding, Math.min(...longitudes) - padding],
+    [Math.max(...latitudes) + padding, Math.max(...longitudes) + padding],
+  ];
+}
+
+function AttractionMarkers({
+  attractions,
+  freeMode,
+  mapsLabel,
+}: {
+  attractions: CityAttraction[];
+  freeMode: boolean;
+  mapsLabel: string;
+}) {
+  if (freeMode || attractions.length === 0) {
+    return null;
+  }
+  return (
+    <>
+      {attractions.map((spot) => (
+        <Marker
+          key={`${spot.title}-${spot.latitude}-${spot.longitude}`}
+          position={[spot.latitude, spot.longitude]}
+        >
+          <Popup>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold">{spot.title}</p>
+              {spot.neighborhood && (
+                <p className="text-xs text-neutral-500">{spot.neighborhood}</p>
+              )}
+              {spot.summary && (
+                <p className="text-xs text-neutral-600">{spot.summary}</p>
+              )}
+              {spot.mapLink && (
+                <a
+                  href={spot.mapLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-lime-600 underline"
+                >
+                  {mapsLabel}
+                </a>
+              )}
+            </div>
+          </Popup>
+        </Marker>
+      ))}
+    </>
+  );
 }
 
 export default function WorldExplorerMap() {
@@ -499,9 +613,21 @@ export default function WorldExplorerMap() {
     null
   );
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
-  const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
   const [selectedCity, setSelectedCity] = useState<City | null>(null);
   const [freeMode, setFreeMode] = useState(false);
+  const [countryQuery, setCountryQuery] = useState("");
+  const [cityQuery, setCityQuery] = useState("");
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [attractions, setAttractions] = useState<CityAttraction[]>([]);
+  const [attractionsError, setAttractionsError] = useState<string | null>(null);
+  const [attractionsLoading, setAttractionsLoading] = useState(false);
+  const [attractionFocus, setAttractionFocus] = useState("");
+  const [attractionRefreshKey, setAttractionRefreshKey] = useState(0);
+  const [mapView, setMapView] = useState<{
+    center: [number, number];
+    zoom: number;
+  }>({ center: [20, 0], zoom: 3 });
+  const { t } = useI18n();
 
   useEffect(() => {
     // Fix Leaflet's default icon path issues in Next.js
@@ -517,12 +643,84 @@ export default function WorldExplorerMap() {
     });
   }, []);
 
+  useEffect(() => {
+    if (!selectedCity) {
+      setAttractions([]);
+      setAttractionsError(null);
+      setAttractionsLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const fetchAttractions = async () => {
+      setAttractionsLoading(true);
+      setAttractionsError(null);
+      try {
+        const response = await fetch("/api/attractions/city", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            city: selectedCity.name,
+            country: selectedCountry?.name,
+            limit: CITY_ATTRACTION_LIMIT,
+            category: attractionFocus.trim() || undefined,
+          }),
+          signal: controller.signal,
+        });
+
+        const text = await response.text();
+        if (!response.ok) {
+          let message = t("worldExplorer.messages.unableToFetch");
+          try {
+            const errorPayload = JSON.parse(text) as { error?: string };
+            message = errorPayload.error || message;
+          } catch {
+            // ignore parse errors
+          }
+          throw new Error(message);
+        }
+
+        if (!text) {
+          throw new Error(t("worldExplorer.messages.emptyResponse"));
+        }
+
+        const payload = JSON.parse(text) as { attractions?: CityAttraction[] };
+        setAttractions(Array.isArray(payload.attractions) ? payload.attractions : []);
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+        const message =
+          error instanceof Error
+            ? error.message
+            : t("worldExplorer.messages.failedToLoad");
+        setAttractions([]);
+        setAttractionsError(message);
+      } finally {
+        if (!controller.signal.aborted) {
+          setAttractionsLoading(false);
+        }
+      }
+    };
+
+    fetchAttractions();
+
+    return () => controller.abort();
+  }, [selectedCity, selectedCountry?.name, attractionFocus, attractionRefreshKey, t]);
+
+  const attractionHighlightBounds = useMemo(() => {
+    if (freeMode) {
+      return null;
+    }
+    return attractionBounds(attractions);
+  }, [attractions, freeMode]);
+
   const activeBounds = useMemo(() => {
+    if (attractionHighlightBounds) {
+      return attractionHighlightBounds;
+    }
     if (selectedCity) {
       return normalizeCityBounds(selectedCity.coords);
-    }
-    if (selectedRegion) {
-      return selectedRegion.bounds;
     }
     if (selectedCountry) {
       return selectedCountry.bounds;
@@ -531,43 +729,193 @@ export default function WorldExplorerMap() {
       return selectedContinent.bounds;
     }
     return WORLD_BOUNDS;
-  }, [selectedCity, selectedRegion, selectedCountry, selectedContinent]);
+  }, [attractionHighlightBounds, selectedCity, selectedCountry, selectedContinent]);
 
-  const availableCountries = selectedContinent?.countries ?? [];
-  const availableRegions = selectedCountry?.regions ?? [];
-  const availableCities = selectedRegion?.cities ?? [];
+  const availableCountries = useMemo(() => {
+    if (selectedContinent) {
+      return selectedContinent.countries;
+    }
+    return atlas.flatMap((continent) => continent.countries);
+  }, [selectedContinent]);
+
+  const availableCities = useMemo(() => {
+    if (selectedCountry) {
+      return selectedCountry.regions.flatMap((region) => region.cities);
+    }
+    if (selectedContinent) {
+      return selectedContinent.countries.flatMap((country) =>
+        country.regions.flatMap((region) => region.cities)
+      );
+    }
+    return atlas.flatMap((continent) =>
+      continent.countries.flatMap((country) =>
+        country.regions.flatMap((region) => region.cities)
+      )
+    );
+  }, [selectedCountry, selectedContinent]);
+
+  const countriesWithParents = useMemo(
+    () =>
+      atlas.flatMap((continent) =>
+        continent.countries.map((country) => ({ continent, country }))
+      ),
+    []
+  );
+
+  const normalizeLabel = useCallback((value: string) => value.trim().toLowerCase(), []);
+
+  const handleLocationSearch = useCallback(
+    (event?: FormEvent<HTMLFormElement>) => {
+      event?.preventDefault();
+      const normalizedCountry = normalizeLabel(countryQuery);
+      const normalizedCity = normalizeLabel(cityQuery);
+
+      if (!normalizedCountry || !normalizedCity) {
+        setSearchError(t("worldExplorer.messages.enterBoth"));
+        return;
+      }
+
+      const countryMatch =
+        countriesWithParents.find(
+          ({ country }) => normalizeLabel(country.name) === normalizedCountry
+        ) ??
+        countriesWithParents.find(({ country }) =>
+          normalizeLabel(country.name).includes(normalizedCountry)
+        );
+
+      if (!countryMatch) {
+        setSearchError(t("worldExplorer.messages.countryNotFound"));
+        return;
+      }
+
+      const allCities = countryMatch.country.regions.flatMap((region) =>
+        region.cities.map((city) => ({ city, region }))
+      );
+
+      const cityMatch =
+        allCities.find(
+          ({ city }) => normalizeLabel(city.name) === normalizedCity
+        ) ??
+        allCities.find(({ city }) =>
+          normalizeLabel(city.name).includes(normalizedCity)
+        );
+
+      if (!cityMatch) {
+        setSearchError(
+          t("worldExplorer.messages.cityNotFound", {
+            city: cityQuery,
+            country: countryMatch.country.name,
+          })
+        );
+        return;
+      }
+
+      setSelectedContinent(countryMatch.continent);
+      setSelectedCountry(countryMatch.country);
+      setSelectedCity(cityMatch.city);
+      setFreeMode(false);
+      setCountryQuery(countryMatch.country.name);
+      setCityQuery(cityMatch.city.name);
+      setSearchError(null);
+    },
+    [countriesWithParents, countryQuery, cityQuery, normalizeLabel, t]
+  );
+
+  const refreshAttractions = useCallback(() => {
+    setAttractionRefreshKey((prev) => prev + 1);
+  }, []);
+
+  const handleMapViewChange = useCallback(
+    (view: { center: [number, number]; zoom: number }) => {
+      setMapView(view);
+    },
+    []
+  );
+
+  const handleLookForAttractions = useCallback(() => {
+    if (mapView.zoom < MIN_ATTRACTION_ZOOM) {
+      setAttractionsError(t("worldExplorer.messages.zoomInFurther"));
+      return;
+    }
+    const lat = mapView.center[0].toFixed(2);
+    const lng = mapView.center[1].toFixed(2);
+    const label = t("worldExplorer.customArea.label", { lat, lng });
+    const pseudoCity: City = {
+      name: label,
+      coords: mapView.center,
+    };
+    setSelectedContinent(null);
+    setSelectedCountry(null);
+    setSelectedCity(pseudoCity);
+    setCountryQuery("");
+    setCityQuery(label);
+    setSearchError(null);
+    setAttractionsError(null);
+  }, [mapView, t]);
 
   const resetSelections = () => {
     setSelectedContinent(null);
     setSelectedCountry(null);
-    setSelectedRegion(null);
     setSelectedCity(null);
     setFreeMode(false);
+    setCountryQuery("");
+    setCityQuery("");
+    setAttractions([]);
+    setAttractionsError(null);
+    setAttractionsLoading(false);
+    setSearchError(null);
+    setAttractionFocus("");
+    setAttractionRefreshKey(0);
   };
 
   return (
-    <section className="min-h-screen bg-linear-to-br from-neutral-950 to-neutral-900 px-6 py-10 text-white">
-      <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:flex-row">
+    <section className="min-h-screen bg-gradient-to-br from-neutral-950 to-neutral-900 px-4 py-8 text-white sm:px-6">
+      <div className="mx-auto flex max-w-7xl flex-col gap-6 lg:flex-row">
         {/* Map Container */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex-1 overflow-hidden rounded-2xl border border-white/10 bg-neutral-900/50 shadow-xl backdrop-blur-sm"
+          className="flex-1 overflow-hidden rounded-[28px] border border-white/5 bg-neutral-900/40 shadow-2xl backdrop-blur-sm"
         >
-          <MapContainer
-            center={[20, 0]}
-            zoom={2}
-            style={{ height: "600px", width: "100%" }}
-            worldCopyJump
-            minZoom={2}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <MapViewport bounds={activeBounds} freeMode={freeMode} />
-            <CityMarkers city={selectedCity} freeMode={freeMode} />
-          </MapContainer>
+          <div className="relative">
+            <MapContainer
+              center={[20, 0]}
+              zoom={3}
+              className="rounded-[28px]"
+              style={{ height: "640px", width: "100%" }}
+              worldCopyJump
+              minZoom={2}
+              maxZoom={10}
+              scrollWheelZoom
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <MapViewport bounds={activeBounds} freeMode={freeMode} />
+              <MapViewTracker onChange={handleMapViewChange} />
+              <CityMarkers city={selectedCity} freeMode={freeMode} />
+              <AttractionMarkers
+                attractions={attractions}
+                freeMode={freeMode}
+                mapsLabel={t("worldExplorer.attractions.openInMaps")}
+              />
+            </MapContainer>
+            <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center z-[100]">
+              <button
+                type="button"
+                onClick={handleLookForAttractions}
+                disabled={mapView.zoom < MIN_ATTRACTION_ZOOM}
+                className={`pointer-events-auto rounded-full px-5 py-2 text-sm font-semibold uppercase tracking-wide shadow-lg transition ${
+                  mapView.zoom < MIN_ATTRACTION_ZOOM
+                    ? "bg-white/30 text-white/70"
+                    : "bg-lime-400 text-neutral-950 hover:bg-lime-300"
+                }`}
+              >
+                {t("worldExplorer.buttons.lookForAttractions")}
+              </button>
+            </div>
+          </div>
         </motion.div>
 
         {/* Controls Panel */}
@@ -575,13 +923,13 @@ export default function WorldExplorerMap() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
-          className="w-full rounded-2xl border border-white/10 bg-neutral-900/50 p-6 backdrop-blur-sm lg:w-96"
+          className="w-full flex-shrink-0 rounded-2xl border border-white/10 bg-neutral-900/50 p-6 backdrop-blur-sm lg:w-[360px] xl:w-[390px]"
         >
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 rounded-full bg-lime-400" />
-              <h2 className="text-xl font-bold">World Explorer</h2>
+              <h2 className="text-xl font-bold">{t("worldExplorer.title")}</h2>
             </div>
             <motion.button
               type="button"
@@ -595,7 +943,9 @@ export default function WorldExplorerMap() {
               }`}
             >
               <Compass className="w-4 h-4" />
-              {freeMode ? "Free Mode" : "Free Mode"}
+              {freeMode
+                ? t("worldExplorer.freeMode.active")
+                : t("worldExplorer.freeMode.cta")}
             </motion.button>
           </div>
 
@@ -606,8 +956,7 @@ export default function WorldExplorerMap() {
               animate={{ opacity: 1 }}
               className="mt-4 text-sm text-white/70 leading-relaxed"
             >
-              Free mode lets you pan, zoom, and explore anywhere on the map.
-              Disable it to return to guided continent/country navigation.
+              {t("worldExplorer.freeModeDescription")}
             </motion.p>
           ) : (
             <motion.p 
@@ -615,12 +964,11 @@ export default function WorldExplorerMap() {
               animate={{ opacity: 1 }}
               className="mt-4 text-sm text-white/70 leading-relaxed"
             >
-              Select a continent to zoom in. Continue drilling down to countries,
-              regions, and cities to focus on specific areas.
+              {t("worldExplorer.guidedDescription")}
             </motion.p>
           )}
 
-          {/* Navigation Sections */}
+          {/* Location Controls */}
           <div className="mt-6 space-y-6">
             {/* Continents */}
             <motion.div
@@ -631,7 +979,7 @@ export default function WorldExplorerMap() {
               <div className="flex items-center justify-between text-xs uppercase tracking-wide text-white/60 mb-3">
                 <span className="flex items-center gap-2">
                   <Globe className="w-4 h-4" />
-                  Continents
+                  {t("worldExplorer.sections.continents")}
                 </span>
                 {selectedContinent && (
                   <motion.button
@@ -640,11 +988,15 @@ export default function WorldExplorerMap() {
                     onClick={() => {
                       setSelectedContinent(null);
                       setSelectedCountry(null);
-                      setSelectedRegion(null);
                       setSelectedCity(null);
+                      setCountryQuery("");
+                      setCityQuery("");
+                      setFreeMode(false);
+                      setAttractions([]);
+                      setAttractionsError(null);
                     }}
                   >
-                    Clear
+                    {t("worldExplorer.actions.clear")}
                   </motion.button>
                 )}
               </div>
@@ -662,8 +1014,12 @@ export default function WorldExplorerMap() {
                     onClick={() => {
                       setSelectedContinent(continent);
                       setSelectedCountry(null);
-                      setSelectedRegion(null);
                       setSelectedCity(null);
+                      setCountryQuery("");
+                      setCityQuery("");
+                      setSearchError(null);
+                      setAttractions([]);
+                      setAttractionsError(null);
                       setFreeMode(false);
                     }}
                   >
@@ -673,116 +1029,120 @@ export default function WorldExplorerMap() {
               </div>
             </motion.div>
 
-            {/* Countries */}
-            <motion.div
+            {/* Search Form */}
+            <motion.form
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.35 }}
+              className="space-y-4"
+              onSubmit={handleLocationSearch}
             >
-              <div className="text-xs uppercase tracking-wide text-white/60 mb-3 flex items-center gap-2">
-                <Navigation className="w-4 h-4" />
-                Countries
+              <div>
+                <div className="text-xs uppercase tracking-wide text-white/60 mb-2 flex items-center gap-2">
+                  <Navigation className="w-4 h-4" />
+                  {t("worldExplorer.sections.country")}
+                </div>
+                <input
+                  type="text"
+                  list="navigator-country-options"
+                  value={countryQuery}
+                  onChange={(event) => {
+                    setCountryQuery(event.target.value);
+                    setSearchError(null);
+                  }}
+                  placeholder={t("worldExplorer.placeholders.country")}
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-lime-300 focus:outline-none"
+                />
+                <p className="mt-2 text-xs text-white/50">
+                  {selectedContinent
+                    ? t("worldExplorer.sections.countryHintSelected", {
+                        continent: selectedContinent.name,
+                      })
+                    : t("worldExplorer.sections.countryHintAll")}
+                </p>
               </div>
-              <div className="space-y-2">
-                {availableCountries.length === 0 && (
-                  <p className="text-sm text-white/50 px-2">
-                    Choose a continent first.
-                  </p>
-                )}
+
+              <div>
+                <div className="text-xs uppercase tracking-wide text-white/60 mb-2 flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  {t("worldExplorer.sections.city")}
+                </div>
+                <input
+                  type="text"
+                  list="navigator-city-options"
+                  value={cityQuery}
+                  onChange={(event) => {
+                    setCityQuery(event.target.value);
+                    setSearchError(null);
+                  }}
+                  placeholder={t("worldExplorer.placeholders.city")}
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-lime-300 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <div className="text-xs uppercase tracking-wide text-white/60 mb-2 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  {t("worldExplorer.sections.focusLabel")}
+                </div>
+                <input
+                  type="text"
+                  list="attraction-focus-options"
+                  value={attractionFocus}
+                  onChange={(event) => {
+                    setAttractionFocus(event.target.value);
+                    setAttractionsError(null);
+                  }}
+                  placeholder={t("worldExplorer.placeholders.focus")}
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-lime-300 focus:outline-none"
+                />
+                <p className="mt-2 text-xs text-white/50">
+                  {t("worldExplorer.focusHint")}
+                </p>
+              </div>
+
+              {searchError && (
+                <p className="text-xs text-red-300">{searchError}</p>
+              )}
+
+              {selectedCity && !searchError && (
+                <p className="text-xs text-white/50">
+                  {t("worldExplorer.sections.centered", {
+                    city: selectedCity.name,
+                    country: selectedCountry ? `, ${selectedCountry.name}` : "",
+                  })}
+                </p>
+              )}
+
+              <motion.button
+                type="submit"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-lime-400 px-4 py-3 text-sm font-semibold text-neutral-950 transition-all hover:bg-lime-300"
+              >
+                <Search className="w-4 h-4" />
+                {t("worldExplorer.buttons.search")}
+              </motion.button>
+
+              <datalist id="navigator-country-options">
                 {availableCountries.map((country) => (
-                  <motion.button
-                    key={country.name}
-                    whileHover={{ x: 5 }}
-                    className={`w-full rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all ${
-                      selectedCountry?.name === country.name
-                        ? "border-lime-400 bg-lime-400/10 text-lime-100 shadow-lg"
-                        : "border-white/10 bg-white/5 text-white/80 hover:border-white/30 hover:bg-white/10"
-                    }`}
-                    onClick={() => {
-                      setSelectedCountry(country);
-                      setSelectedRegion(null);
-                      setSelectedCity(null);
-                      setFreeMode(false);
-                    }}
-                  >
-                    {country.name}
-                  </motion.button>
+                  <option key={country.name} value={country.name} />
                 ))}
-              </div>
-            </motion.div>
-
-            {/* Regions */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <div className="text-xs uppercase tracking-wide text-white/60 mb-3 flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
-                Regions
-              </div>
-              <div className="space-y-2">
-                {availableRegions.length === 0 && (
-                  <p className="text-sm text-white/50 px-2">
-                    Select a country to explore regions.
-                  </p>
-                )}
-                {availableRegions.map((region) => (
-                  <motion.button
-                    key={region.name}
-                    whileHover={{ x: 5 }}
-                    className={`w-full rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all ${
-                      selectedRegion?.name === region.name
-                        ? "border-lime-400 bg-lime-400/10 text-lime-100 shadow-lg"
-                        : "border-white/10 bg-white/5 text-white/80 hover:border-white/30 hover:bg-white/10"
-                    }`}
-                    onClick={() => {
-                      setSelectedRegion(region);
-                      setSelectedCity(null);
-                      setFreeMode(false);
-                    }}
-                  >
-                    {region.name}
-                  </motion.button>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Cities */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <div className="text-xs uppercase tracking-wide text-white/60 mb-3 flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
-                Cities
-              </div>
-              <div className="space-y-2">
-                {availableCities.length === 0 && (
-                  <p className="text-sm text-white/50 px-2">
-                    Pick a region to focus on cities.
-                  </p>
-                )}
+              </datalist>
+              <datalist id="navigator-city-options">
                 {availableCities.map((city) => (
-                  <motion.button
-                    key={city.name}
-                    whileHover={{ x: 5 }}
-                    className={`w-full rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all ${
-                      selectedCity?.name === city.name
-                        ? "border-lime-400 bg-lime-400/10 text-lime-100 shadow-lg"
-                        : "border-white/10 bg-white/5 text-white/80 hover:border-white/30 hover:bg-white/10"
-                    }`}
-                    onClick={() => {
-                      setSelectedCity(city);
-                      setFreeMode(false);
-                    }}
-                  >
-                    {city.name}
-                  </motion.button>
+                  <option
+                    key={`${city.name}-${city.coords[0]}-${city.coords[1]}`}
+                    value={city.name}
+                  />
                 ))}
-              </div>
-            </motion.div>
+              </datalist>
+              <datalist id="attraction-focus-options">
+                {ATTRACTION_FOCUS_SUGGESTIONS.map((option) => (
+                  <option key={option} value={option} />
+                ))}
+              </datalist>
+            </motion.form>
           </div>
 
           {/* Action Buttons */}
@@ -795,18 +1155,25 @@ export default function WorldExplorerMap() {
             <motion.button
               type="button"
               onClick={() => {
-                setSelectedCity(null);
-                setSelectedRegion(null);
-                setSelectedCountry(null);
-                if (selectedContinent) {
-                  setFreeMode(false);
+                if (selectedCity) {
+                  setSelectedCity(null);
+                  setAttractions([]);
+                  setAttractionsError(null);
+                } else if (selectedCountry) {
+                  setSelectedCountry(null);
+                  setCountryQuery("");
+                  setCityQuery("");
+                } else {
+                  setSelectedContinent(null);
                 }
+                setSearchError(null);
+                setFreeMode(false);
               }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="rounded-xl border border-white/20 px-4 py-2 text-sm text-white/80 transition-all hover:border-white/40 hover:bg-white/10"
             >
-              Back a level
+              {t("worldExplorer.buttons.back")}
             </motion.button>
             <motion.button
               type="button"
@@ -815,8 +1182,117 @@ export default function WorldExplorerMap() {
               whileTap={{ scale: 0.95 }}
               className="rounded-xl bg-green-500 px-4 py-2 text-sm font-semibold text-neutral-950 transition-all hover:bg-green-400"
             >
-              Reset explorer
+              {t("worldExplorer.buttons.reset")}
             </motion.button>
+          </motion.div>
+
+          {/* Gemini Attractions */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-white/60">
+                  {t("worldExplorer.attractions.heading")}
+                </p>
+                <p className="text-sm text-white/80">
+                  {selectedCity
+                    ? t("worldExplorer.attractions.subtitleSelected", {
+                        count: CITY_ATTRACTION_LIMIT,
+                        city: selectedCity.name,
+                      })
+                    : t("worldExplorer.attractions.subtitleEmpty")}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-white/50">
+                  {t("worldExplorer.attractions.powered")}
+                </span>
+                <button
+                  type="button"
+                  onClick={refreshAttractions}
+                  disabled={!selectedCity || attractionsLoading}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide transition ${
+                    !selectedCity || attractionsLoading
+                      ? "border border-white/10 text-white/40"
+                      : "border border-lime-300/60 text-lime-200 hover:border-lime-200 hover:text-lime-100"
+                  }`}
+                >
+                  {t("worldExplorer.attractions.refresh")}
+                </button>
+              </div>
+            </div>
+
+            {!selectedCity && (
+              <p className="mt-4 text-sm text-white/60">
+                {t("worldExplorer.attractions.instructions")}
+              </p>
+            )}
+
+            {selectedCity && (
+              <div className="mt-4 space-y-4">
+                {attractionFocus.trim() && (
+                  <p className="text-xs uppercase tracking-wide text-lime-200">
+                    {t("worldExplorer.attractions.focusing", {
+                      focus: attractionFocus.trim(),
+                    })}
+                  </p>
+                )}
+                {attractionsLoading && (
+                  <p className="text-sm text-white/70">
+                    {t("worldExplorer.attractions.loading")}
+                  </p>
+                )}
+                {attractionsError && (
+                  <p className="text-sm text-red-300">{attractionsError}</p>
+                )}
+                {!attractionsLoading &&
+                  !attractionsError &&
+                  attractions.length === 0 && (
+                    <p className="text-sm text-white/60">
+                      {t("worldExplorer.attractions.error")}
+                    </p>
+                  )}
+                {attractions.length > 0 && (
+                  <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+                    {attractions.map((spot) => (
+                      <article
+                        key={`${spot.title}-${spot.latitude}-${spot.longitude}`}
+                        className="rounded-xl border border-white/10 bg-neutral-900/60 p-4"
+                      >
+                        <p className="text-sm font-semibold text-white">
+                          {spot.title}
+                        </p>
+                        {spot.neighborhood && (
+                          <p className="text-xs uppercase tracking-wide text-white/40">
+                            {spot.neighborhood}
+                          </p>
+                        )}
+                        {spot.summary && (
+                          <p className="mt-2 text-sm text-white/80">
+                            {spot.summary}
+                          </p>
+                        )}
+                        {spot.mapLink && (
+                          <a
+                            href={spot.mapLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-lime-300 hover:text-lime-200"
+                          >
+                            <MapPin className="w-3 h-3" />
+                            {t("worldExplorer.attractions.openInMaps")}
+                          </a>
+                        )}
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </motion.div>
         </motion.div>
       </div>

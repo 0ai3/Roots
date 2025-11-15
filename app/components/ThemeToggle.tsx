@@ -4,10 +4,12 @@ import { motion } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import { usePathname } from "next/navigation";
+import { useI18n } from "@/app/hooks/useI18n";
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
+  const { t } = useI18n();
 
   // Hide the global fixed toggle on specific pages where we provide
   // a per-page theme control or want to force a light-style layout.
@@ -37,7 +39,7 @@ export default function ThemeToggle() {
       }`}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
-      aria-label="Toggle theme"
+      aria-label={t("accessibility.toggleTheme")}
     >
       <motion.div
         initial={false}

@@ -3,6 +3,7 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { setStoredUserId } from "../lib/userId";
+import { useI18n } from "@/app/hooks/useI18n";
 import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
 type Props = {
@@ -47,7 +48,7 @@ const EMPTY_FORM: ProfileFields = {
   socialHandle: "",
 };
 
-const formatDate = (value?: string | null) => {
+const formatDate = (value?: string | null, locale?: string) => {
   if (!value) {
     return null;
   }
@@ -55,7 +56,7 @@ const formatDate = (value?: string | null) => {
   if (Number.isNaN(date.getTime())) {
     return null;
   }
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(locale || undefined, {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -64,6 +65,7 @@ const formatDate = (value?: string | null) => {
 
 export default function ProfileForm({ initialPoints, initialUserId }: Props = {}) {
   const { points } = useExperiencePoints({ initialPoints, initialUserId });
+  const { t, locale } = useI18n();
   const [formState, setFormState] = useState<ProfileFields>(EMPTY_FORM);
   const [profileMeta, setProfileMeta] = useState<ProfileMeta>({
     role: null,
@@ -86,7 +88,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
         const response = await fetch("/api/profile");
         const data = (await response.json().catch(() => null)) ?? {};
         if (!response.ok) {
-          throw new Error(data?.error ?? "Unable to load your profile.");
+          throw new Error(data?.error ?? t("profile.errors.load"));
         }
         const profile = (data?.profile ?? null) as ProfileResponse | null;
         if (!isActive) {
@@ -127,7 +129,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
         const message =
           error instanceof Error
             ? error.message
-            : "Something went wrong. Please try again.";
+            : t("profile.errors.generic");
         setErrorMessage(message);
       } finally {
         if (isActive) {
@@ -139,7 +141,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [t]);
 
   // Validate home country
   useEffect(() => {
@@ -179,12 +181,12 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
   };
 
   const formattedCreatedAt = useMemo(
-    () => formatDate(profileMeta?.createdAt ?? null),
-    [profileMeta?.createdAt]
+    () => formatDate(profileMeta?.createdAt ?? null, locale),
+    [profileMeta?.createdAt, locale]
   );
   const formattedUpdatedAt = useMemo(
-    () => formatDate(profileMeta?.updatedAt ?? null),
-    [profileMeta?.updatedAt]
+    () => formatDate(profileMeta?.updatedAt ?? null, locale),
+    [profileMeta?.updatedAt, locale]
   );
 
   const handleChange =
@@ -217,7 +219,7 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
       });
       const data = (await response.json().catch(() => null)) ?? {};
       if (!response.ok) {
-        throw new Error(data?.error ?? "Unable to save your profile.");
+        throw new Error(data?.error ?? t("profile.errors.save"));
       }
       const profile = (data?.profile ?? null) as ProfileResponse | null;
       if (profile) {
@@ -239,12 +241,12 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
         });
         setStoredUserId(profile.userId ?? null);
       }
-      setStatusMessage("Profile saved successfully.");
+      setStatusMessage(t("profile.status.success"));
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
-          : "Unable to update your profile right now.";
+          : t("profile.status.error");
       setErrorMessage(message);
     } finally {
       setIsSaving(false);
@@ -270,29 +272,37 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
     <section className="space-y-8">
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-          <p className="text-xs uppercase tracking-wide text-white/50">Experience points</p>
-          <p className="text-4xl font-semibold text-white">{points}</p>
-          <p className="text-xs text-white/50">
-            Earn more points by logging attractions and recipes.
+          <p className="text-xs uppercase tracking-wide text-white/50">
+            {t("dashboard.content.pointsLabel")}
           </p>
+          <p className="text-4xl font-semibold text-white">{points}</p>
+          <p className="text-xs text-white/50">{t("profile.pointsHint")}</p>
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-          <p className="text-xs uppercase tracking-wide text-white/50">Account</p>
+          <p className="text-xs uppercase tracking-wide text-white/50">
+            {t("profile.accountLabel")}
+          </p>
           <p className="text-base font-semibold text-white">{profileMeta?.email || "—"}</p>
           <dl className="mt-4 space-y-2 text-sm text-white/70">
             <div className="flex items-center justify-between">
-              <dt className="uppercase tracking-wide text-white/40">Role</dt>
+              <dt className="uppercase tracking-wide text-white/40">
+                {t("dashboard.content.roleLabel")}
+              </dt>
               <dd className="rounded-full border border-white/15 px-3 py-1 text-xs text-white">
                 {profileMeta?.role ?? "client"}
               </dd>
             </div>
             <div className="flex items-center justify-between">
-              <dt className="uppercase tracking-wide text-white/40">Member since</dt>
+              <dt className="uppercase tracking-wide text-white/40">
+                {t("dashboard.content.memberSince")}
+              </dt>
               <dd>{formattedCreatedAt ?? "—"}</dd>
             </div>
             <div className="flex items-center justify-between">
-              <dt className="uppercase tracking-wide text-white/40">Last updated</dt>
+              <dt className="uppercase tracking-wide text-white/40">
+                {t("common.lastUpdated")}
+              </dt>
               <dd>{formattedUpdatedAt ?? "—"}</dd>
             </div>
           </dl>
@@ -317,12 +327,12 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
       >
         <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-2 text-sm font-medium text-white/80">
-            <span>Name</span>
-            <input
-              type="text"
-              value={formState.name}
-              onChange={handleChange("name")}
-              placeholder="Your name"
+          <span>{t("profile.fields.name")}</span>
+          <input
+            type="text"
+            value={formState.name}
+            onChange={handleChange("name")}
+            placeholder={t("profile.fields.namePlaceholder")}
               className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
               disabled={isFormDisabled}
               required
@@ -330,12 +340,12 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
           </label>
 
           <label className="space-y-2 text-sm font-medium text-white/80">
-            <span>Email</span>
-            <input
-              type="email"
-              value={formState.email}
-              onChange={handleChange("email")}
-              placeholder="you@example.com"
+          <span>{t("profile.fields.email")}</span>
+          <input
+            type="email"
+            value={formState.email}
+            onChange={handleChange("email")}
+            placeholder={t("profile.fields.emailPlaceholder")}
               className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
               disabled={isFormDisabled}
               required
@@ -343,19 +353,17 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
           </label>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="space-y-2 text-sm font-medium text-white/80">
-            <span>Current Location</span>
-            <input
-              type="text"
-              value={formState.location}
-              onChange={handleChange("location")}
-              placeholder="City, Country"
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
-              disabled={isFormDisabled}
-            />
-            <p className="text-xs text-white/40">Where you are currently or traveling to</p>
-          </label>
+        <label className="space-y-2 text-sm font-medium text-white/80">
+          <span>Location</span>
+          <input
+            type="text"
+            value={formState.location}
+            onChange={handleChange("location")}
+            placeholder={t("profile.fields.locationPlaceholder")}
+            className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
+            disabled={isFormDisabled}
+          />
+        </label>
 
           <label className="space-y-2 text-sm font-medium text-white/80">
             <span>Home Country</span>
@@ -384,11 +392,11 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
 
         <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-2 text-sm font-medium text-white/80">
-            <span>Favorite museums</span>
+            <span>{t("profile.fields.favoriteMuseums")}</span>
             <textarea
               value={formState.favoriteMuseums}
               onChange={handleChange("favoriteMuseums")}
-              placeholder="Tell us about galleries or exhibits you love."
+              placeholder={t("profile.fields.favoriteMuseumsPlaceholder")}
               rows={4}
               className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
               disabled={isFormDisabled}
@@ -396,11 +404,11 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
           </label>
 
           <label className="space-y-2 text-sm font-medium text-white/80">
-            <span>Favorite recipes</span>
+            <span>{t("profile.fields.favoriteRecipes")}</span>
             <textarea
               value={formState.favoriteRecipes}
               onChange={handleChange("favoriteRecipes")}
-              placeholder="Share signature dishes or family recipes."
+              placeholder={t("profile.fields.favoriteRecipesPlaceholder")}
               rows={4}
               className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
               disabled={isFormDisabled}
@@ -409,11 +417,11 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
         </div>
 
         <label className="space-y-2 text-sm font-medium text-white/80">
-          <span>Bio</span>
+          <span>{t("profile.fields.bio")}</span>
           <textarea
             value={formState.bio}
             onChange={handleChange("bio")}
-            placeholder="Share your travel memories, passions, or anything Roots should know."
+            placeholder={t("profile.fields.bioPlaceholder")}
             rows={4}
             className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
             disabled={isFormDisabled}
@@ -421,12 +429,12 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
         </label>
 
         <label className="space-y-2 text-sm font-medium text-white/80">
-          <span>Social handle</span>
+          <span>{t("profile.fields.socialHandle")}</span>
           <input
             type="text"
             value={formState.socialHandle}
             onChange={handleChange("socialHandle")}
-            placeholder="@roots_explorer"
+            placeholder={t("profile.fields.socialHandlePlaceholder")}
             className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white placeholder:text-white/40 focus:border-emerald-300 focus:outline-none disabled:opacity-50"
             disabled={isFormDisabled}
           />
@@ -438,10 +446,14 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
             disabled={isFormDisabled || (formState.homeCountry !== "" && homeCountryValidation === "invalid")}
             className="rounded-full bg-emerald-500 px-6 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isSaving ? "Saving..." : isLoading ? "Loading..." : "Save profile"}
+            {isSaving
+              ? t("profile.status.saving")
+              : isLoading
+                ? t("profile.status.loading")
+                : t("profile.actions.save")}
           </button>
           <p className="text-xs text-white/60">
-            Your info powers personalized travel and food ideas.
+            {t("profile.actions.helper")}
           </p>
         </div>
       </form>
