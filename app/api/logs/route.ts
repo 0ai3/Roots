@@ -5,6 +5,20 @@ import { getDb } from "@/app/lib/mongo";
 
 const LOGS_COLLECTION = "travel_logs";
 
+function normalizeLocationValue(value?: string | null) {
+  if (!value) {
+    return "";
+  }
+  const cleaned = value.trim().toLowerCase().replace(/\s+/g, " ");
+  if (!cleaned) {
+    return "";
+  }
+  return cleaned
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export async function GET() {
   try {
     const cookieStore = await cookies();
@@ -32,7 +46,7 @@ export async function GET() {
     // Count unique countries visited
     const countries = new Set(
       attractions
-        .map(log => log.country)
+        .map((log) => normalizeLocationValue(log.country))
         .filter(Boolean)
     );
     
@@ -74,6 +88,9 @@ export async function POST(request: NextRequest) {
     const payload = await request.json();
     const { type, title, description, country, city, rating, imageUrl, notes } = payload;
 
+    const normalizedCountry = normalizeLocationValue(country);
+    const normalizedCity = normalizeLocationValue(city);
+
     if (!type || !title) {
       return NextResponse.json(
         { error: "Type and title are required." },
@@ -89,8 +106,8 @@ export async function POST(request: NextRequest) {
       type, // 'attraction' or 'recipe'
       title,
       description: description || "",
-      country: country || "",
-      city: city || "",
+      country: normalizedCountry,
+      city: normalizedCity,
       rating: rating || null,
       imageUrl: imageUrl || "",
       notes: notes || "",

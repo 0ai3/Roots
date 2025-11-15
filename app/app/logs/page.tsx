@@ -311,7 +311,7 @@ export default function LogsPage() {
 
         {/* Stats Grid */}
         <div className="grid gap-4 md:grid-cols-4">
-          <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 p-6 backdrop-blur">
+          <div className="rounded-3xl border border-white/10 bg-linear-to-br from-emerald-500/20 to-teal-500/20 p-6 backdrop-blur">
             <div className="flex items-center gap-3">
               <Globe2 className="h-8 w-8 text-emerald-400" />
               <div>
@@ -321,7 +321,7 @@ export default function LogsPage() {
             </div>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
               <div
-                className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 transition-all duration-500"
+                className="h-full bg-linear-to-r from-emerald-400 to-teal-400 transition-all duration-500"
                 style={{ width: `${stats.worldPercentage}%` }}
               />
             </div>
@@ -587,7 +587,7 @@ export default function LogsPage() {
                     />
                   </div>
                 ) : (
-                  <div className="flex h-48 w-full items-center justify-center bg-gradient-to-br from-slate-800/50 to-slate-900/50">
+                  <div className="flex h-48 w-full items-center justify-center bg-linear-to-br from-slate-800/50 to-slate-900/50">
                     <ImageIcon className="h-16 w-16 text-white/20" />
                   </div>
                 )}
