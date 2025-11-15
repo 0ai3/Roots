@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTheme } from "@/app/components/ThemeProvider";
 import DashboardPageLayout from "@/app/components/DashboardPageLayout";
 import PageThemeToggle from "@/app/components/PageThemeToggle";
 import { useTheme } from "@/app/components/ThemeProvider";
@@ -84,7 +85,7 @@ export default function LogsPage() {
     setIsDarkMode(theme === "dark");
   }, [theme]);
 
-  // Theme is controlled by the global ThemeToggle provider
+  // Theme is controlled by the global ThemeToggle provider (via ThemeProvider)
 
   // Color utility functions
   const getBgColor = (opacity: string = "") => {
