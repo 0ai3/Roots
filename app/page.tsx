@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useState, useEffect, useMemo } from "react";
+
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -1140,27 +1140,6 @@ function ImageWithFallback({
   );
 }
 
-function AppInner({
-  mousePosition,
-  scrollY,
-}: {
-  mousePosition: { x: number; y: number };
-  scrollY: number;
-}) {
-  const { theme } = useTheme();
-
-  return (
-    <div className="relative">
-      <Navbar scrollY={scrollY} />
-      <ThemeToggle />
-      <HeroSection scrollY={scrollY} />
-      <FeaturesSection />
-      <ExploreSection />
-      <InteractiveGarden mousePosition={mousePosition} />
-      <CTASection />
-    </div>
-  );
-}
 
 function AppInner({
   mousePosition,
