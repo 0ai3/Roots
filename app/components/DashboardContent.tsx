@@ -199,7 +199,7 @@ export default function DashboardContent({ user }: Props) {
                     whileHover={{ scale: 1.02 }}
                     className={`h-80 w-full overflow-hidden rounded-xl border ${cardBorder} flex-1 relative`}
                   >
-                    <div className={`absolute inset-0 bg-gradient-to-t ${
+                    <div className={`absolute inset-0 bg-linear-to-t ${
                       isDarkMode 
                         ? "from-neutral-900/20 to-transparent" 
                         : "from-white/20 to-transparent"
