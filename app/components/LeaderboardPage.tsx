@@ -260,7 +260,7 @@ export default function LeaderboardPage() {
                         2
                       </div>
                     </div>
-                    <h3 className="font-bold text-lg mb-2 text-neutral-900">
+                    <h3 className="font-bold text-lg mb-2 text-white">
                       {entries[1].name}
                     </h3>
                     <p className="text-2xl font-bold mb-1 text-gray-600">
@@ -290,7 +290,7 @@ export default function LeaderboardPage() {
                         1
                       </div>
                     </div>
-                    <h3 className="font-bold text-xl mb-2 text-neutral-900">
+                    <h3 className="font-bold text-xl mb-2 text-white">
                       {entries[0].name}
                     </h3>
                     <p className="text-3xl font-bold mb-1 text-yellow-600">
@@ -321,7 +321,7 @@ export default function LeaderboardPage() {
                         3
                       </div>
                     </div>
-                    <h3 className="font-bold text-lg mb-2 text-neutral-900">
+                    <h3 className="font-bold text-lg mb-2 text-white">
                       {entries[2].name}
                     </h3>
                     <p className="text-2xl font-bold mb-1 text-amber-600">
