@@ -75,7 +75,7 @@ export default function LearnAndEarnGame({
   const [score, setScore] = useState(0);
   const [showFeedback, setShowFeedback] = useState(false);
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(
-    null,
+    null
   );
   const [lastAward, setLastAward] = useState<number | null>(null);
 
@@ -127,12 +127,12 @@ export default function LearnAndEarnGame({
           country: trimmedCountry,
           type: quizType,
           difficulty: "medium",
-          questionCount: 10
+          questionCount: 10,
         }),
       });
 
       const data: APIResponse = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data?.error ?? "Unable to generate module.");
       }
@@ -156,7 +156,7 @@ export default function LearnAndEarnGame({
           })),
         };
         setModuleData(formattedModule);
-        
+
         // Show warning if using fallback
         if (data.warning) {
           console.warn(data.warning);
@@ -256,12 +256,18 @@ export default function LearnAndEarnGame({
   const currentCountry = moduleData?.country ?? "";
 
   return (
-    <section className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}>
+    <section
+      className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}
+    >
       <div className="mt-4 space-y-6 p-6">
-        <div className={`rounded-3xl border p-6 ${getBorderColor()} ${getCardBg()}`}>
+        <div
+          className={`rounded-3xl border p-6 ${getBorderColor()} ${getCardBg()}`}
+        >
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+              <p
+                className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}
+              >
                 Generate a Learn & Earn module
               </p>
               <h2 className="text-2xl font-semibold">
@@ -284,12 +290,12 @@ export default function LearnAndEarnGame({
               value={countryInput}
               onChange={(event) => setCountryInput(event.target.value)}
               placeholder="e.g., Peru, Thailand, Brazil"
-              className={`flex-1 rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-amber-300 focus:outline-none ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+              className={`flex-1 rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-lime-300 focus:outline-none ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
             />
             <select
               value={quizType}
               onChange={(event) => setQuizType(event.target.value)}
-              className={`rounded-2xl border px-4 py-3 text-base focus:border-amber-300 focus:outline-none ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+              className={`rounded-2xl border px-4 py-3 text-base focus:border-lime-300 focus:outline-none ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
             >
               <option value="cultural">Cultural</option>
               <option value="geography">Geography</option>
@@ -301,7 +307,7 @@ export default function LearnAndEarnGame({
             <button
               type="submit"
               disabled={isGenerating}
-              className="inline-flex items-center justify-center rounded-2xl bg-amber-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed"
+              className="inline-flex items-center justify-center rounded-2xl bg-lime-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-lime-300 disabled:cursor-not-allowed"
             >
               {isGenerating ? (
                 <>
@@ -323,7 +329,7 @@ export default function LearnAndEarnGame({
                   setCountryInput(suggestion);
                   setGenerateError(null);
                 }}
-                className="rounded-full border px-3 py-1 transition hover:border-amber-300 hover:text-amber-200 border-white/15 text-white/70"
+                className="rounded-full border px-3 py-1 transition hover:border-lime-300 hover:text-lime-200 border-white/15 text-white/70"
               >
                 {suggestion}
               </button>
@@ -337,22 +343,27 @@ export default function LearnAndEarnGame({
           )}
         </div>
 
-        <div className={`rounded-3xl border p-6 ${getBorderColor()} ${getCardBg()}`}>
+        <div
+          className={`rounded-3xl border p-6 ${getBorderColor()} ${getCardBg()}`}
+        >
           {!moduleData && !isGenerating && (
             <div className={getMutedTextColor()}>
               <p>
-                Enter a country above to receive a cultural summary and a 10-question quiz
-                generated on the spot.
+                Enter a country above to receive a cultural summary and a
+                10-question quiz generated on the spot.
               </p>
               <p className="text-gray-600">
-                Can&apos;t find what you&apos;re looking for? Try our cultural games!
+                Can&apos;t find what you&apos;re looking for? Try our cultural
+                games!
               </p>
             </div>
           )}
 
           {isGenerating && (
-            <div className={`flex items-center gap-3 text-sm ${getMutedTextColor()}`}>
-              <Loader2 className="h-5 w-5 animate-spin text-amber-300" />
+            <div
+              className={`flex items-center gap-3 text-sm ${getMutedTextColor()}`}
+            >
+              <Loader2 className="h-5 w-5 animate-spin text-lime-300" />
               Crafting your learn & earn module...
             </div>
           )}
@@ -360,7 +371,9 @@ export default function LearnAndEarnGame({
           {moduleData && !isGenerating && (
             <div className="space-y-6">
               <header>
-                <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+                <p
+                  className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}
+                >
                   {moduleData.country}
                 </p>
                 <h3 className="text-2xl font-semibold">{moduleData.summary}</h3>
@@ -368,7 +381,10 @@ export default function LearnAndEarnGame({
 
               <div className="space-y-4 rounded-2xl border p-5 border-white/10 bg-slate-950/40">
                 {moduleData.reading.map((paragraph, index) => (
-                  <p key={index} className="text-sm leading-relaxed text-white/80">
+                  <p
+                    key={index}
+                    className="text-sm leading-relaxed text-white/80"
+                  >
                     {paragraph}
                   </p>
                 ))}
@@ -378,7 +394,7 @@ export default function LearnAndEarnGame({
                 <button
                   type="button"
                   onClick={handleStartQuiz}
-                  className="rounded-full bg-amber-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-amber-300"
+                  className="rounded-full bg-lime-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-lime-300"
                 >
                   Start 10-question quiz for {currentCountry}
                 </button>
@@ -386,7 +402,9 @@ export default function LearnAndEarnGame({
 
               {isQuizActive && currentQuestionData && (
                 <div className="space-y-4 rounded-2xl border p-5 border-white/10 bg-slate-950/40">
-                  <div className={`flex items-center justify-between text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+                  <div
+                    className={`flex items-center justify-between text-xs uppercase tracking-wide ${getMutedTextColor()}`}
+                  >
                     <span>
                       Question {currentQuestion + 1} of {quizLength}
                     </span>
@@ -411,7 +429,7 @@ export default function LearnAndEarnGame({
                               ? "border-rose-300/70 bg-rose-400/10 text-rose-100"
                               : state === "disabled"
                               ? "border-white/5 bg-transparent text-white/40"
-                              : "border-white/15 bg-transparent hover:border-amber-200 hover:text-amber-100"
+                              : "border-white/15 bg-transparent hover:border-lime-200 hover:text-lime-100"
                           }`}
                         >
                           {option}
@@ -423,13 +441,15 @@ export default function LearnAndEarnGame({
                   {showFeedback && (
                     <div className="rounded-2xl border p-4 text-sm border-white/15 bg-white/5 text-white/80">
                       <p className="font-semibold">
-                        {lastAnswerCorrect ? "Great memory!" : "Take another look"}
+                        {lastAnswerCorrect
+                          ? "Great memory!"
+                          : "Take another look"}
                       </p>
                       <p className="mt-2">{currentQuestionData.explanation}</p>
                       <button
                         type="button"
                         onClick={handleNextQuestion}
-                        className="mt-4 rounded-full bg-amber-400 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-950 transition hover:bg-amber-300"
+                        className="mt-4 rounded-full bg-lime-400 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-950 transition hover:bg-lime-300"
                       >
                         {currentQuestion + 1 === quizLength
                           ? "View results"
@@ -443,7 +463,9 @@ export default function LearnAndEarnGame({
               {isComplete && moduleData && (
                 <div className="space-y-4 rounded-2xl border p-5 border-white/10 bg-slate-950/40">
                   <header>
-                    <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+                    <p
+                      className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}
+                    >
                       Quiz complete
                     </p>
                     <h3 className="text-2xl font-semibold">
@@ -457,14 +479,14 @@ export default function LearnAndEarnGame({
                     <button
                       type="button"
                       onClick={handleStartQuiz}
-                      className="rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition hover:border-amber-200 hover:text-amber-100 border-white/15 text-white"
+                      className="rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition hover:border-lime-200 hover:text-lime-100 border-white/15 text-white"
                     >
                       Retake this quiz
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsComplete(false)}
-                      className="rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition hover:border-amber-200 hover:text-amber-100 border-white/15 text-white"
+                      className="rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition hover:border-lime-200 hover:text-lime-100 border-white/15 text-white"
                     >
                       Review the story
                     </button>
