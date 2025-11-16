@@ -17,3 +17,28 @@
 .profile-light ::placeholder {
 	color: #ffffff !important; 
 }
+@layer base {
+  h1, h2, h3 {
+    @apply font-serif tracking-tight text-balance;
+  }
+
+  h1 {
+    @apply text-5xl lg:text-6xl leading-tight;
+  }
+
+  h2 {
+    @apply text-4xl lg:text-5xl leading-snug;
+  }
+
+  h3 {
+    @apply text-2xl lg:text-3xl;
+  }
+
+  p {
+    @apply text-base lg:text-lg leading-relaxed text-neutral-300;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-lime-400 via-yellow-300 to-lime-400 bg-clip-text text-transparent;
+  }
+}
