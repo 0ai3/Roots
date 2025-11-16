@@ -59,8 +59,7 @@ export default function MapPage() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-5xl md:text-6xl font-bold mb-6 leading-tight"
               >
-                Interactive{" "}
-                <span className="text-lime-400">Map</span>
+                Interactive <span className="text-lime-400">Map</span>
               </motion.h1>
 
               <motion.p
@@ -77,6 +76,7 @@ export default function MapPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
+                className="flex justify-center"
               >
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -122,21 +122,13 @@ export default function MapPage() {
                     transition={{ delay: i * 0.1 }}
                     className={`rounded-2xl p-6 border backdrop-blur-sm bg-neutral-900/50 border-white/10`}
                   >
-                    <div
-                      className={`p-3 rounded-xl w-fit mb-4 bg-lime-400/20`}
-                    >
-                      <feature.icon
-                        className={`w-6 h-6 text-lime-400`}
-                      />
+                    <div className={`p-3 rounded-xl w-fit mb-4 bg-lime-400/20`}>
+                      <feature.icon className={`w-6 h-6 text-lime-400`} />
                     </div>
-                    <h3
-                      className={`font-bold text-lg mb-2 text-white`}
-                    >
+                    <h3 className={`font-bold text-lg mb-2 text-white`}>
                       {feature.title}
                     </h3>
-                    <p
-                      className={`text-sm text-neutral-400`}
-                    >
+                    <p className={`text-sm text-neutral-400`}>
                       {feature.description}
                     </p>
                   </motion.div>
