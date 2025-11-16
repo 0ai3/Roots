@@ -96,25 +96,17 @@ export default function DashboardPageLayout({
   // Use light theme for SSR/initial render to prevent hydration mismatch
   const effectiveIsDarkMode = mounted ? isDarkMode : false;
 
-  const sectionTextColor = effectiveIsDarkMode ? "text-white" : "text-neutral-900";
-  const baseClass = `flex-1 rounded-3xl border p-8 shadow-lg ${
-    effectiveIsDarkMode
-      ? "border-neutral-800 bg-neutral-900/30"
-      : "border-neutral-200 bg-white/80"
-  } ${sectionTextColor}`;
+  const sectionTextColor = "text-white";
+  const baseClass = `flex-1 rounded-3xl border p-8 shadow-lg border-neutral-800 bg-neutral-900/30 ${sectionTextColor}`;
   const sectionClass = contentClassName
     ? `${baseClass} ${contentClassName}`
     : baseClass;
 
-  const mainClass = effectiveIsDarkMode
-    ? "min-h-screen bg-black px-4 py-16 transition-colors duration-300"
-    : "min-h-screen bg-gradient-to-br from-amber-50 to-orange-50/30 px-4 py-16 transition-colors duration-300";
+  const mainClass = "min-h-screen bg-black px-4 py-16 transition-colors duration-300";
 
   return (
     <main
-      className={`${mainClass} ${
-        effectiveIsDarkMode ? "text-white" : "text-neutral-900"
-      }`}
+      className={`${mainClass} text-white`}
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-8 lg:flex-row">
         <DashboardSidebar />
@@ -128,9 +120,7 @@ export default function DashboardPageLayout({
               )}
               {description && (
                 <p
-                  className={`text-sm ${
-                    effectiveIsDarkMode ? "text-white/70" : "text-neutral-600"
-                  }`}
+                  className="text-sm text-white/70"
                 >
                   {description}
                 </p>

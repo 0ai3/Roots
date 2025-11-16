@@ -149,69 +149,62 @@ export default function DashboardSidebar() {
       return;
     }
 
-    saveTimeoutRef.current = setTimeout(async () => {
-      const profileData = profileDataRef.current;
-      
-      // Update hasLocation state
-      if (location.trim().length === 0) {
-        setHasLocation(false);
-        return;
-      }
-      
-      setHasLocation(true);
-
-      // Only save if we have profile data and location changed
-      if (!profileData) {
-        console.log("No profile data yet, skipping save");
-        return;
-      }
-
-      // Check if location actually changed
-      const currentSavedLocation = profileData.location || "";
-      if (location.trim() === currentSavedLocation.trim()) {
-        console.log("Location unchanged, skipping save");
-        return;
-      }
-
-      console.log("Saving location:", location.trim());
-      setIsSavingLocation(true);
-      
-      try {
-        const response = await fetch("/api/profile", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: profileData.name || "",
-            email: profileData.email || "",
-            location: location.trim(),
-            homeCountry: profileData.homeCountry || "",
-            favoriteMuseums: profileData.favoriteMuseums || "",
-            favoriteRecipes: profileData.favoriteRecipes || "",
-            bio: profileData.bio || "",
-            socialHandle: profileData.socialHandle || "",
-          }),
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          profileDataRef.current = data.profile;
-          console.log("✅ Location saved successfully:", location.trim());
-        } else {
-          console.error("Failed to save location:", response.status);
-        }
-      } catch (error) {
-        console.error("Error saving location:", error);
-      } finally {
-        setIsSavingLocation(false);
-      }
-    }, 1000); // Wait 1 second after user stops typing
-
-    return () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
-    };
+    // Update hasLocation state based on location input
+    setHasLocation(location.trim().length > 0);
   }, [location]);
+
+  // Manual save location function
+  const handleSaveLocation = async () => {
+    const profileData = profileDataRef.current;
+    if (!profileData) {
+      return;
+    }
+
+    const currentSavedLocation = profileData.location || "";
+    if (location.trim() === currentSavedLocation.trim()) {
+      console.log("Location unchanged, skipping save");
+      return;
+    }
+
+    // Don't save if we don't have required profile data yet
+    if (!profileData.name || !profileData.email) {
+      console.log("Skipping location save - profile data not loaded yet");
+      return;
+    }
+
+    console.log("Saving location:", location.trim());
+    setIsSavingLocation(true);
+    
+    try {
+      const response = await fetch("/api/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: profileData.name,
+          email: profileData.email,
+          location: location.trim(),
+          homeCountry: profileData.homeCountry || "",
+          favoriteMuseums: profileData.favoriteMuseums || "",
+          favoriteRecipes: profileData.favoriteRecipes || "",
+          bio: profileData.bio || "",
+          socialHandle: profileData.socialHandle || "",
+        }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        profileDataRef.current = data.profile;
+        setHasLocation(location.trim().length > 0);
+        console.log("✅ Location saved successfully:", location.trim());
+      } else {
+        console.error("Failed to save location:", response.status);
+      }
+    } catch (error) {
+      console.error("Error saving location:", error);
+    } finally {
+      setIsSavingLocation(false);
+    }
+  };
 
   const handleLogout = async () => {
     if (isLoggingOut) {
@@ -293,14 +286,19 @@ export default function DashboardSidebar() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-4">
-            {/* Location Input */}
+            {/* Location Input with Save Icon */}
             <div className="relative">
               <input
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSaveLocation();
+                  }
+                }}
                 placeholder={!hasLocation ? "⚠️ Set your location" : "Current location..."}
-                className={`w-52 px-3 py-2 text-sm rounded-full border transition-all focus:outline-none focus:ring-2 ${
+                className={`w-52 px-3 py-2 pr-10 text-sm rounded-full border transition-all focus:outline-none focus:ring-2 ${
                   !hasLocation
                     ? isDarkLocal
                       ? "bg-red-900/20 border-red-500/50 text-red-200 placeholder:text-red-300 focus:ring-red-400/30 focus:border-red-400 animate-pulse"
@@ -310,13 +308,26 @@ export default function DashboardSidebar() {
                     : "bg-white border-neutral-300 text-neutral-900 placeholder:text-neutral-400 focus:ring-emerald-500/30 focus:border-emerald-500"
                 }`}
               />
-              {isSavingLocation && (
-                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <button
+                onClick={handleSaveLocation}
+                disabled={isSavingLocation}
+                className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full transition-all hover:bg-opacity-80 disabled:opacity-50 ${
+                  isDarkLocal
+                    ? "text-lime-400 hover:bg-lime-400/10"
+                    : "text-emerald-600 hover:bg-emerald-600/10"
+                }`}
+                title="Save location"
+              >
+                {isSavingLocation ? (
                   <div className={`w-4 h-4 border-2 border-t-transparent rounded-full animate-spin ${
                     isDarkLocal ? "border-lime-400" : "border-emerald-600"
                   }`} />
-                </div>
-              )}
+                ) : (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </button>
             </div>
 
             {navLinks.slice(0, 6).map((link) => {

@@ -685,38 +685,6 @@ interface CTASectionProps {
 }
 
 function CTASection({ userId }: CTASectionProps) {
-  const [email, setEmail] = useState("");
-  const [sending, setSending] = useState(false);
-  const [result, setResult] = useState<null | "success" | "error">(null);
-
-  const handleNewsletterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-
-    setSending(true);
-    setResult(null);
-
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, type: "newsletter" }),
-      });
-
-      if (response.ok) {
-        setResult("success");
-        setEmail("");
-      } else {
-        setResult("error");
-      }
-    } catch (error) {
-      console.error("Newsletter error:", error);
-      setResult("error");
-    } finally {
-      setSending(false);
-    }
-  };
-
   return (
     <section className="relative py-24 px-6 lg:px-12 overflow-hidden bg-neutral-950">
       <div className="max-w-7xl mx-auto">
@@ -741,41 +709,27 @@ function CTASection({ userId }: CTASectionProps) {
                   for free and begin your adventure.
                 </p>
 
-                <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 px-5 py-4 rounded-full backdrop-blur-sm border bg-neutral-800/50 border-neutral-600">
                       <input
                         type="email"
                         placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={sending}
                         className="flex-1 bg-transparent outline-none placeholder:text-neutral-500 text-white"
-                        required
                       />
                     </div>
                   </div>
-                  <motion.button
-                    type="submit"
-                    disabled={sending}
-                    className="px-8 py-4 rounded-full flex items-center justify-center gap-2 bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors disabled:opacity-50"
-                    whileHover={{ scale: sending ? 1 : 1.05 }}
-                    whileTap={{ scale: sending ? 1 : 0.95 }}
-                  >
-                    {sending ? "Subscribing..." : "Subscribe"}
-                    <ArrowRight className="w-5 h-5" />
-                  </motion.button>
-                </form>
-                {result === "success" && (
-                  <p className="mt-4 text-sm text-lime-400">
-                    ✓ Thanks for subscribing! We&apos;ll be in touch.
-                  </p>
-                )}
-                {result === "error" && (
-                  <p className="mt-4 text-sm text-red-400">
-                    ✗ Something went wrong. Please try again.
-                  </p>
-                )}
+                  <Link href={userId ? "/app/dashboard" : "/login"}>
+                    <motion.button
+                      className="px-8 py-4 rounded-full flex items-center justify-center gap-2 bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Get Started
+                      <ArrowRight className="w-5 h-5" />
+                    </motion.button>
+                  </Link>
+                </div>
               </motion.div>
 
               <motion.div

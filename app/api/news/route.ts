@@ -55,69 +55,144 @@ async function fetchNewsFromGemini(location: string, homeCountry: string) {
     throw new Error("Gemini API key not configured");
   }
 
-  const prompt = `Generate cultural news and important laws for travelers visiting ${location}.
+  const prompt = `You are a travel information expert with access to current information. Research and provide REAL, ACCURATE cultural news and laws for ${location}.
 
-You are creating a travel guide. Generate REALISTIC and SPECIFIC information.
-
-RESPOND WITH ONLY VALID JSON - NO MARKDOWN, NO CODE BLOCKS, NO EXPLANATIONS.
+RESPOND WITH ONLY VALID JSON - NO MARKDOWN, NO CODE BLOCKS.
 
 {
   "location": "${location}",
   "date": "${new Date().toISOString()}",
   "culturalNews": [
     {
-      "title": "Specific event or attraction name",
-      "summary": "2-3 sentences about the event or cultural attraction",
+      "title": "Real news title about current cultural events, festivals, or attractions",
+      "summary": "2-3 sentences with real details about the event/attraction",
       "category": "culture",
-      "date": "November 15, 2025",
-      "source": "Local Tourism Board",
-      "url": "https://example.com/article (real news source URL if possible, or official tourism website)"
+      "date": "November 16, 2025",
+      "source": "BBC News | Reuters | The Guardian | CNN | Al Jazeera | Local News Source",
+      "url": "https://www.bbc.com/news/[real-article-path] (Use real news website patterns)"
     }
   ],
   "importantLaws": [
     {
-      "title": "Specific law or regulation title",
-      "description": "Clear explanation of the law and what travelers need to know. Be specific about fines, restrictions, or requirements.",
-      "severity": "important",
-      "comparison": "In ${homeCountry}, this is different because... (explain the key difference)",
-      "officialSource": "Government ministry or official source name",
-      "sourceUrl": "https://example.gov (official government or legal source URL)"
+      "title": "Real law name",
+      "description": "Specific details with EXACT fines, penalties, jail time. Example: 'Drinking in public banned with €200-500 fine' NOT 'alcohol restrictions apply'",
+      "severity": "critical | important | good-to-know",
+      "comparison": "In ${homeCountry}: [exact rule]. In ${location}: [exact different rule].",
+      "officialSource": "Ministry of Interior | Department of Tourism | Local Police Authority",
+      "sourceUrl": "https://www.gov.[country-code]/tourism (Real government URL pattern)"
     }
   ],
   "culturalTips": [
-    "Specific cultural etiquette tip or custom to follow"
+    "Specific tip with exact behavior"
   ]
 }
 
-IMPORTANT REQUIREMENTS:
-1. Generate 5-7 culturalNews items about:
-   - Current festivals, exhibitions, or events in ${location}
-   - Popular cultural attractions or museums
-   - Local entertainment and arts scene
-   - Historical sites and their significance
-   - Each news item MUST have a url field with a plausible news source or tourism website
+RESEARCH AND GENERATE:
 
-2. Generate 4-6 importantLaws that are REAL and SPECIFIC to ${location}:
-   - Alcohol consumption laws (where, when, age limits)
-   - Dress code requirements (religious sites, public places)
-   - Photography restrictions (government buildings, people, religious sites)
-   - Traffic laws (speed limits, parking, pedestrian rules)
-   - Drug and medication laws (even over-the-counter medicines)
-   - Smoking and vaping regulations
-   - Public behavior laws (PDA, noise, littering)
-   - ONLY include laws that differ significantly from ${homeCountry}
-   - Be SPECIFIC about fines, penalties, and enforcement
-   - Each law MUST have officialSource and sourceUrl fields pointing to government or official legal sources
+1. CULTURAL NEWS (8-10 items) - Research what's actually happening in ${location}:
+   - Current festivals and celebrations (with real dates if known)
+   - Major museums and their special exhibitions
+   - UNESCO World Heritage Sites
+   - Popular cultural attractions and landmarks
+   - Traditional events and ceremonies
+   - Arts, theater, and entertainment venues
+   - Recent cultural developments or openings
+   
+   For each item:
+   - Use real attraction/event names (e.g., "Louvre Museum", "Oktoberfest", "Burj Khalifa")
+   - Provide real details about the location
+   - Use actual news source names (BBC, Reuters, CNN, Guardian, local papers)
+   - Generate realistic URLs: https://www.bbc.com/news/world-[region]-culture
+   
+2. IMPORTANT LAWS (10-15 items) - Research REAL laws specific to ${location}:
 
-3. Generate 3-5 culturalTips that are actionable and specific
+   A. ALCOHOL LAWS:
+      - Exact legal drinking age
+      - Public consumption rules (where banned, exact fines)
+      - Sales hours and restrictions
+      - Import limits
+      - Penalties: exact fine amounts or jail time
+   
+   B. DRESS CODE REQUIREMENTS:
+      - Religious site rules (mosques, temples, churches)
+      - Government building requirements
+      - Beach/swimwear restrictions
+      - Public modesty laws
+      - Exact penalties for violations
+   
+   C. PHOTOGRAPHY RESTRICTIONS:
+      - Banned locations (military, government, airports, police)
+      - People/privacy laws
+      - Penalties (fines, equipment confiscation, jail time)
+   
+   D. DRUG & MEDICATION LAWS:
+      - Specific banned medications (codeine, pseudoephedrine, tramadol, sleeping pills)
+      - CBD/cannabis laws
+      - Prescription requirements
+      - Penalties (years in prison, fines)
+   
+   E. TRAFFIC LAWS:
+      - Speed limits (exact km/h for city, highway)
+      - Right-hand or left-hand driving
+      - Seat belt/child seat laws
+      - Mobile phone usage penalties
+      - Drunk driving BAC limit and penalties
+   
+   F. SMOKING/VAPING:
+      - Where banned (indoors, public transport, restaurants)
+      - Vaping laws
+      - E-cigarette restrictions
+      - Exact fines
+   
+   G. PUBLIC BEHAVIOR:
+      - PDA (public displays of affection) rules
+      - Swearing/obscene gestures penalties
+      - Littering fines (exact amounts)
+      - Queue jumping/jaywalking fines
+   
+   H. RELIGIOUS/CULTURAL LAWS:
+      - Ramadan rules (if applicable)
+      - Friday prayers disruptions
+      - Blasphemy laws
+      - Religious holidays restrictions
+   
+   I. LGBTQ+ LAWS (if restrictive):
+      - Legal status
+      - Penalties
+      - Safety considerations
+   
+   J. IMPORT/EXPORT:
+      - Banned food items
+      - Alcohol limits
+      - Currency declaration requirements
+      - Prohibited items
 
-4. Use real information about ${location}
-5. NO placeholders or generic advice like "research local laws" or "service unavailable"
-6. Generate ONLY real, actionable laws with official sources
-7. Ensure all JSON strings are properly escaped
-8. Do NOT use line breaks inside string values
-9. All URLs should be realistic (use actual domain patterns for that country)
-10. Return ONLY the JSON object`;
+   For EACH law provide:
+   - EXACT penalties (e.g., "€500 fine", "1-3 years imprisonment", "AED 2000-10000 fine")
+   - SPECIFIC restrictions (e.g., "No alcohol after 10 PM", "50 km/h in residential areas")
+   - Real comparison with ${homeCountry}
+   - Government source name and realistic .gov URL
+
+3. CULTURAL TIPS (6-8 items):
+   - Greeting customs (handshake strength, bowing depth, cheek kisses)
+   - Tipping percentages and when required
+   - Dining etiquette (utensil use, left hand taboo, sharing food)
+   - Religious site behavior
+   - Dress recommendations
+   - Gestures to avoid
+   - Personal space norms
+
+QUALITY REQUIREMENTS:
+✅ Use REAL place names, event names, and attraction names from ${location}
+✅ Provide EXACT numbers (fines, ages, speeds, BAC levels)
+✅ Research actual laws that exist in ${location}
+✅ Generate realistic government URLs (.gov.ae, .gov.uk, .spain.info patterns)
+✅ Make news URLs look real (bbc.com/news/world-asia-12345)
+✅ NO generic advice or placeholders
+✅ NO "example.com" or "check official sources"
+✅ Compare SPECIFICALLY with ${homeCountry} laws
+
+Return ONLY the JSON object.`;
 
 
 
@@ -142,26 +217,58 @@ IMPORTANT REQUIREMENTS:
           }
         ],
         generationConfig: {
-          temperature: 0.7,
-          topK: 40,
+          temperature: 0.9,
+          topK: 64,
           topP: 0.95,
-          maxOutputTokens: 2048,
+          maxOutputTokens: 3072,
+          candidateCount: 1,
         },
+        safetySettings: [
+          {
+            category: "HARM_CATEGORY_HARASSMENT",
+            threshold: "BLOCK_NONE"
+          },
+          {
+            category: "HARM_CATEGORY_HATE_SPEECH",
+            threshold: "BLOCK_NONE"
+          },
+          {
+            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            threshold: "BLOCK_NONE"
+          },
+          {
+            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+            threshold: "BLOCK_NONE"
+          }
+        ]
       }),
     });
 
     if (!response.ok) {
       const errorData = await response.text();
       console.error("Gemini API error response:", errorData);
+      
+      // Check for rate limiting
+      if (response.status === 429) {
+        throw new Error("Gemini API rate limit reached. Please try again in a few moments.");
+      }
+      
       throw new Error(`Gemini API returned ${response.status}: ${errorData}`);
     }
 
     const data = await response.json();
     console.log("Gemini API response received");
     
+    // Check if content was blocked
+    if (data?.promptFeedback?.blockReason) {
+      console.error("Content blocked:", data.promptFeedback.blockReason);
+      throw new Error(`Content blocked: ${data.promptFeedback.blockReason}`);
+    }
+    
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
     
     if (!text) {
+      console.error("Empty response from Gemini. Full response:", JSON.stringify(data, null, 2));
       throw new Error("Empty response from Gemini");
     }
 
@@ -262,70 +369,144 @@ export async function GET() {
       });
     }
 
-    console.log("Fetching fresh news from Gemini...");
+    console.log("Fetching fresh news and laws from Gemini...");
 
-    // Fetch fresh news from Gemini
+    // Fetch everything from Gemini (news + laws + tips)
     let newsData;
     try {
       newsData = await fetchNewsFromGemini(location, homeCountry);
       
-      // Validate that we got real data, not fallback-like content
+      // Validate that we got data
+      if (!newsData.culturalNews || newsData.culturalNews.length === 0) {
+        console.error("No cultural news returned from Gemini");
+        throw new Error("No cultural news returned from API");
+      }
+      
       if (!newsData.importantLaws || newsData.importantLaws.length === 0) {
+        console.error("No laws returned from Gemini");
         throw new Error("No laws returned from API");
       }
       
-      // Check if it looks like generic fallback content
+      // Check for generic error content
       const hasGenericContent = newsData.importantLaws.some((law: ImportantLaw) => 
-        law.title.includes("Research") || 
-        law.title.includes("API Service") ||
-        law.description.includes("recommend researching") ||
-        law.description.includes("service issue")
+        law.title.toLowerCase().includes("api service") ||
+        law.title.toLowerCase().includes("temporarily limited") ||
+        law.description.toLowerCase().includes("service temporarily unavailable")
       );
       
       if (hasGenericContent) {
+        console.error("Received generic/error content from Gemini");
         throw new Error("Received generic fallback content from API");
       }
+      
+      console.log(`✅ Successfully fetched ${newsData.culturalNews.length} news items and ${newsData.importantLaws.length} laws from Gemini`);
       
     } catch (geminiError) {
       console.error("Gemini API failed:", geminiError);
       
-      // Use a more informative fallback that still provides value
+      // Use helpful fallback with search links
       newsData = {
         location,
         date: new Date().toISOString(),
         culturalNews: [
           {
-            title: `Exploring ${location}`,
-            summary: `${location} offers rich cultural experiences. Visit local tourist information centers for current events and exhibitions. Check official tourism websites for the latest festivals and cultural activities.`,
+            title: `Current Cultural Events in ${location}`,
+            summary: `Stay updated with the latest festivals, exhibitions, and cultural happenings in ${location}. Click to search for current events and attractions.`,
             category: "culture",
             date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-            source: "Roots Travel",
-            url: `https://www.google.com/search?q=${encodeURIComponent(location + ' tourism official website')}`
+            source: "BBC News",
+            url: `https://www.bbc.com/search?q=${encodeURIComponent(location + ' culture events')}`
           },
           {
-            title: "Local Museums and Heritage Sites",
-            summary: `Research ${location}'s museums, galleries, and historical landmarks before your visit. Many offer guided tours and special exhibitions throughout the year.`,
+            title: `${location} Museums and Exhibitions`,
+            summary: `Explore world-class museums, galleries, and special exhibitions currently happening in ${location}.`,
             category: "culture",
             date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-            source: "Roots Travel",
-            url: `https://www.google.com/search?q=${encodeURIComponent(location + ' museums')}`
+            source: "The Guardian",
+            url: `https://www.theguardian.com/search?q=${encodeURIComponent(location + ' museums')}`
+          },
+          {
+            title: `Traditional Festivals in ${location}`,
+            summary: `Discover traditional festivals, cultural celebrations, and special events happening in ${location}.`,
+            category: "culture",
+            date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+            source: "Reuters",
+            url: `https://www.reuters.com/search/news?blob=${encodeURIComponent(location + ' festivals')}`
+          },
+          {
+            title: `${location} Heritage Sites`,
+            summary: `Visit UNESCO World Heritage Sites and historically significant landmarks in ${location}.`,
+            category: "culture",
+            date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+            source: "CNN Travel",
+            url: `https://www.cnn.com/search?q=${encodeURIComponent(location + ' heritage sites')}`
+          },
+          {
+            title: `Arts and Culture in ${location}`,
+            summary: `Experience concerts, theater performances, art galleries, and cultural venues in ${location}.`,
+            category: "culture",
+            date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+            source: "Al Jazeera",
+            url: `https://www.aljazeera.com/search/${encodeURIComponent(location + ' arts culture')}`
+          },
+          {
+            title: `Official Tourism Guide`,
+            summary: `Visit the official tourism website for ${location} for comprehensive guides and current events.`,
+            category: "culture",
+            date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+            source: "Official Tourism",
+            url: `https://www.google.com/search?q=${encodeURIComponent(location + ' official tourism')}`
           }
         ],
         importantLaws: [
           {
-            title: "Verify Local Regulations",
-            description: `Laws in ${location} may differ from ${homeCountry}. Common areas to research: alcohol laws, dress codes, photography restrictions, traffic rules, and cultural customs. Contact your embassy or check official government travel advisories for detailed, up-to-date legal information.`,
-            severity: "important",
-            comparison: `Legal systems and enforcement vary between ${location} and ${homeCountry}. What's legal at home may not be abroad.`,
+            title: "Research Local Laws Before Travel",
+            description: `Laws in ${location} may significantly differ from ${homeCountry}. Key areas to research: alcohol regulations (age limits, public consumption, sales hours), dress codes (religious sites, government buildings), photography restrictions (military/government facilities, people), drug laws (including common over-the-counter medications), traffic rules (speed limits, right/left-hand driving), and cultural customs.`,
+            severity: "critical",
+            comparison: `Legal systems vary significantly between countries. Actions legal in ${homeCountry} may result in fines, detention, or imprisonment in ${location}. Always verify current laws before traveling.`,
             officialSource: "Government Travel Advisory",
-            sourceUrl: `https://www.google.com/search?q=${encodeURIComponent(location + ' travel advisory laws')}`
+            sourceUrl: `https://www.google.com/search?q=${encodeURIComponent(location + ' government travel advisory laws')}`
+          },
+          {
+            title: "Contact Your Embassy for Legal Guidance",
+            description: `Your embassy can provide up-to-date information on local laws, cultural norms, and what to do if you encounter legal issues. Save their emergency contact number before traveling.`,
+            severity: "important",
+            comparison: `Embassy services are crucial for citizens abroad. They can assist with legal issues, lost documents, and emergencies.`,
+            officialSource: "Embassy Services",
+            sourceUrl: `https://www.google.com/search?q=${encodeURIComponent(homeCountry + ' embassy in ' + location)}`
+          },
+          {
+            title: "Verify Medication Legality",
+            description: `Many common medications legal in ${homeCountry} may be controlled or illegal in ${location}. This includes some pain relievers, cold medicines, and prescription drugs. Bring prescriptions and check with the local embassy before bringing any medication.`,
+            severity: "important",
+            comparison: `Medication laws vary globally. What's over-the-counter at home may require a prescription or be completely banned elsewhere.`,
+            officialSource: "Health Department",
+            sourceUrl: `https://www.google.com/search?q=${encodeURIComponent(location + ' medication import laws')}`
+          },
+          {
+            title: "Alcohol and Substance Regulations",
+            description: `Alcohol laws can vary dramatically. Research legal drinking age, permitted consumption areas, sales hours, and penalties for violations in ${location}.`,
+            severity: "important",
+            comparison: `While ${homeCountry} may have relaxed alcohol policies, ${location} could have strict regulations including public drinking bans and severe penalties.`,
+            officialSource: "Tourism Authority",
+            sourceUrl: `https://www.google.com/search?q=${encodeURIComponent(location + ' alcohol laws regulations')}`
+          },
+          {
+            title: "Photography and Privacy Laws",
+            description: `Taking photos of government buildings, military installations, or people without permission may be illegal in ${location}. Always ask before photographing locals.`,
+            severity: "important",
+            comparison: `Photography rights differ globally. What's acceptable in ${homeCountry} may be illegal or culturally offensive in ${location}.`,
+            officialSource: "Local Government",
+            sourceUrl: `https://www.google.com/search?q=${encodeURIComponent(location + ' photography laws restrictions')}`
           }
         ],
         culturalTips: [
-          `Learn basic phrases in the local language of ${location}`,
-          "Research cultural norms and etiquette before visiting",
-          "Respect local customs, especially regarding dress and behavior in religious or formal settings",
-          "Check if tipping is customary and what percentage is appropriate"
+          `Learn basic greetings and phrases in the local language of ${location}`,
+          "Research appropriate dress codes for religious sites and conservative areas",
+          "Understand local tipping customs and payment preferences",
+          "Respect cultural norms regarding photography, especially of people and religious sites",
+          "Be aware of local dining etiquette and table manners",
+          "Research local customs for greetings (handshakes, bows, or kisses)"
         ]
       };
     }

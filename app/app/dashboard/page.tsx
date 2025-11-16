@@ -72,7 +72,7 @@ export default function DashboardPage() {
 
   return (
     <DashboardPageLayout>
-      <div className="relative min-h-screen bg-white dark:bg-neutral-950">
+      <div className="relative min-h-screen bg-neutral-950">
         {/* Hero Section */}
         <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
@@ -83,7 +83,7 @@ export default function DashboardPage() {
               className="object-cover"
               priority
             />
-            <div className="absolute inset-0 bg-linear-to-br from-black/70 via-black/50 to-transparent dark:from-black/80 dark:via-black/60" />
+            <div className="absolute inset-0 bg-linear-to-br from-black/70 via-black/50 to-transparent dark:from-black/90 dark:via-black/70" />
           </div>
 
           <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 text-center">
@@ -160,22 +160,22 @@ export default function DashboardPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
                 whileHover={{ y: -5 }}
-                className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-xl border border-neutral-200 dark:border-neutral-800"
+                className="bg-neutral-900 rounded-2xl p-6 shadow-xl border border-neutral-800"
               >
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-lime-100 dark:bg-lime-400/20 flex items-center justify-center">
-                    <Award className="w-6 h-6 text-lime-600 dark:text-lime-400" />
+                  <div className="w-12 h-12 rounded-xl bg-lime-200 dark:bg-lime-400/20 flex items-center justify-center">
+                    <Award className="w-6 h-6 text-lime-700 dark:text-lime-400" />
                   </div>
                   <div>
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                    <p className="text-sm text-neutral-400">
                       Your Points
                     </p>
-                    <p className="text-2xl font-bold text-neutral-900 dark:text-white">
+                    <p className="text-2xl font-bold text-white">
                       {user.points.toLocaleString()}
                     </p>
                   </div>
                 </div>
-                <p className="text-xs text-neutral-500 dark:text-neutral-500">
+                <p className="text-xs text-neutral-500">
                   Keep exploring to earn more
                 </p>
               </motion.div>
@@ -186,22 +186,22 @@ export default function DashboardPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
                 whileHover={{ y: -5 }}
-                className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-xl border border-neutral-200 dark:border-neutral-800"
+                className="bg-neutral-900 rounded-2xl p-6 shadow-xl border border-neutral-800"
               >
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-400/20 flex items-center justify-center">
-                    <Calendar className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                  <div className="w-12 h-12 rounded-xl bg-emerald-200 dark:bg-emerald-400/20 flex items-center justify-center">
+                    <Calendar className="w-6 h-6 text-emerald-700 dark:text-emerald-400" />
                   </div>
                   <div>
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                    <p className="text-sm text-neutral-400">
                       Member Since
                     </p>
-                    <p className="text-lg font-bold text-neutral-900 dark:text-white">
+                    <p className="text-lg font-bold text-white">
                       {memberSince}
                     </p>
                   </div>
                 </div>
-                <p className="text-xs text-neutral-500 dark:text-neutral-500">
+                <p className="text-xs text-neutral-500">
                   {user.role === "admin" ? "Admin Account" : "Explorer Account"}
                 </p>
               </motion.div>
@@ -212,22 +212,22 @@ export default function DashboardPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 }}
                 whileHover={{ y: -5 }}
-                className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-xl border border-neutral-200 dark:border-neutral-800"
+                className="bg-neutral-900 rounded-2xl p-6 shadow-xl border border-neutral-800"
               >
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-400/20 flex items-center justify-center">
-                    <Globe className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                  <div className="w-12 h-12 rounded-xl bg-blue-200 dark:bg-blue-400/20 flex items-center justify-center">
+                    <Globe className="w-6 h-6 text-blue-700 dark:text-blue-400" />
                   </div>
                   <div>
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                    <p className="text-sm text-neutral-400">
                       Countries Explored
                     </p>
-                    <p className="text-2xl font-bold text-neutral-900 dark:text-white">
+                    <p className="text-2xl font-bold text-white">
                       24
                     </p>
                   </div>
                 </div>
-                <p className="text-xs text-neutral-500 dark:text-neutral-500">
+                <p className="text-xs text-neutral-500">
                   171 more to discover
                 </p>
               </motion.div>
@@ -238,22 +238,22 @@ export default function DashboardPage() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.4 }}
                 whileHover={{ y: -5 }}
-                className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-xl border border-neutral-200 dark:border-neutral-800"
+                className="bg-neutral-900 rounded-2xl p-6 shadow-xl border border-neutral-800"
               >
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-400/20 flex items-center justify-center">
-                    <TrendingUp className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                  <div className="w-12 h-12 rounded-xl bg-purple-200 dark:bg-purple-400/20 flex items-center justify-center">
+                    <TrendingUp className="w-6 h-6 text-purple-700 dark:text-purple-400" />
                   </div>
                   <div>
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                    <p className="text-sm text-neutral-400">
                       This Week
                     </p>
-                    <p className="text-2xl font-bold text-neutral-900 dark:text-white">
+                    <p className="text-2xl font-bold text-white">
                       +250
                     </p>
                   </div>
                 </div>
-                <p className="text-xs text-neutral-500 dark:text-neutral-500">
+                <p className="text-xs text-neutral-500">
                   Points earned recently
                 </p>
               </motion.div>
@@ -262,7 +262,7 @@ export default function DashboardPage() {
         </section>
 
         {/* Quick Actions Section */}
-        <section className="py-20 bg-neutral-50 dark:bg-neutral-950">
+        <section className="py-20 bg-neutral-950">
           <div className="max-w-7xl mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -270,13 +270,13 @@ export default function DashboardPage() {
               viewport={{ once: true }}
               className="text-center mb-12"
             >
-              <h2 className="text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+              <h2 className="text-4xl font-bold text-white mb-4">
                 Quick{" "}
-                <span className="text-lime-600 dark:text-lime-400">
+                <span className="text-lime-400">
                   Actions
                 </span>
               </h2>
-              <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
+              <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
                 Jump into your favorite activities and continue your cultural
                 journey
               </p>
@@ -336,22 +336,22 @@ export default function DashboardPage() {
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -5, scale: 1.02 }}
                   onClick={() => router.push(action.href)}
-                  className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-800 hover:border-lime-400/50 dark:hover:border-lime-400/50 transition-all text-left group"
+                  className="bg-neutral-900 rounded-2xl p-6 shadow-lg border border-neutral-800 hover:border-lime-400/50 transition-all text-left group"
                 >
                   <div
-                    className={`w-14 h-14 rounded-xl bg-${action.color}-100 dark:bg-${action.color}-400/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
+                    className={`w-14 h-14 rounded-xl bg-${action.color}-200 dark:bg-${action.color}-400/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
                   >
                     <action.icon
-                      className={`w-7 h-7 text-${action.color}-600 dark:text-${action.color}-400`}
+                      className={`w-7 h-7 text-${action.color}-700 dark:text-${action.color}-400`}
                     />
                   </div>
-                  <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-bold text-white mb-2">
                     {action.title}
                   </h3>
-                  <p className="text-neutral-600 dark:text-neutral-400 text-sm">
+                  <p className="text-neutral-400 text-sm">
                     {action.description}
                   </p>
-                  <div className="mt-4 flex items-center gap-2 text-lime-600 dark:text-lime-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="mt-4 flex items-center gap-2 text-lime-400 opacity-0 group-hover:opacity-100 transition-opacity">
                     <span className="text-sm font-semibold">Get Started</span>
                     <ArrowRight className="w-4 h-4" />
                   </div>
@@ -362,7 +362,7 @@ export default function DashboardPage() {
         </section>
 
         {/* Achievement Highlights */}
-        <section className="py-20 bg-white dark:bg-neutral-950">
+        <section className="py-20 bg-neutral-950">
           <div className="max-w-7xl mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -370,13 +370,13 @@ export default function DashboardPage() {
               viewport={{ once: true }}
               className="text-center mb-12"
             >
-              <h2 className="text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+              <h2 className="text-4xl font-bold text-white mb-4">
                 Recent{" "}
-                <span className="text-emerald-600 dark:text-emerald-400">
+                <span className="text-emerald-400">
                   Achievements
                 </span>
               </h2>
-              <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
+              <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
                 Celebrate your milestones and cultural discoveries
               </p>
             </motion.div>
@@ -409,16 +409,16 @@ export default function DashboardPage() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ scale: 1.05 }}
-                  className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-800"
+                  className="bg-neutral-900 rounded-2xl p-6 shadow-lg border border-neutral-800"
                 >
                   <div className="text-5xl mb-4">{achievement.icon}</div>
-                  <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-bold text-white mb-2">
                     {achievement.title}
                   </h3>
-                  <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-3">
+                  <p className="text-neutral-400 text-sm mb-3">
                     {achievement.description}
                   </p>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-500">
+                  <p className="text-xs text-neutral-500">
                     {achievement.date}
                   </p>
                 </motion.div>
@@ -428,7 +428,7 @@ export default function DashboardPage() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 bg-linear-to-br from-lime-600 to-emerald-600 dark:from-lime-500 dark:to-emerald-500 text-white">
+        <section className="py-20 bg-linear-to-br from-lime-600 to-emerald-600 dark:from-lime-600/90 dark:to-emerald-600/90 text-white">
           <div className="max-w-4xl mx-auto px-6 text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -447,7 +447,7 @@ export default function DashboardPage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => router.push("/app/map")}
-                className="px-10 py-5 bg-white text-lime-600 dark:text-lime-600 rounded-xl font-bold text-lg flex items-center gap-3 mx-auto hover:bg-neutral-100 dark:hover:bg-neutral-200 transition-colors"
+                className="px-10 py-5 bg-neutral-900 text-lime-400 rounded-xl font-bold text-lg flex items-center gap-3 mx-auto hover:bg-neutral-800 transition-colors"
               >
                 Start Exploring
                 <ArrowRight className="w-6 h-6" />
