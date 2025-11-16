@@ -51,7 +51,7 @@ const conversationTopics = [
   },
 ];
 
-function HeroSection() {
+function HeroSection({ onStartChat }: { onStartChat: () => void }) {
   const router = useRouter(); // ensure router is defined inside this component
   return (
     <section className="relative min-h-[60vh] flex items-center overflow-hidden">
@@ -95,7 +95,7 @@ function HeroSection() {
 
             <div className="flex flex-wrap gap-4">
               <motion.button
-                onClick={() => router.push("/app/chat")}
+                onClick={onStartChat}
                 className="px-8 py-4 rounded-full flex items-center gap-2 bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -306,7 +306,7 @@ export default function ChatPage() {
 
       {!showChat ? (
         <>
-          <HeroSection />
+          <HeroSection onStartChat={() => setShowChat(true)} />
           <StatsSection />
           <TopicsSection />
           <FeaturesSection />
@@ -331,7 +331,7 @@ export default function ChatPage() {
                   cultures, traditions, and languages from around the world
                 </p>
                 <motion.button
-                  onClick={() => router.push("/app/chat")}
+                  onClick={() => setShowChat(true)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="px-8 py-4 rounded-full flex items-center gap-2 mx-auto transition-colors bg-lime-400 text-neutral-950 hover:bg-lime-300"
