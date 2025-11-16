@@ -46,6 +46,9 @@ export default function LeaderboardPage() {
     ? entries.find((entry) => entry.userId === userId)
     : undefined;
 
+  // Force dark mode for leaderboard page (ensure elements use dark tokens)
+  const isDarkMode = true;
+
   // Dark mode only colors
   const getBgColor = () => "bg-black";
   const getTextColor = () => "text-white";
@@ -93,8 +96,7 @@ export default function LeaderboardPage() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
               >
-                Global{" "}
-                <span className="text-lime-400">Leaderboard</span>
+                Global <span className="text-lime-400">Leaderboard</span>
               </motion.h1>
 
               <motion.p
@@ -168,7 +170,11 @@ export default function LeaderboardPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: i * 0.1 }}
-                    className="rounded-2xl p-6 backdrop-blur-sm border bg-white border-neutral-200 shadow-lg"
+                    className={`rounded-2xl p-6 backdrop-blur-sm border ${
+                      isDarkMode
+                        ? "bg-neutral-900/90 border-white/10"
+                        : "bg-white border-neutral-200 shadow-lg"
+                    }`}
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div
@@ -200,10 +206,10 @@ export default function LeaderboardPage() {
                         </p>
                       </div>
                     </div>
-                    <p className="text-sm font-medium text-neutral-700 mb-1">
+                    <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-neutral-700'} mb-1`}>
                       {stat.label}
                     </p>
-                    <p className="text-xs text-neutral-500">
+                    <p className={`text-xs ${isDarkMode ? 'text-white/70' : 'text-neutral-500'}`}>
                       {stat.desc}
                     </p>
                   </motion.div>
@@ -240,7 +246,11 @@ export default function LeaderboardPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.1 }}
-                    className="rounded-2xl p-6 text-center border backdrop-blur-sm bg-white border-gray-300 shadow-lg md:mt-8"
+                    className={`rounded-2xl p-6 text-center border backdrop-blur-sm ${
+                      isDarkMode
+                        ? "bg-neutral-900/50 border-gray-400/20"
+                        : "bg-white border-gray-300 shadow-lg"
+                    } md:mt-8`}
                   >
                     <div className="relative inline-block mb-4">
                       <div className="w-20 h-20 rounded-full flex items-center justify-center bg-gray-100">
@@ -266,7 +276,11 @@ export default function LeaderboardPage() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="rounded-2xl p-6 text-center border backdrop-blur-sm bg-linear-to-br from-yellow-50 to-amber-50 border-yellow-300 shadow-xl"
+                    className={`rounded-2xl p-6 text-center border backdrop-blur-sm ${
+                      isDarkMode
+                        ? "bg-linear-to-br from-yellow-500/10 to-amber-500/5 border-yellow-500/30"
+                        : "bg-linear-to-br from-yellow-50 to-amber-50 border-yellow-300 shadow-xl"
+                    }`}
                   >
                     <div className="relative inline-block mb-4">
                       <div className="w-24 h-24 rounded-full flex items-center justify-center bg-yellow-100">
@@ -293,7 +307,11 @@ export default function LeaderboardPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.2 }}
-                    className="rounded-2xl p-6 text-center border backdrop-blur-sm bg-white border-amber-300 shadow-lg md:mt-8"
+                    className={`rounded-2xl p-6 text-center border backdrop-blur-sm ${
+                      isDarkMode
+                        ? "bg-neutral-900/50 border-amber-600/20"
+                        : "bg-white border-amber-300 shadow-lg"
+                    } md:mt-8`}
                   >
                     <div className="relative inline-block mb-4">
                       <div className="w-20 h-20 rounded-full flex items-center justify-center bg-amber-100">
