@@ -23,18 +23,20 @@ import {
   X as XIcon,
 } from "lucide-react";
 
-const navLinks = [
+const mainNavLinks = [
   { label: "nav.dashboard", href: "/app/dashboard", icon: Home },
-  { label: "nav.profile", href: "/app/profile", icon: User },
-  { label: "nav.logs", href: "/app/logs", icon: BookOpen },
   { label: "nav.chat", href: "/app/chat", icon: MessageCircle },
   { label: "nav.map", href: "/app/map", icon: Map },
   { label: "nav.games", href: "/app/games", icon: Gamepad2 },
   { label: "nav.recipes", href: "/app/recipes", icon: Utensils },
-  { label: "nav.offers", href: "/app/offerts", icon: Gift },
   { label: "nav.news", href: "/app/news", icon: Newspaper },
   { label: "nav.attractions", href: "/app/attractions", icon: Landmark },
+];
+
+const profileDropdownLinks = [
+  { label: "nav.logs", href: "/app/logs", icon: BookOpen },
   { label: "nav.leaderboard", href: "/app/leaderboard", icon: Trophy },
+  { label: "nav.offers", href: "/app/offerts", icon: Gift },
 ];
 
 interface ProfileData {
@@ -330,7 +332,7 @@ export default function DashboardSidebar() {
               </button>
             </div>
 
-            {navLinks.slice(0, 6).map((link) => {
+            {mainNavLinks.map((link) => {
               const isActive =
                 pathname === link.href || pathname?.startsWith(`${link.href}/`);
               const Icon = link.icon;
@@ -355,16 +357,21 @@ export default function DashboardSidebar() {
               );
             })}
 
-            {/* Dropdown for More Items */}
+            {/* Profile Dropdown */}
             <div className="relative group">
               <button
-                className={`flex items-center gap-1 text-sm font-medium transition-colors ${
-                  isDarkLocal
-                    ? "text-neutral-300 hover:text-lime-400"
-                    : "text-neutral-700 hover:text-emerald-600"
+                className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-colors ${
+                  pathname === "/app/profile" || pathname === "/app/logs" || pathname === "/app/leaderboard" || pathname === "/app/offerts"
+                    ? isDarkLocal
+                      ? "text-lime-400 bg-lime-400/10"
+                      : "text-emerald-600 bg-emerald-50"
+                    : isDarkLocal
+                    ? "text-neutral-300 hover:text-lime-400 hover:bg-neutral-800"
+                    : "text-neutral-700 hover:text-emerald-600 hover:bg-slate-50"
                 }`}
               >
-                More
+                <User className="w-4 h-4" />
+                Profile
                 <svg
                   className="w-4 h-4"
                   fill="none"
@@ -388,7 +395,25 @@ export default function DashboardSidebar() {
                 }`}
               >
                 <div className="py-2">
-                  {navLinks.slice(6).map((link) => {
+                  {/* Profile Link */}
+                  <Link
+                    href="/app/profile"
+                    className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                      pathname === "/app/profile"
+                        ? isDarkLocal
+                          ? "text-lime-400 bg-lime-400/10"
+                          : "text-emerald-600 bg-emerald-50"
+                        : isDarkLocal
+                        ? "text-neutral-300 hover:bg-neutral-800"
+                        : "text-neutral-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    <User className="w-4 h-4" />
+                    {t("nav.profile")}
+                  </Link>
+
+                  {/* Logs and other dropdown links */}
+                  {profileDropdownLinks.map((link) => {
                     const isActive =
                       pathname === link.href ||
                       pathname?.startsWith(`${link.href}/`);
@@ -413,27 +438,30 @@ export default function DashboardSidebar() {
                       </Link>
                     );
                   })}
+
+                  {/* Divider */}
+                  <div className={`my-2 border-t ${
+                    isDarkLocal ? "border-neutral-800" : "border-neutral-200"
+                  }`} />
+
+                  {/* Logout Button in Dropdown */}
+                  <button
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                      isDarkLocal
+                        ? "text-red-400 hover:bg-red-400/10"
+                        : "text-red-600 hover:bg-red-50"
+                    } disabled:opacity-50`}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    {isLoggingOut
+                      ? t("dashboard.sidebar.signingOut")
+                      : t("dashboard.sidebar.logout")}
+                  </button>
                 </div>
               </div>
             </div>
-
-            {/* Logout Button */}
-            <motion.button
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-colors ${
-                isDarkLocal
-                  ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
-                  : "bg-emerald-600 text-white hover:bg-emerald-700"
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-              <LogOut className="w-4 h-4" />
-              {isLoggingOut
-                ? t("dashboard.sidebar.signingOut")
-                : t("dashboard.sidebar.logout")}
-            </motion.button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -496,7 +524,8 @@ export default function DashboardSidebar() {
             </div>
 
             <div className="space-y-1">
-              {navLinks.map((link) => {
+              {/* All Main Nav Links */}
+              {mainNavLinks.map((link) => {
                 const isActive =
                   pathname === link.href ||
                   pathname?.startsWith(`${link.href}/`);
@@ -522,6 +551,56 @@ export default function DashboardSidebar() {
                   </Link>
                 );
               })}
+
+              {/* Profile Section */}
+              <div className={`my-2 pt-2 border-t ${
+                isDarkLocal ? "border-neutral-800" : "border-neutral-200"
+              }`}>
+                <Link
+                  href="/app/profile"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
+                    pathname === "/app/profile"
+                      ? isDarkLocal
+                        ? "text-lime-400 bg-lime-400/10"
+                        : "text-emerald-600 bg-emerald-50"
+                      : isDarkLocal
+                      ? "text-neutral-300 hover:bg-neutral-800"
+                      : "text-neutral-700 hover:bg-slate-50"
+                  }`}
+                >
+                  <User className="w-5 h-5" />
+                  {t("nav.profile")}
+                </Link>
+
+                {/* Profile Dropdown Links */}
+                {profileDropdownLinks.map((link) => {
+                  const isActive =
+                    pathname === link.href ||
+                    pathname?.startsWith(`${link.href}/`);
+                  const Icon = link.icon;
+
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
+                        isActive
+                          ? isDarkLocal
+                            ? "text-lime-400 bg-lime-400/10"
+                            : "text-emerald-600 bg-emerald-50"
+                          : isDarkLocal
+                          ? "text-neutral-300 hover:bg-neutral-800"
+                          : "text-neutral-700 hover:bg-slate-50"
+                      }`}
+                    >
+                      <Icon className="w-5 h-5" />
+                      {t(link.label)}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
 
             <button
