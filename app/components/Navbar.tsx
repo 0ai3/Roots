@@ -7,6 +7,12 @@ import { Menu as MenuIcon, X as XIcon } from "lucide-react";
 
 import Link from "next/link";
 
+const navLinks = [
+  { name: "Features", href: "#features" },
+  { name: "About", href: "#about" },
+  { name: "Contact", href: "/contact" },
+];
+
 interface NavbarProps {
   scrollY?: number;
   userId?: string | null;

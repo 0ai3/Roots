@@ -12,12 +12,12 @@ import {
   Building2,
   Palette,
   MapPin,
-  Play,
 } from "lucide-react";
 import Navbar from "./components/Navbar";
 import Image from "next/image";
 import Link from "next/link";
 import { fetchUserId } from "./lib/userId";
+import NewsletterSignup from "./components/NewsletterSignup";
 
 // Mock translation function if i18n is not set up
 const useI18n = () => ({
@@ -188,7 +188,7 @@ function ImageWithFallback({
   );
 }
 
-function HeroSection({ scrollY }: HeroSectionProps) {
+function HeroSection({ scrollY, userId }: HeroSectionProps) {
   const parallaxY = scrollY * 0.5;
 
   return (
@@ -230,23 +230,16 @@ function HeroSection({ scrollY }: HeroSectionProps) {
               </p>
 
               <div className="flex flex-wrap gap-4">
-                <motion.button
-                  className="px-8 py-4 rounded-full flex items-center gap-2 bg-linear-to-r from-lime-400 to-yellow-300 text-neutral-950 font-semibold hover:shadow-lime-400/30 transition-shadow"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Start Exploring
-                  <ArrowRight className="w-5 h-5" />
-                </motion.button>
-
-                <motion.button
-                  className="px-8 py-4 rounded-full backdrop-blur-sm border bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50 transition-colors flex items-center gap-2"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Play className="w-5 h-5" />
-                  Watch Video
-                </motion.button>
+                <Link href={userId ? "/app/dashboard" : "/login"}>
+                  <motion.button
+                    className="px-8 py-4 rounded-full flex items-center gap-2 bg-linear-to-r from-lime-400 to-yellow-300 text-neutral-950 font-semibold hover:shadow-lime-400/30 transition-shadow"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Start Exploring
+                    <ArrowRight className="w-5 h-5" />
+                  </motion.button>
+                </Link>
               </div>
 
               <div className="grid grid-cols-3 gap-6 mt-12 text-center">
@@ -816,32 +809,6 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
             );
           })}
         </div>
-
-        {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="relative z-20 mt-20"
-        >
-          <div className="flex flex-col sm:flex-row gap-4 items-center">
-            <motion.button
-              className="px-8 py-4 rounded-full bg-linear-to-r from-lime-400 to-yellow-300 text-neutral-950 font-semibold shadow-md hover:shadow-lime-400/30 transition-transform"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Join Community
-            </motion.button>
-            <motion.button
-              className="px-8 py-4 rounded-full backdrop-blur-sm border bg-neutral-800/60 text-white border-neutral-700 hover:bg-neutral-700/50 transition-transform font-medium"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Learn More
-            </motion.button>
-          </div>
-        </motion.div>
       </div>
 
       {/* Gradient Fade at Bottom */}
@@ -1024,6 +991,12 @@ export default function App() {
       {mounted && (
         <InteractiveGarden mousePosition={mousePosition} userId={userId} />
       )}
+
+      {/* Newsletter Section */}
+      <section className="py-24 px-6 lg:px-12 bg-neutral-950">
+        <NewsletterSignup />
+      </section>
+
       <CTASection userId={userId} />
     </div>
   );
