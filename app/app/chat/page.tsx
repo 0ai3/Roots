@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import {
   MessageCircle,
   Globe2,
@@ -52,7 +51,6 @@ const conversationTopics = [
 ];
 
 function HeroSection({ onStartChat }: { onStartChat: () => void }) {
-  const router = useRouter(); // ensure router is defined inside this component
   return (
     <section className="relative min-h-[60vh] flex items-center overflow-hidden">
       <div className="absolute inset-0">
@@ -298,8 +296,6 @@ function FeaturesSection() {
 
 export default function ChatPage() {
   const [showChat, setShowChat] = useState(false);
-  const router = useRouter();
-
   return (
     <DashboardPageLayout>
       {/* Theme controlled by global ThemeToggle */}

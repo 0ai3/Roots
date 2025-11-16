@@ -3,7 +3,6 @@
 import { FormEvent, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Sparkles, Globe, Heart } from "lucide-react";
 import {
   checkEmailAction,
   loginAction,

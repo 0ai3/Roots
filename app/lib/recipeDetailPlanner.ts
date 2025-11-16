@@ -90,9 +90,42 @@ export async function requestRecipeDetail(
   const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
   const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
 
-  const formatInstruction =
-    'Respond ONLY with valid JSON matching: {"name":"","servings":"","prepTime":"","cookTime":"","ingredients":[""],"steps":[""],"tips":""}. Include at least six ingredients and six imperative steps tailored to the requested dish.';
-  const requestParts = [{ text: `the recipe for ${payload.recipeName}` }, { text: formatInstruction }];
+  const formatInstruction = `You are an expert chef. Provide a COMPLETE detailed recipe for "${payload.recipeName}"${payload.region ? ` from ${payload.region}` : ''}${payload.description ? ` (${payload.description})` : ''}.
+
+CRITICAL REQUIREMENTS:
+1. ALL ingredients MUST include precise measurements in grams (g), milliliters (ml), or standard units
+   - Example: "500g chicken breast", "250ml milk", "2 tablespoons (30ml) olive oil"
+   - NEVER list ingredients without measurements
+2. ALL cooking steps MUST include:
+   - Exact temperatures (e.g., "180°C", "medium-high heat")
+   - Precise cooking times (e.g., "25 minutes", "until golden brown, about 5-7 minutes")
+   - Visual cues (e.g., "until edges are crispy", "until it thickens")
+3. Specify serving size clearly (e.g., "Serves 4 people")
+4. Provide prep time and cook time estimates
+5. Include chef tips about technique, substitutions, or common mistakes to avoid
+
+${payload.dietaryFocus ? `Dietary focus: ${payload.dietaryFocus}` : ''}
+${payload.notes ? `Additional preferences: ${payload.notes}` : ''}
+
+Respond ONLY with valid JSON matching this exact structure:
+{
+  "name": "Recipe Name",
+  "servings": "Serves X people",
+  "prepTime": "X minutes",
+  "cookTime": "X minutes",
+  "ingredients": [
+    "Exact amount with unit (e.g., 500g chicken breast)",
+    "Another ingredient with measurement"
+  ],
+  "steps": [
+    "Step 1 with temperature and time details",
+    "Step 2 with visual cues and timing"
+  ],
+  "tips": "Chef's helpful tips and notes"
+}
+
+Ensure at least 8-12 ingredients with measurements and 8-12 detailed cooking steps.`;
+  const requestParts = [{ text: formatInstruction }];
 
   detailRequestInFlight = true;
   try {
