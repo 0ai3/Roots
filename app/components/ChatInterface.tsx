@@ -268,7 +268,7 @@ export default function ChatInterface() {
         
         <aside className={`rounded-3xl border p-5 ${getBorderColor()} ${getCardBg()}`}>
           <div className={`flex items-center gap-2 text-sm ${getMutedTextColor()}`}>
-            <MessageCircle className="h-5 w-5 text-amber-500 dark:text-amber-300" />
+            <MessageCircle className="h-5 w-5 text-lime-500 dark:text-lime-300" />
             Real-time friends list
           </div>
           <form onSubmit={handleAddFriend} className="mt-4 space-y-3">
@@ -279,13 +279,13 @@ export default function ChatInterface() {
                 value={newHandle}
                 onChange={(event) => setNewHandle(event.target.value)}
                 placeholder="Add by @social_handle"
-                className={`w-full rounded-2xl border pl-9 pr-3 py-2 text-sm placeholder:${getMutedTextColor()} focus:border-amber-500 dark:focus:border-amber-300 focus:outline-none ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+                className={`w-full rounded-2xl border pl-9 pr-3 py-2 text-sm placeholder:${getMutedTextColor()} focus:border-lime-500 dark:focus:border-lime-300 focus:outline-none ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
               />
             </div>
             <button
               type="submit"
               disabled={addFriendState === "loading"}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-amber-500 dark:bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-600 dark:hover:bg-amber-300 disabled:opacity-60"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-lime-500 dark:bg-lime-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-lime-600 dark:hover:bg-lime-300 disabled:opacity-60"
             >
               {addFriendState === "loading" ? (
                 <>
@@ -331,11 +331,11 @@ export default function ChatInterface() {
                   className={`w-full rounded-2xl border px-4 py-3 text-left text-sm transition ${
                     friend.id === selectedFriendId
                       ? isDarkMode
-                        ? "border-amber-300/70 bg-amber-400/10"
-                        : "border-amber-400/70 bg-amber-500/10"
+                        ? "border-lime-300/70 bg-lime-400/10"
+                        : "border-lime-400/70 bg-lime-500/10"
                       : isDarkMode
-                        ? "border-white/10 bg-transparent hover:border-amber-200/40"
-                        : "border-slate-200 bg-transparent hover:border-amber-400/40"
+                        ? "border-white/10 bg-transparent hover:border-lime-200/40"
+                        : "border-slate-200 bg-transparent hover:border-lime-400/40"
                   }`}
                 >
                   <p className="font-semibold">{friend.name}</p>
@@ -394,8 +394,8 @@ export default function ChatInterface() {
                             ? "border-white/15 bg-white/10 text-white"
                             : "border-slate-200 bg-slate-100 text-slate-900"
                           : isDarkMode
-                            ? "border-amber-300/60 bg-amber-400/10 text-amber-50"
-                            : "border-amber-400/60 bg-amber-500/10 text-amber-900"
+                            ? "border-lime-300/60 bg-lime-400/10 text-lime-50"
+                            : "border-lime-400/60 bg-lime-500/10 text-lime-900"
                       }`}
                     >
                       <p className="whitespace-pre-line">{message.body}</p>
@@ -415,7 +415,7 @@ export default function ChatInterface() {
                     onChange={(event) => setNewMessage(event.target.value)}
                     placeholder={`Send a message to ${selectedFriend.name}`}
                     rows={3}
-                    className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-amber-500 dark:focus:border-amber-300 focus:outline-none ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+                    className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-lime-500 dark:focus:border-lime-300 focus:outline-none ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
                   />
                   {messagesError && (
                     <p className={`mt-2 text-sm ${isDarkMode ? "text-rose-200" : "text-rose-600"}`}>{messagesError}</p>
@@ -425,7 +425,7 @@ export default function ChatInterface() {
                   <button
                     type="submit"
                     disabled={isSending}
-                    className="inline-flex items-center gap-2 rounded-full bg-amber-500 dark:bg-amber-400 px-5 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-600 dark:hover:bg-amber-300 disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-full bg-lime-500 dark:bg-lime-400 px-5 py-2 text-sm font-semibold text-slate-950 transition hover:bg-lime-600 dark:hover:bg-lime-300 disabled:opacity-60"
                   >
                     {isSending ? (
                       <>
@@ -443,7 +443,7 @@ export default function ChatInterface() {
             </>
           ) : (
             <div className={`flex h-full flex-col items-center justify-center text-center ${getMutedTextColor()}`}>
-              <MessageCircle className="h-12 w-12 text-amber-500 dark:text-amber-300" />
+              <MessageCircle className="h-12 w-12 text-lime-500 dark:text-lime-300" />
               <p className="mt-3 text-lg font-semibold">No traveler selected</p>
               <p className="text-sm">Add a friend on the left to start chatting.</p>
             </div>
