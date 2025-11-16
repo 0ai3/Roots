@@ -17,6 +17,7 @@ import Navbar from "./components/Navbar";
 import Image from "next/image";
 import Link from "next/link";
 import { fetchUserId } from "./lib/userId";
+import NewsletterSignup from "./components/NewsletterSignup";
 
 // Mock translation function if i18n is not set up
 const useI18n = () => ({
@@ -808,8 +809,6 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
             );
           })}
         </div>
-
-
       </div>
 
       {/* Gradient Fade at Bottom */}
@@ -992,6 +991,12 @@ export default function App() {
       {mounted && (
         <InteractiveGarden mousePosition={mousePosition} userId={userId} />
       )}
+
+      {/* Newsletter Section */}
+      <section className="py-24 px-6 lg:px-12 bg-neutral-950">
+        <NewsletterSignup />
+      </section>
+
       <CTASection userId={userId} />
     </div>
   );
