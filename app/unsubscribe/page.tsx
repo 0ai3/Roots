@@ -104,8 +104,7 @@ function UnsubscribeContent() {
                 </h1>
 
                 <p className="text-neutral-400 mb-6 text-center">
-                  We're sorry to see you go. Enter your email to unsubscribe
-                  from our newsletter.
+                  We&apos;re sorry to see you go. Enter your email to unsubscribe from our newsletter.
                 </p>
 
                 <form onSubmit={handleUnsubscribe} className="space-y-4">
