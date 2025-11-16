@@ -34,13 +34,6 @@ export default function Navbar(e: NavbarProps) {
 
   const isScrolled = scrollPosition > 50;
 
-  const navLinks = [
-    { name: "Traditions", href: userId ? "/app/map" : "/login" },
-    { name: "Food & Culture", href: userId ? "/app/map" : "/login" },
-    { name: "Museums", href: userId ? "/app/map" : "/login" },
-    { name: "Attractions", href: userId ? "/app/attractions" : "/login" },
-  ];
-
   return (
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -97,19 +90,7 @@ export default function Navbar(e: NavbarProps) {
           </motion.div>
 
           <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={`text-sm transition-colors ${
-                  currentTheme === "dark"
-                    ? "text-neutral-300 hover:text-lime-400"
-                    : "text-neutral-700 hover:text-emerald-600"
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
+            
             <Link href={userId ? "/app/dashboard" : "/login"}>
               <motion.button
                 className={`px-6 py-2.5 rounded-full transition-colors ${
