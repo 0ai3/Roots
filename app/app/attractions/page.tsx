@@ -116,7 +116,7 @@ function StatsSection() {
                     : stat.color === "purple"
                     ? "text-purple-400"
                     : stat.color === "orange"
-                    ? "text-orange-400"
+                    ? "text-lime-400"
                     : "text-yellow-400"
                 }`}
               />

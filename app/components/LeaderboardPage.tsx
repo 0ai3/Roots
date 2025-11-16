@@ -178,7 +178,7 @@ export default function LeaderboardPage() {
                             : stat.color === "yellow"
                             ? "bg-yellow-400/20"
                             : stat.color === "orange"
-                            ? "bg-orange-400/20"
+                            ? "bg-lime-400/20"
                             : "bg-blue-400/20"
                         }`}
                       >
@@ -189,7 +189,7 @@ export default function LeaderboardPage() {
                               : stat.color === "yellow"
                               ? "text-yellow-600"
                               : stat.color === "orange"
-                              ? "text-orange-600"
+                              ? "text-lime-600"
                               : "text-blue-600"
                           }`}
                         />

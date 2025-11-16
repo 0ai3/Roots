@@ -124,7 +124,7 @@ export default function GamesPage() {
                 { label: "Active Games", value: "50+", icon: Gamepad2, color: "lime" },
                 { label: "Players", value: "25K+", icon: Users, color: "blue" },
                 { label: "Countries", value: "195", icon: Globe, color: "purple" },
-                { label: "Total Rewards", value: "1M+", icon: Award, color: "orange" },
+                { label: "Total Rewards", value: "1M+", icon: Award, color: "lime" },
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}
@@ -202,7 +202,7 @@ export default function GamesPage() {
                   description: "Arrange historical events in correct order",
                   difficulty: "Hard",
                   points: "150-400",
-                  color: "orange",
+                  color: "lime",
                 },
                 {
                   icon: Zap,

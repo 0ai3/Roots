@@ -56,7 +56,7 @@ export default function ContactPage() {
             className={`absolute inset-0 ${
               theme === "dark"
                 ? "bg-linear-to-b from-neutral-950/80 via-neutral-950/70 to-neutral-950"
-                : "bg-linear-to-b from-white/60 via-orange-50/80 to-white"
+                : "bg-linear-to-b from-white/60 via-lime-50/80 to-white"
             }`}
           />
         </div>
@@ -164,7 +164,7 @@ export default function ContactPage() {
                       ? "text-blue-400"
                       : item.color === "purple"
                       ? "text-purple-400"
-                      : "text-orange-400"
+                      : "text-lime-400"
                   }`}
                 />
                 <h3
@@ -196,7 +196,7 @@ export default function ContactPage() {
               className={`rounded-3xl border p-8 lg:p-12 ${
                 theme === "dark"
                   ? "bg-linear-to-br from-neutral-900 to-neutral-800 border-neutral-700"
-                  : "bg-linear-to-br from-emerald-50 to-orange-50 border-emerald-200"
+                  : "bg-linear-to-br from-emerald-50 to-lime-50 border-emerald-200"
               }`}
             >
               <div className="text-center mb-8">

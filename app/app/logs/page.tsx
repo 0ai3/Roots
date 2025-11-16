@@ -748,7 +748,7 @@ export default function LogsPage() {
                     className={`rounded-3xl border ${getBorderColor()} ${getCardBg()} p-6 backdrop-blur`}
                   >
                     <div className="flex items-center gap-3">
-                      <Utensils className="h-8 w-8 text-orange-400" />
+                      <Utensils className="h-8 w-8 text-lime-400" />
                       <div>
                         <p
                           className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}
@@ -1085,7 +1085,7 @@ export default function LogsPage() {
                               {log.type === "attraction" ? (
                                 <MapPin className="h-5 w-5 text-blue-400" />
                               ) : (
-                                <Utensils className="h-5 w-5 text-orange-400" />
+                                <Utensils className="h-5 w-5 text-lime-400" />
                               )}
                               <span
                                 className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}

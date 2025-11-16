@@ -586,7 +586,7 @@ export default function OffertsPage() {
                               coupon.category === "museum"
                                 ? "bg-blue-500/20 border-blue-400/30"
                                 : coupon.category === "coffee"
-                                ? "bg-orange-500/20 border-orange-400/30"
+                                ? "bg-lime-500/20 border-lime-400/30"
                                 : "bg-pink-500/20 border-pink-400/30"
                             }`}
                           >
@@ -595,7 +595,7 @@ export default function OffertsPage() {
                                 coupon.category === "museum"
                                   ? "text-blue-400"
                                   : coupon.category === "coffee"
-                                  ? "text-orange-400"
+                                  ? "text-lime-400"
                                   : "text-pink-400"
                               }`}
                             />

@@ -201,7 +201,7 @@ function TopicsSection() {
                         : topic.color === "purple"
                         ? "text-purple-400"
                         : topic.color === "orange"
-                        ? "text-orange-400"
+                        ? "text-lime-400"
                         : "text-pink-400"
                     }`}
                   />
