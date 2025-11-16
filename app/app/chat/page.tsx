@@ -17,6 +17,7 @@ import {
 import DashboardPageLayout from "../../components/DashboardPageLayout";
 import ChatInterface from "../../components/ChatInterface";
 import Image from "next/image";
+import { useI18n } from "../../hooks/useI18n";
 
 // Sample conversation starters
 const conversationTopics = [
@@ -75,20 +76,17 @@ function HeroSection({ onStartChat }: { onStartChat: () => void }) {
             <motion.div className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full border bg-lime-400/10 border-lime-400/20">
               <div className="w-2 h-2 rounded-full bg-lime-400" />
               <span className="text-sm text-lime-400">
-                AI-Powered Cultural Assistant
+                {t("chat.hero.badge")}
               </span>
             </motion.div>
 
             <h1 className="text-5xl lg:text-6xl font-bold mb-6 text-white">
-              Chat About{" "}
-              <span className="text-lime-400">Culture</span>
+              {t("chat.hero.title")}{" "}
+              <span className="text-lime-400">{t("chat.hero.titleHighlight")}</span>
             </h1>
 
             <p className="text-lg mb-8 text-neutral-300">
-              Have meaningful conversations about global cultures, traditions,
-              languages, and heritage. Get instant answers, learn new phrases,
-              and explore the world&apos;s cultural diversity through AI-powered
-              dialogue.
+              {t("chat.hero.subtitle")}
             </p>
 
             <div className="flex flex-wrap gap-4">
@@ -99,7 +97,7 @@ function HeroSection({ onStartChat }: { onStartChat: () => void }) {
                 whileTap={{ scale: 0.95 }}
               >
                 <MessageCircle className="w-5 h-5" />
-                Start Chatting
+                {t("chat.hero.startChatting")}
               </motion.button>
             </div>
           </motion.div>
@@ -112,14 +110,14 @@ function HeroSection({ onStartChat }: { onStartChat: () => void }) {
 function StatsSection() {
   const stats = [
     {
-      label: "Conversations",
+      label: t("chat.stats.conversations"),
       value: "50K+",
       icon: MessageCircle,
       color: "blue",
     },
-    { label: "Languages", value: "100+", icon: Languages, color: "purple" },
-    { label: "Active Users", value: "10K+", icon: Users, color: "orange" },
-    { label: "Response Time", value: "<1s", icon: Zap, color: "yellow" },
+    { label: t("chat.stats.languages"), value: "100+", icon: Languages, color: "purple" },
+    { label: t("chat.stats.activeUsers"), value: "10K+", icon: Users, color: "orange" },
+    { label: t("chat.stats.responseTime"), value: "<1s", icon: Zap, color: "yellow" },
   ];
 
   return (
@@ -170,14 +168,13 @@ function TopicsSection() {
           className="text-center mb-16"
         >
           <div className="inline-block px-4 py-2 rounded-full mb-4 bg-lime-400/10 text-lime-400">
-            Popular Topics
+            {t("chat.topics.badge")}
           </div>
           <h2 className="text-4xl font-bold mb-4 text-white">
-            What Would You Like to Explore?
+            {t("chat.topics.title")}
           </h2>
           <p className="max-w-2xl mx-auto text-neutral-400">
-            Choose a topic to start your cultural journey or ask anything
-            you&apos;re curious about
+            {t("chat.topics.subtitle")}
           </p>
         </motion.div>
 

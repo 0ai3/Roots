@@ -18,6 +18,7 @@ import DashboardPageLayout from "../../components/DashboardPageLayout";
 import AttractionPlanner from "../../components/AttractionPlanner";
 import Image from "next/image";
 import { useExperiencePoints } from "../../hooks/useExperiencePoints";
+import { useI18n } from "../../hooks/useI18n";
 
 type Attraction = {
   id: string;
@@ -40,6 +41,7 @@ type Favorite = {
 };
 
 function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
+  const { t } = useI18n();
   return (
     <section className="relative min-h-[60vh] flex items-center overflow-hidden">
       <div className="absolute inset-0">
@@ -62,13 +64,11 @@ function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
             className="max-w-3xl"
           >
             <h1 className="text-5xl lg:text-6xl font-bold mb-6 text-white">
-              Discover <span className="text-lime-400">Global Attractions</span>
+              {t("attractions.hero.title")} <span className="text-lime-400">{t("attractions.hero.titleHighlight")}</span>
             </h1>
 
             <p className="text-lg mb-8 text-neutral-300">
-              Experience the world&apos;s most iconic landmarks, historical
-              sites, and cultural treasures. From ancient wonders to modern
-              marvels, plan your perfect cultural journey.
+              {t("attractions.hero.subtitle")}
             </p>
 
             <motion.button
@@ -78,7 +78,7 @@ function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
               whileTap={{ scale: 0.95 }}
             >
               <Compass className="w-5 h-5" />
-              Plan Your Visit
+              {t("attractions.hero.planVisit")}
             </motion.button>
           </motion.div>
         </div>
@@ -88,11 +88,12 @@ function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
 }
 
 function StatsSection() {
+  const { t } = useI18n();
   const stats = [
-    { label: "Attractions", value: "5K+", icon: MapPin, color: "blue" },
-    { label: "Countries", value: "195", icon: Globe2, color: "purple" },
-    { label: "Categories", value: "50+", icon: Building2, color: "orange" },
-    { label: "Reviews", value: "1M+", icon: Star, color: "yellow" },
+    { label: t("attractions.stats.attractions"), value: "5K+", icon: MapPin, color: "blue" },
+    { label: t("attractions.stats.countries"), value: "195", icon: Globe2, color: "purple" },
+    { label: t("attractions.stats.categories"), value: "50+", icon: Building2, color: "orange" },
+    { label: t("attractions.stats.reviews"), value: "1M+", icon: Star, color: "yellow" },
   ];
 
   return (

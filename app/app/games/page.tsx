@@ -20,8 +20,10 @@ import {
 } from "lucide-react";
 import DashboardPageLayout from "../../components/DashboardPageLayout";
 import LearnAndEarnGame from "../../components/LearnAndEarnGame";
+import { useI18n } from "../../hooks/useI18n";
 
 export default function GamesPage() {
+  const { t } = useI18n();
   const [showGame, setShowGame] = useState(false);
 
   if (showGame) {
@@ -32,7 +34,7 @@ export default function GamesPage() {
             onClick={() => setShowGame(false)}
             className="px-6 py-3 rounded-xl font-semibold bg-neutral-800 text-white hover:bg-neutral-700 transition-colors"
           >
-            ← Back to Games
+            ← {t("nav.games")}
           </button>
         </div>
         <LearnAndEarnGame initialPoints={0} initialUserId={null} />
@@ -65,7 +67,7 @@ export default function GamesPage() {
             >
               <Sparkles className="w-4 h-4 text-lime-400" />
               <span className="text-sm font-medium text-lime-400">
-                Learn Through Play
+                {t("games.hero.badge")}
               </span>
             </motion.div>
 
@@ -75,8 +77,8 @@ export default function GamesPage() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-white"
             >
-              Cultural{" "}
-              <span className="text-lime-400">Games</span>
+              {t("games.hero.title")}{" "}
+              <span className="text-lime-400">{t("games.hero.titleHighlight")}</span>
             </motion.h1>
 
             <motion.p
@@ -85,8 +87,7 @@ export default function GamesPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-xl mb-8 max-w-2xl mx-auto text-white/90"
             >
-              Master world cultures through interactive challenges, earn points,
-              and compete with explorers worldwide
+              {t("games.hero.subtitle")}
             </motion.p>
 
             <motion.div
@@ -102,7 +103,7 @@ export default function GamesPage() {
                 className="px-8 py-4 rounded-xl font-semibold flex items-center gap-2 bg-lime-400 text-black hover:bg-lime-300 transition-colors"
               >
                 <Gamepad2 className="w-5 h-5" />
-                Start Playing
+                {t("games.hero.startPlaying")}
                 <ArrowRight className="w-5 h-5" />
               </motion.button>
               <Link href="/app/leaderboard">
@@ -112,7 +113,7 @@ export default function GamesPage() {
                   className="px-8 py-4 rounded-xl font-semibold flex items-center gap-2 backdrop-blur-sm border bg-white/10 text-white border-white/20 hover:bg-white/20 transition-colors"
                 >
                   <Trophy className="w-5 h-5" />
-                  View Leaderboard
+                  {t("games.hero.viewLeaderboard")}
                 </motion.button>
               </Link>
             </motion.div>
@@ -124,10 +125,10 @@ export default function GamesPage() {
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {[
-                { label: "Active Games", value: "50+", icon: Gamepad2, color: "lime" },
-                { label: "Players", value: "25K+", icon: Users, color: "blue" },
-                { label: "Countries", value: "195", icon: Globe, color: "purple" },
-                { label: "Total Rewards", value: "1M+", icon: Award, color: "lime" },
+                { label: t("games.stats.activeGames"), value: "50+", icon: Gamepad2, color: "lime" },
+                { label: t("games.stats.players"), value: "25K+", icon: Users, color: "blue" },
+                { label: t("games.stats.countries"), value: "195", icon: Globe, color: "purple" },
+                { label: t("games.stats.totalRewards"), value: "1M+", icon: Award, color: "lime" },
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}
@@ -156,12 +157,11 @@ export default function GamesPage() {
               className="text-center mb-12"
             >
               <h2 className="text-4xl font-bold mb-4 text-white">
-                Featured{" "}
-                <span className="text-lime-400">Challenges</span>
+                {t("games.featured.title")}{" "}
+                <span className="text-lime-400">{t("games.featured.titleHighlight")}</span>
               </h2>
               <p className="text-lg max-w-2xl mx-auto text-neutral-400">
-                Test your knowledge and earn points with our exciting cultural
-                games
+                {t("games.featured.subtitle")}
               </p>
             </motion.div>
 
@@ -169,33 +169,33 @@ export default function GamesPage() {
               {[
                 {
                   icon: Brain,
-                  title: "Cultural Quiz",
-                  description: "Answer questions about world cultures and traditions",
-                  difficulty: "Medium",
+                  title: t("games.card.culturalQuiz.title"),
+                  description: t("games.card.culturalQuiz.description"),
+                  difficulty: t("games.difficulty.medium"),
                   points: "5-10",
                   color: "lime",
                 },
                 {
                   icon: Globe,
-                  title: "Geography Master",
-                  description: "Identify countries, capitals, and landmarks",
-                  difficulty: "Easy",
+                  title: t("games.card.geographyMaster.title"),
+                  description: t("games.card.geographyMaster.description"),
+                  difficulty: t("games.difficulty.easy"),
                   points: "30-150",
                   color: "blue",
                 },
                 {
                   icon: Target,
-                  title: "Tradition Matcher",
-                  description: "Match cultural practices to their origins",
-                  difficulty: "Hard",
+                  title: t("games.card.traditionMatcher.title"),
+                  description: t("games.card.traditionMatcher.description"),
+                  difficulty: t("games.difficulty.hard"),
                   points: "100-300",
                   color: "purple",
                 },
                 {
                   icon: Star,
-                  title: "Language Challenge",
-                  description: "Learn basic phrases from different languages",
-                  difficulty: "Medium",
+                  title: t("games.card.languageChallenge.title"),
+                  description: t("games.card.languageChallenge.description"),
+                  difficulty: t("games.difficulty.medium"),
                   points: "75-250",
                   color: "emerald",
                 },
@@ -203,7 +203,7 @@ export default function GamesPage() {
                   icon: Trophy,
                   title: "History Timeline",
                   description: "Arrange historical events in correct order",
-                  difficulty: "Hard",
+                  difficulty: t("games.difficulty.hard"),
                   points: "150-400",
                   color: "lime",
                 },
@@ -211,7 +211,7 @@ export default function GamesPage() {
                   icon: Zap,
                   title: "Speed Round",
                   description: "Quick-fire questions with time pressure",
-                  difficulty: "Easy",
+                  difficulty: t("games.difficulty.easy"),
                   points: "20-100",
                   color: "pink",
                 },
@@ -246,11 +246,11 @@ export default function GamesPage() {
                       {game.difficulty}
                     </span>
                     <span className="text-sm font-semibold text-lime-400">
-                      {game.points} pts
+                      {game.points} {t("games.card.points")}
                     </span>
                   </div>
                   <div className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity text-lime-400">
-                    <span className="text-sm font-semibold">Play Now</span>
+                    <span className="text-sm font-semibold">{t("games.card.playNow")}</span>
                     <ArrowRight className="w-4 h-4" />
                   </div>
                 </motion.div>

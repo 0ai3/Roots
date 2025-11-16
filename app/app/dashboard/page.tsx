@@ -20,6 +20,8 @@ import {
   Target,
 } from "lucide-react";
 import DashboardPageLayout from "@/app/components/DashboardPageLayout";
+import { useI18n } from "@/app/hooks/useI18n";
+
 type DashboardUser = {
   email: string;
   role: "client" | "admin";
@@ -30,6 +32,7 @@ type DashboardUser = {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [user, setUser] = useState<DashboardUser | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -94,7 +97,7 @@ export default function DashboardPage() {
             >
               <Sparkles className="w-4 h-4 text-lime-400 dark:text-lime-400" />
               <span className="text-sm font-medium text-lime-400 dark:text-lime-400">
-                Your Cultural Journey Hub
+                {t("dashboard.content.culturalJourney")}
               </span>
             </motion.div>
 
@@ -104,7 +107,7 @@ export default function DashboardPage() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight"
             >
-              Welcome Back,{" "}
+              {t("dashboard.content.welcome")}{" "}
               <span className="text-lime-400 dark:text-lime-400">
                 {greetingName}
               </span>
@@ -116,8 +119,7 @@ export default function DashboardPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-xl text-white/90 dark:text-white/80 mb-8 max-w-2xl mx-auto"
             >
-              Continue your exploration of world cultures, traditions, and
-              connections. Your next adventure awaits.
+              {t("dashboard.content.welcomeBody")}
             </motion.p>
 
             <motion.div
@@ -133,7 +135,7 @@ export default function DashboardPage() {
                 className="px-8 py-4 bg-lime-400 dark:bg-lime-400 text-black dark:text-black rounded-xl font-semibold flex items-center gap-2 hover:bg-lime-300 dark:hover:bg-lime-300 transition-colors"
               >
                 <Compass className="w-5 h-5" />
-                Explore Map
+                {t("dashboard.content.mapHeading")}
                 <ArrowRight className="w-5 h-5" />
               </motion.button>
               <motion.button
@@ -143,7 +145,7 @@ export default function DashboardPage() {
                 className="px-8 py-4 bg-white/10 dark:bg-white/10 text-white dark:text-white backdrop-blur-sm border border-white/20 dark:border-white/20 rounded-xl font-semibold flex items-center gap-2 hover:bg-white/20 dark:hover:bg-white/20 transition-colors"
               >
                 <MapPin className="w-5 h-5" />
-                View Attractions
+                {t("nav.attractions")}
               </motion.button>
             </motion.div>
           </div>
@@ -167,7 +169,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-sm text-neutral-400">
-                      Your Points
+                      {t("dashboard.content.pointsLabel")}
                     </p>
                     <p className="text-2xl font-bold text-white">
                       {user.points.toLocaleString()}
@@ -175,7 +177,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <p className="text-xs text-neutral-500">
-                  Keep exploring to earn more
+                  {t("dashboard.content.pointsSubtitle")}
                 </p>
               </motion.div>
 
@@ -193,7 +195,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-sm text-neutral-400">
-                      Member Since
+                      {t("dashboard.content.memberSince")}
                     </p>
                     <p className="text-lg font-bold text-white">
                       {memberSince}
@@ -201,7 +203,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <p className="text-xs text-neutral-500">
-                  {user.role === "admin" ? "Admin Account" : "Explorer Account"}
+                  {user.role === "admin" ? t("dashboard.roles.admin") : t("dashboard.roles.client")}
                 </p>
               </motion.div>
 
@@ -245,7 +247,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-sm text-neutral-400">
-                      This Week
+                      {t("dashboard.content.thisWeek")}
                     </p>
                     <p className="text-2xl font-bold text-white">
                       +250
@@ -253,7 +255,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <p className="text-xs text-neutral-500">
-                  Points earned recently
+                  {t("dashboard.content.pointsEarnedRecently")}
                 </p>
               </motion.div>
             </div>
@@ -270,14 +272,13 @@ export default function DashboardPage() {
               className="text-center mb-12"
             >
               <h2 className="text-4xl font-bold text-white mb-4">
-                Quick{" "}
+                {t("dashboard.quickActions.title")}{" "}
                 <span className="text-lime-400">
-                  Actions
+                  {t("dashboard.quickActions.titleHighlight")}
                 </span>
               </h2>
               <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
-                Jump into your favorite activities and continue your cultural
-                journey
+                {t("dashboard.quickActions.subtitle")}
               </p>
             </motion.div>
 
@@ -285,44 +286,43 @@ export default function DashboardPage() {
               {[
                 {
                   icon: MapPin,
-                  title: "Discover Attractions",
-                  description: "Explore landmarks and cultural sites worldwide",
+                  title: t("dashboard.quickActions.discoverAttractions"),
+                  description: t("dashboard.quickActions.discoverAttractionsDesc"),
                   color: "lime",
                   href: "/app/attractions",
                 },
                 {
                   icon: MessageCircle,
-                  title: "Cultural Chat",
-                  description: "Connect with AI to learn about traditions",
+                  title: t("dashboard.quickActions.culturalChat"),
+                  description: t("dashboard.quickActions.culturalChatDesc"),
                   color: "blue",
                   href: "/app/chat",
                 },
                 {
                   icon: Target,
-                  title: "Plan Your Journey",
-                  description: "Create personalized cultural itineraries",
+                  title: t("dashboard.quickActions.planJourney"),
+                  description: t("dashboard.quickActions.planJourneyDesc"),
                   color: "purple",
                   href: "/app/map",
                 },
                 {
                   icon: Users,
-                  title: "Community",
-                  description: "Join discussions with fellow explorers",
+                  title: t("dashboard.quickActions.community"),
+                  description: t("dashboard.quickActions.communityDesc"),
                   color: "emerald",
                   href: "/app/news",
                 },
                 {
                   icon: Star,
-                  title: "Featured Recipes",
-                  description:
-                    "Discover authentic dishes from around the world",
+                  title: t("dashboard.quickActions.featuredRecipes"),
+                  description: t("dashboard.quickActions.featuredRecipesDesc"),
                   color: "orange",
                   href: "/app/recipes",
                 },
                 {
                   icon: Heart,
-                  title: "Your Favorites",
-                  description: "Access saved destinations and experiences",
+                  title: t("dashboard.quickActions.yourFavorites"),
+                  description: t("dashboard.quickActions.yourFavoritesDesc"),
                   color: "pink",
                   href: "/app/dashboard",
                 },
@@ -351,7 +351,7 @@ export default function DashboardPage() {
                     {action.description}
                   </p>
                   <div className="mt-4 flex items-center gap-2 text-lime-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-sm font-semibold">Get Started</span>
+                    <span className="text-sm font-semibold">{t("dashboard.quickActions.getStarted")}</span>
                     <ArrowRight className="w-4 h-4" />
                   </div>
                 </motion.button>
@@ -370,13 +370,13 @@ export default function DashboardPage() {
               className="text-center mb-12"
             >
               <h2 className="text-4xl font-bold text-white mb-4">
-                Recent{" "}
+                {t("dashboard.achievements.title")}{" "}
                 <span className="text-emerald-400">
-                  Achievements
+                  {t("dashboard.achievements.titleHighlight")}
                 </span>
               </h2>
               <p className="text-lg text-neutral-400 max-w-2xl mx-auto">
-                Celebrate your milestones and cultural discoveries
+                {t("dashboard.achievements.subtitle")}
               </p>
             </motion.div>
 
@@ -384,8 +384,8 @@ export default function DashboardPage() {
               {[
                 {
                   icon: "🏆",
-                  title: "First Explorer",
-                  description: "Completed your first cultural journey",
+                  title: t("dashboard.achievements.firstExplorer"),
+                  description: t("dashboard.achievements.firstExplorerDesc"),
                   date: "2 days ago",
                 },
                 {

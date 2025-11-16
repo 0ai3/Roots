@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Newspaper, AlertTriangle, Info, Sparkles, Calendar, RefreshCw, Settings, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useI18n } from "../../hooks/useI18n";
 
 type NewsItem = {
   title: string;
@@ -34,6 +35,7 @@ type NewsData = {
 
 export default function NewsPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [newsData, setNewsData] = useState<NewsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);

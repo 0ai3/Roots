@@ -4,14 +4,9 @@ import { useState, useEffect } from "react";
 import { useTheme } from "./ThemeProvider";
 import { motion } from "framer-motion";
 import { Menu as MenuIcon, X as XIcon } from "lucide-react";
+import { useI18n } from "../hooks/useI18n";
 
 import Link from "next/link";
-
-const navLinks = [
-  { name: "Features", href: "#features" },
-  { name: "About", href: "#about" },
-  { name: "Contact", href: "/contact" },
-];
 
 interface NavbarProps {
   scrollY?: number;
@@ -20,6 +15,7 @@ interface NavbarProps {
 
 export default function Navbar(e: NavbarProps) {
   const { theme, mounted } = useTheme();
+  const { t } = useI18n();
   const userId = e.userId;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -107,7 +103,7 @@ export default function Navbar(e: NavbarProps) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Get Started
+                {t("home.cta.getStarted")}
               </motion.button>
             </Link>
           </div>
@@ -148,7 +144,7 @@ export default function Navbar(e: NavbarProps) {
                   currentTheme === "dark" ? "bg-lime-400 text-neutral-950" : "bg-emerald-600 text-white"
                 }`}
               >
-                Get Started
+                {t("home.cta.getStarted")}
               </button>
             </Link>
           </motion.div>

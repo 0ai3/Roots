@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Check, Loader2, Sparkles, ArrowRight } from "lucide-react";
+import { useI18n } from "../hooks/useI18n";
 
 export default function NewsletterSignup() {
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [status, setStatus] = useState<
@@ -79,7 +81,7 @@ export default function NewsletterSignup() {
             >
               <Sparkles className="w-4 h-4 text-lime-400" />
               <span className="text-xs font-semibold text-lime-400 uppercase tracking-wider">
-                Stay Connected
+                {t("newsletter.badge")}
               </span>
             </motion.div>
 
@@ -90,10 +92,10 @@ export default function NewsletterSignup() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-3xl md:text-5xl font-bold mb-4 leading-tight"
             >
-              <span className="text-white">Join Our</span>
+              <span className="text-white">{t("newsletter.title")}</span>
               <br />
               <span className="bg-linear-to-r from-lime-400 via-yellow-300 to-lime-400 bg-clip-text text-transparent">
-                Cultural Community
+                {t("newsletter.titleHighlight")}
               </span>
             </motion.h3>
 
@@ -104,8 +106,7 @@ export default function NewsletterSignup() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-neutral-400 mb-6 text-base md:text-lg leading-relaxed"
             >
-              Get weekly insights on world cultures, exclusive recipes, and
-              special content delivered to your inbox.
+              {t("newsletter.subtitle")}
             </motion.p>
 
             {/* Features list */}
@@ -117,9 +118,9 @@ export default function NewsletterSignup() {
               className="hidden md:flex flex-col gap-3 mb-6"
             >
               {[
-                { icon: "🍳", text: "Authentic recipes from around the world" },
-                { icon: "🎭", text: "Cultural stories and traditions" },
-                { icon: "🎁", text: "Exclusive content and early access" },
+                { icon: "🍳", text: t("newsletter.features.recipes") },
+                { icon: "🎭", text: t("newsletter.features.stories") },
+                { icon: "🎁", text: t("newsletter.features.exclusive") },
               ].map((feature, index) => (
                 <motion.div
                   key={index}
@@ -169,7 +170,7 @@ export default function NewsletterSignup() {
                     <Check className="w-8 h-8 text-neutral-950" />
                   </div>
                   <h4 className="text-2xl font-bold mb-2 text-white">
-                    You&apos;re all set! 🎉
+                    {t("newsletter.success.title")}
                   </h4>
                   <p className="text-neutral-300 leading-relaxed">{message}</p>
                 </div>
@@ -189,7 +190,7 @@ export default function NewsletterSignup() {
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Your name (optional)"
+                      placeholder={t("newsletter.form.name")}
                       className="w-full px-5 py-4 rounded-xl bg-neutral-800/50 backdrop-blur-sm border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-400 focus:outline-none focus:ring-2 focus:ring-lime-400/20 transition-all"
                     />
                   </div>
@@ -199,7 +200,7 @@ export default function NewsletterSignup() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Your email address"
+                      placeholder={t("newsletter.form.email")}
                       required
                       className="w-full px-5 py-4 rounded-xl bg-neutral-800/50 backdrop-blur-sm border border-neutral-700 text-white placeholder-neutral-500 focus:border-lime-400 focus:outline-none focus:ring-2 focus:ring-lime-400/20 transition-all"
                     />
@@ -226,20 +227,19 @@ export default function NewsletterSignup() {
                   {status === "loading" ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Subscribing...
+                      {t("newsletter.form.subscribing")}
                     </>
                   ) : (
                     <>
                       <Mail className="w-5 h-5" />
-                      Subscribe to Newsletter
+                      {t("newsletter.form.subscribe")}
                       <ArrowRight className="w-5 h-5" />
                     </>
                   )}
                 </motion.button>
 
                 <p className="text-xs text-neutral-500 text-center">
-                  We respect your privacy. Unsubscribe at any time. No spam,
-                  ever.
+                  {t("newsletter.form.privacy")}
                 </p>
               </motion.form>
             )}

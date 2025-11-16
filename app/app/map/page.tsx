@@ -6,8 +6,10 @@ import WorldExplorerMap from "../../components/WorldExplorerMap";
 import { motion } from "framer-motion";
 import { MapPin, ArrowRight, Navigation, Route } from "lucide-react";
 import Image from "next/image";
+import { useI18n } from "../../hooks/useI18n";
 
 export default function MapPage() {
+  const { t } = useI18n();
   const [showBrowse, setShowBrowse] = useState(true);
 
   const getBgColor = () => {
@@ -51,7 +53,7 @@ export default function MapPage() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6"
               >
                 <MapPin className="w-4 h-4 text-lime-400" />
-                <span className="text-sm font-medium">Live Explorer</span>
+                <span className="text-sm font-medium">{t("map.hero.badge")}</span>
               </motion.div>
 
               <motion.h1
@@ -60,7 +62,7 @@ export default function MapPage() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-5xl md:text-6xl font-bold mb-6 leading-tight"
               >
-                Interactive <span className="text-lime-400">Map</span>
+                {t("map.hero.title")} <span className="text-lime-400">{t("map.hero.titleHighlight")}</span>
               </motion.h1>
 
               <motion.p
@@ -69,8 +71,7 @@ export default function MapPage() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="text-lg mb-8 max-w-2xl mx-auto text-white/90"
               >
-                Track your position, navigate to attractions, and explore the
-                world in real-time
+                {t("map.hero.subtitle")}
               </motion.p>
 
               <motion.div
@@ -86,7 +87,7 @@ export default function MapPage() {
                   className="px-8 py-4 rounded-xl font-semibold flex items-center gap-2 bg-lime-400 text-black hover:bg-lime-300"
                 >
                   <Navigation className="w-5 h-5" />
-                  Open Map
+                  {t("map.hero.openMap")}
                   <ArrowRight className="w-5 h-5" />
                 </motion.button>
               </motion.div>

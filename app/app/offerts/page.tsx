@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useI18n } from "../../hooks/useI18n";
 
 type Coupon = {
   _id: string;
@@ -46,6 +47,7 @@ type RedeemedCoupon = {
 };
 
 export default function OffertsPage() {
+  const { t } = useI18n();
   const [showBrowse, setShowBrowse] = useState(true);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [redeemedCoupons, setRedeemedCoupons] = useState<RedeemedCoupon[]>([]);
