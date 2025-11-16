@@ -10,11 +10,7 @@ export default async function RecipesPage() {
   const t = createTranslator(locale);
 
   return (
-    <DashboardPageLayout
-      title={t("recipes.title")}
-      description={t("recipes.description")}
-    >
-      {/* Theme controlled by global ThemeToggle */}
+    <DashboardPageLayout>
       <RecipeIdeasPlanner
         initialPoints={experience.points}
         initialUserId={experience.userId}

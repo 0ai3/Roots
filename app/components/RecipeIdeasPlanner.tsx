@@ -835,31 +835,6 @@ export default function RecipeIdeasPlanner({
     };
   }, []);
 
-  // Color utility functions
-  const getBgColor = () => {
-    return isDarkMode ? "bg-black" : "bg-white";
-  };
-
-  const getTextColor = () => {
-    return isDarkMode ? "text-white" : "text-slate-900";
-  };
-
-  const getMutedTextColor = () => {
-    return isDarkMode ? "text-white/70" : "text-slate-600";
-  };
-
-  const getBorderColor = () => {
-    return isDarkMode ? "border-white/10" : "border-slate-200";
-  };
-
-  const getCardBg = () => {
-    return isDarkMode ? "bg-white/5" : "bg-slate-50";
-  };
-
-  const getInputBg = () => {
-    return isDarkMode ? "bg-black/40" : "bg-white";
-  };
-
   const { t } = useI18n();
   const samplePrompts = useMemo(
     () =>
@@ -1241,8 +1216,8 @@ export default function RecipeIdeasPlanner({
 
   return (
     <div className="relative min-h-screen bg-neutral-950">
-      {/* Hero Section */}
-      <section className="relative min-h-[40vh] flex items-center justify-center overflow-hidden">
+      {/* Hero Section - Made more compact */}
+      <section className="relative min-h-[35vh] sm:min-h-[40vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1920&q=80"
@@ -1254,15 +1229,15 @@ export default function RecipeIdeasPlanner({
           <div className="absolute inset-0 bg-linear-to-br from-black/80 via-black/60 to-transparent" />
         </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto px-6 py-16 text-center">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-400/10 border border-amber-400/20 mb-6"
+            className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-amber-400/10 border border-amber-400/20 mb-4 sm:mb-6"
           >
-            <ChefHat className="w-4 h-4 text-amber-400" />
-            <span className="text-sm font-medium text-amber-400">
+            <ChefHat className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400" />
+            <span className="text-xs sm:text-sm font-bold text-amber-400 uppercase tracking-widest">
               Roots Test Kitchen
             </span>
           </motion.div>
@@ -1271,126 +1246,174 @@ export default function RecipeIdeasPlanner({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-3 sm:mb-4 leading-tight"
           >
             Discover{" "}
-            <span className="text-amber-400">Authentic Recipes</span>
+            <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Authentic Recipes</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg text-white/80 max-w-2xl mx-auto"
+            className="text-base sm:text-lg md:text-xl text-white/80 max-w-2xl mx-auto font-medium"
           >
-            Explore traditional dishes from around the world with AI-powered recipe suggestions
+            Explore <span className="text-white font-bold">traditional dishes</span> from around the world with <span className="text-amber-400 font-bold">AI-powered</span> recipe suggestions
           </motion.p>
         </div>
       </section>
 
       {/* Content Section */}
-      <section className="relative z-20 -mt-12 pb-20">
-        <div className="max-w-5xl mx-auto px-6 space-y-6">
+      <section className="relative z-20 -mt-8 sm:-mt-12 pb-12 sm:pb-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6">
+          {/* Points Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             whileHover={{ y: -5 }}
-            className="bg-neutral-900 rounded-2xl p-6 shadow-xl border border-neutral-800"
+            className="bg-neutral-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xl border border-neutral-800"
           >
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-amber-400/20 flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-amber-400" />
+            <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-amber-400/20 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
               </div>
               <div>
-                <p className="text-sm text-neutral-400">
+                <p className="text-xs sm:text-sm text-neutral-400 font-semibold uppercase tracking-wide">
                   {t("dashboard.content.pointsLabel")}
                 </p>
-                <p className="text-3xl font-bold text-white">{points}</p>
+                <p className="text-2xl sm:text-3xl md:text-4xl font-black text-white">{points}</p>
               </div>
             </div>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs sm:text-sm text-neutral-500 font-medium">
               {t("planner.common.pointsHint")}
             </p>
           </motion.div>
 
+          {/* Features Grid - New section to fill space */}
+          {showSetupForm && messages.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.15 }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
+            >
+              {[
+                {
+                  icon: "🌍",
+                  title: "Global Cuisine",
+                  description: "Discover recipes from every corner of the world",
+                  color: "blue"
+                },
+                {
+                  icon: "👨‍🍳",
+                  title: "AI Chef Assistant",
+                  description: "Get personalized recipe recommendations",
+                  color: "amber"
+                },
+                {
+                  icon: "📖",
+                  title: "Step-by-Step",
+                  description: "Detailed instructions with audio narration",
+                  color: "lime"
+                },
+              ].map((feature, idx) => (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.15 + idx * 0.1 }}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  className="bg-neutral-900 rounded-xl border border-neutral-800 p-4 sm:p-5 hover:border-amber-400/30 transition-all"
+                >
+                  <div className="text-3xl sm:text-4xl mb-3">{feature.icon}</div>
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-2">{feature.title}</h3>
+                  <p className="text-xs sm:text-sm text-neutral-400 font-medium leading-relaxed">{feature.description}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+
+          {/* Setup Form */}
           {showSetupForm && (
             <motion.form
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
+              transition={{ delay: 0.2 }}
               onSubmit={handleSubmit}
-              className="space-y-6 bg-neutral-900 rounded-2xl p-8 shadow-xl border border-neutral-800"
+              className="space-y-4 sm:space-y-6 bg-neutral-900 rounded-xl sm:rounded-2xl p-5 sm:p-8 shadow-xl border border-neutral-800"
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-orange-400/20 flex items-center justify-center">
-                  <UtensilsCrossed className="w-5 h-5 text-orange-400" />
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-orange-400/20 flex items-center justify-center">
+                  <UtensilsCrossed className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" />
                 </div>
-                <h2 className="text-2xl font-bold text-white">Recipe Preferences</h2>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white">Recipe Preferences</h2>
               </div>
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
                 <label className="space-y-2">
-                  <span className="text-sm font-medium text-neutral-400">{t("planner.recipes.countryLabel")}</span>
+                  <span className="text-xs sm:text-sm font-bold text-neutral-400 uppercase tracking-wide">{t("planner.recipes.countryLabel")}</span>
                   <input
                     type="text"
                     value={country}
                     onChange={(event) => setCountry(event.target.value)}
                     placeholder={t("planner.recipes.countryPlaceholder")}
-                    className="w-full rounded-xl border px-4 py-3 text-base placeholder:text-neutral-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all border-neutral-700 bg-neutral-800/50 text-white"
+                    className="w-full rounded-lg sm:rounded-xl border px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base font-medium placeholder:text-neutral-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all border-neutral-700 bg-neutral-800/50 text-white"
                   />
                 </label>
 
                 <label className="space-y-2">
-                  <span className="text-sm font-medium text-neutral-400">{t("planner.recipes.zoneLabel")}</span>
+                  <span className="text-xs sm:text-sm font-bold text-neutral-400 uppercase tracking-wide">{t("planner.recipes.zoneLabel")}</span>
                   <input
                     type="text"
                     value={zone}
                     onChange={(event) => setZone(event.target.value)}
                     placeholder={t("planner.recipes.zonePlaceholder")}
-                    className="w-full rounded-xl border px-4 py-3 text-base placeholder:text-neutral-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all border-neutral-700 bg-neutral-800/50 text-white"
+                    className="w-full rounded-lg sm:rounded-xl border px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base font-medium placeholder:text-neutral-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all border-neutral-700 bg-neutral-800/50 text-white"
                   />
                 </label>
               </div>
 
               <label className="space-y-2">
-                <span className="text-sm font-medium text-neutral-400">{t("planner.recipes.focusLabel")}</span>
+                <span className="text-xs sm:text-sm font-bold text-neutral-400 uppercase tracking-wide">{t("planner.recipes.focusLabel")}</span>
                 <input
                   type="text"
                   value={dietaryFocus}
                   onChange={(event) => setDietaryFocus(event.target.value)}
                   placeholder={t("planner.recipes.focusPlaceholder")}
-                  className="w-full rounded-xl border px-4 py-3 text-base placeholder:text-neutral-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all border-neutral-700 bg-neutral-800/50 text-white"
+                  className="w-full rounded-lg sm:rounded-xl border px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base font-medium placeholder:text-neutral-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all border-neutral-700 bg-neutral-800/50 text-white"
                 />
               </label>
 
               <label className="space-y-2">
-                <span className="text-sm font-medium text-neutral-400">{t("planner.recipes.notesLabel")}</span>
+                <span className="text-xs sm:text-sm font-bold text-neutral-400 uppercase tracking-wide">{t("planner.recipes.notesLabel")}</span>
                 <textarea
                   value={notes}
                   onChange={(event) => setNotes(event.target.value)}
                   placeholder={t("planner.recipes.notesPlaceholder")}
                   rows={3}
-                  className="w-full rounded-xl border px-4 py-3 text-base placeholder:text-neutral-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all border-neutral-700 bg-neutral-800/50 text-white resize-none"
+                  className="w-full rounded-lg sm:rounded-xl border px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base font-medium placeholder:text-neutral-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all border-neutral-700 bg-neutral-800/50 text-white resize-none"
                 />
               </label>
 
               <label className="space-y-2">
-                <span className="text-sm font-medium text-neutral-400">{t("planner.recipes.requestLabel")}</span>
+                <span className="text-xs sm:text-sm font-bold text-neutral-400 uppercase tracking-wide">{t("planner.recipes.requestLabel")}</span>
                 <textarea
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
                   placeholder={t("planner.recipes.requestPlaceholder")}
                   rows={3}
-                  className="w-full rounded-xl border px-4 py-3 text-base placeholder:text-neutral-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all border-neutral-700 bg-neutral-800/50 text-white resize-none"
+                  className="w-full rounded-lg sm:rounded-xl border px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base font-medium placeholder:text-neutral-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all border-neutral-700 bg-neutral-800/50 text-white resize-none"
                 />
               </label>
 
-              <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-neutral-800">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-3 sm:pt-4 border-t border-neutral-800">
                 <button
                   type="submit"
                   disabled={!canSubmit}
-                  className="px-8 py-3 bg-amber-400 text-black rounded-xl font-semibold transition-all hover:bg-amber-300 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2"
+                  className="px-6 sm:px-8 py-2.5 sm:py-3 bg-amber-400 text-black rounded-lg sm:rounded-xl font-black text-sm sm:text-base transition-all hover:bg-amber-300 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2 uppercase tracking-wide"
                 >
                   {isLoading ? (
                     <>
@@ -1404,12 +1427,12 @@ export default function RecipeIdeasPlanner({
                     </>
                   )}
                 </button>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-neutral-500 font-medium">
                   {t("common.poweredByGemini")}
                 </p>
               </div>
 
-              <div className="space-y-3 pt-4 border-t border-neutral-800">
+              <div className="space-y-3 pt-3 sm:pt-4 border-t border-neutral-800">
                 <p className="text-xs uppercase tracking-wide text-neutral-400">
                   {t("planner.common.sampleLabel")}
                 </p>
@@ -1419,7 +1442,7 @@ export default function RecipeIdeasPlanner({
                       key={prompt}
                       type="button"
                       onClick={() => setInput(prompt)}
-                      className="rounded-full border border-neutral-700 px-4 py-2 text-sm text-neutral-300 transition hover:border-amber-400/50 hover:bg-amber-400/10 hover:text-amber-400"
+                      className="rounded-full border border-neutral-700 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-neutral-300 transition hover:border-amber-400/50 hover:bg-amber-400/10 hover:text-amber-400"
                     >
                       {prompt}
                     </button>
@@ -1434,7 +1457,7 @@ export default function RecipeIdeasPlanner({
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-red-900/20 border border-red-500/30 rounded-xl px-5 py-4 text-sm text-red-200 flex items-center gap-3"
+                  className="bg-red-900/20 border border-red-500/30 rounded-lg sm:rounded-xl px-4 sm:px-5 py-3 sm:py-4 text-xs sm:text-sm text-red-200 flex items-center gap-3"
                 >
                   {error}
                 </motion.div>
@@ -1442,27 +1465,29 @@ export default function RecipeIdeasPlanner({
             </motion.form>
           )}
 
+          {/* Conversation Area */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className={`bg-neutral-900 rounded-2xl p-8 shadow-xl border border-neutral-800 ${
+            transition={{ delay: showSetupForm ? 0.3 : 0.1 }}
+            className={`bg-neutral-900 rounded-xl sm:rounded-2xl p-5 sm:p-8 shadow-xl border border-neutral-800 ${
               !showSetupForm ? "bg-linear-to-br from-amber-900/10 to-neutral-900" : ""
             }`}
           >
-            <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-amber-400/20 flex items-center justify-center">
-                  <ChefHat className="w-5 h-5 text-amber-400" />
+            {/* Conversation Header */}
+            <div className="mb-4 sm:mb-6 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-amber-400/20 flex items-center justify-center">
+                  <ChefHat className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
                 </div>
                 <div>
-                  <p className="text-xl font-bold text-white">
+                  <p className="text-base sm:text-xl font-bold text-white">
                     {showSetupForm
                       ? t("planner.recipes.conversationTitle")
                       : t("planner.recipes.kitchenTitle")}
                   </p>
-                  <p className="text-sm text-neutral-400">
+                  <p className="text-xs sm:text-sm text-neutral-400">
                     {showSetupForm
                       ? t("planner.recipes.conversationHint")
                       : t("planner.recipes.chatHint")}
@@ -1470,17 +1495,17 @@ export default function RecipeIdeasPlanner({
                 </div>
               </div>
               {hasAssistantReply && (
-                <div className="flex flex-wrap items-center gap-3 text-xs">
-                  <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-amber-400">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs">
+                  <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 sm:px-3 py-1 text-amber-400">
                     {country || t("planner.recipes.countrySet")}
                   </span>
-                  <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-amber-400">
+                  <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 sm:px-3 py-1 text-amber-400">
                     {zone || t("planner.recipes.zoneSet")}
                   </span>
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="rounded-full border border-neutral-700 px-4 py-1.5 text-neutral-300 transition hover:border-red-400/50 hover:bg-red-400/10 hover:text-red-400"
+                    className="rounded-full border border-neutral-700 px-3 sm:px-4 py-1 sm:py-1.5 text-neutral-300 transition hover:border-red-400/50 hover:bg-red-400/10 hover:text-red-400"
                   >
                     {t("planner.recipes.reset")}
                   </button>
@@ -1489,41 +1514,59 @@ export default function RecipeIdeasPlanner({
             </div>
 
             {messages.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-20 h-20 rounded-2xl bg-neutral-800/50 flex items-center justify-center mx-auto mb-4">
-                  <UtensilsCrossed className="w-10 h-10 text-neutral-600" />
-                </div>
-                <p className="text-base font-medium text-white mb-1">
+              <div className="text-center py-8 sm:py-12">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-neutral-800/50 flex items-center justify-center mx-auto mb-4"
+                >
+                  <UtensilsCrossed className="w-8 h-8 sm:w-10 sm:h-10 text-neutral-600" />
+                </motion.div>
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  className="text-sm sm:text-base font-medium text-white mb-1"
+                >
                   {showSetupForm
                     ? t("planner.recipes.emptyForm")
                     : t("planner.recipes.waiting")}
-                </p>
+                </motion.p>
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="text-xs sm:text-sm text-neutral-400"
+                >
+                  Fill out the form above to get started
+                </motion.p>
               </div>
             ) : (
-              <div className="max-h-[600px] space-y-4 overflow-y-auto pr-2 scrollbar-thin scrollbar-track-neutral-800 scrollbar-thumb-neutral-700 hover:scrollbar-thumb-neutral-600">
-              {messages.map((message) => (
-                <MessageBubble
-                  key={message.id}
-                  message={message}
-                  onLogRecipe={handleLogRecipe}
-                  cookedRecipes={cookedRecipes}
-                  t={t}
-                  onSelectRecipe={handleSelectRecipeDetail}
-                  recipeDetails={recipeDetails}
-                  onListenToRecipe={handleListenToRecipe}
-                  onPauseRecipeAudio={handlePauseRecipeAudio}
-                  onSeekRecipeAudio={handleSeekRecipeAudio}
-                  isDarkMode={isDarkMode}
-                />
-              ))}
+              <div className="max-h-[500px] sm:max-h-[600px] space-y-3 sm:space-y-4 overflow-y-auto pr-2 scrollbar-thin scrollbar-track-neutral-800 scrollbar-thumb-neutral-700 hover:scrollbar-thumb-neutral-600">
+                {messages.map((message) => (
+                  <MessageBubble
+                    key={message.id}
+                    message={message}
+                    onLogRecipe={handleLogRecipe}
+                    cookedRecipes={cookedRecipes}
+                    t={t}
+                    onSelectRecipe={handleSelectRecipeDetail}
+                    recipeDetails={recipeDetails}
+                    onListenToRecipe={handleListenToRecipe}
+                    onPauseRecipeAudio={handlePauseRecipeAudio}
+                    onSeekRecipeAudio={handleSeekRecipeAudio}
+                    isDarkMode={isDarkMode}
+                  />
+                ))}
                 {isLoading && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="flex items-center gap-3 rounded-2xl border border-amber-400/30 bg-amber-400/5 px-5 py-4"
+                    className="flex items-center gap-3 rounded-xl sm:rounded-2xl border border-amber-400/30 bg-amber-400/5 px-4 sm:px-5 py-3 sm:py-4"
                   >
-                    <Loader2 className="h-5 w-5 animate-spin text-amber-400" />
-                    <p className="text-sm text-amber-200">
+                    <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-amber-400" />
+                    <p className="text-xs sm:text-sm text-amber-200">
                       Roots Test Kitchen is thinking...
                     </p>
                   </motion.div>
@@ -1535,7 +1578,7 @@ export default function RecipeIdeasPlanner({
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 bg-red-900/20 border border-red-500/30 rounded-xl px-5 py-4 text-sm text-red-200"
+                className="mt-3 sm:mt-4 bg-red-900/20 border border-red-500/30 rounded-lg sm:rounded-xl px-4 sm:px-5 py-3 sm:py-4 text-xs sm:text-sm text-red-200"
               >
                 {error}
               </motion.div>
@@ -1544,7 +1587,7 @@ export default function RecipeIdeasPlanner({
             {hasAssistantReply && (
               <form
                 onSubmit={handleSubmit}
-                className="mt-6 flex flex-col gap-4 rounded-2xl border border-neutral-800 bg-neutral-800/30 p-5"
+                className="mt-4 sm:mt-6 flex flex-col gap-3 sm:gap-4 rounded-xl sm:rounded-2xl border border-neutral-800 bg-neutral-800/30 p-4 sm:p-5"
               >
                 <textarea
                   value={input}
@@ -1552,18 +1595,18 @@ export default function RecipeIdeasPlanner({
                   placeholder={t("planner.recipes.replyPlaceholder")}
                   rows={3}
                   disabled={isLoading}
-                  className="w-full rounded-xl border border-neutral-700 bg-neutral-800/50 px-4 py-3 text-base text-white placeholder:text-neutral-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all resize-none"
+                  className="w-full rounded-lg sm:rounded-xl border border-neutral-700 bg-neutral-800/50 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder:text-neutral-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 focus:outline-none transition-all resize-none"
                 />
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-neutral-500">{t("common.poweredByGemini")}</span>
                   <button
                     type="submit"
                     disabled={!canSubmit}
-                    className="px-6 py-2.5 bg-amber-400 text-black rounded-xl font-semibold text-sm transition-all hover:bg-amber-300 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2"
+                    className="px-4 sm:px-6 py-2 sm:py-2.5 bg-amber-400 text-black rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm transition-all hover:bg-amber-300 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2"
                   >
                     {isLoading ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                         {t("planner.recipes.replyLoading")}
                       </>
                     ) : (
