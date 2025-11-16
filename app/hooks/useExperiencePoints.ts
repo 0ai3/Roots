@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   getStoredUserId,
+  fetchUserId,
   USER_ID_EVENT,
   setStoredUserId,
 } from "../lib/userId";
@@ -53,20 +54,23 @@ export function useExperiencePoints(options?: ExperiencePointsOptions) {
       return;
     }
 
+    // Fetch userId from API on mount
+    let isMounted = true;
+    fetchUserId().then((id) => {
+      if (isMounted && id) {
+        syncUserId(id);
+      }
+    });
+
     const handleProfileEvent = (event: Event) => {
       const detail = (event as CustomEvent<string | null>).detail ?? null;
       syncUserId(detail);
     };
 
     window.addEventListener(USER_ID_EVENT, handleProfileEvent as EventListener);
-    // Ensure we pick up any stored ID even if we mounted before login finalized.
-    const stored = getStoredUserId();
-    if (stored) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      syncUserId(stored);
-    }
 
     return () => {
+      isMounted = false;
       window.removeEventListener(USER_ID_EVENT, handleProfileEvent as EventListener);
     };
   }, [syncUserId]);

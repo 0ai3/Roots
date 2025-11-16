@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { setStoredUserId } from "../lib/userId";
+import { setStoredUserId, clearCachedUserId } from "../lib/userId";
 import { useI18n } from "../../app/hooks/useI18n";
 import {
   Home,
@@ -220,6 +220,7 @@ export default function DashboardSidebar() {
     setIsLoggingOut(true);
     try {
       await fetch("/api/auth/logout", { method: "POST" });
+      clearCachedUserId();
       setStoredUserId(null);
       router.push("/");
     } catch {
