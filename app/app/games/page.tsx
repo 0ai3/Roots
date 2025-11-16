@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Gamepad2,
   Trophy,
@@ -104,14 +105,16 @@ export default function GamesPage() {
                 Start Playing
                 <ArrowRight className="w-5 h-5" />
               </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 rounded-xl font-semibold flex items-center gap-2 backdrop-blur-sm border bg-white/10 text-white border-white/20 hover:bg-white/20 transition-colors"
-              >
-                <Trophy className="w-5 h-5" />
-                View Leaderboard
-              </motion.button>
+              <Link href="/app/leaderboard">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-4 rounded-xl font-semibold flex items-center gap-2 backdrop-blur-sm border bg-white/10 text-white border-white/20 hover:bg-white/20 transition-colors"
+                >
+                  <Trophy className="w-5 h-5" />
+                  View Leaderboard
+                </motion.button>
+              </Link>
             </motion.div>
           </div>
         </section>

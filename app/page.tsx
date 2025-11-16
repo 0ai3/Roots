@@ -225,7 +225,7 @@ function HeroSection({ scrollY, userId }: HeroSectionProps) {
               </h1>
 
               <p className="text-lg mb-10 max-w-xl text-neutral-300 leading-relaxed">
-                Dive into the world's diverse heritage — from age-old traditions
+                Dive into the world&apos; s diverse heritage — from age-old traditions
                 and authentic cuisines to living stories that define who we are.
               </p>
 
@@ -376,7 +376,7 @@ function FeaturesSection() {
             </span>
           </h2>
           <p className="max-w-2xl mx-auto text-neutral-400 text-lg leading-relaxed">
-            Immerse yourself in the world's rich cultural tapestry through our
+            Immerse yourself in the world&apos;s rich cultural tapestry through our
             comprehensive platform.
           </p>
         </motion.div>
