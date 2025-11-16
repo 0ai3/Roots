@@ -24,12 +24,12 @@ import {
 } from "lucide-react";
 
 const mainNavLinks = [
-  { label: "nav.chat", href: "/app/chat", icon: MessageCircle },
   { label: "nav.map", href: "/app/map", icon: Map },
   { label: "nav.games", href: "/app/games", icon: Gamepad2 },
   { label: "nav.recipes", href: "/app/recipes", icon: Utensils },
   { label: "nav.news", href: "/app/news", icon: Newspaper },
   { label: "nav.attractions", href: "/app/attractions", icon: Landmark },
+  { label: "nav.chat", href: "/app/chat", icon: MessageCircle },
 ];
 
 const profileDropdownLinks = [
@@ -198,6 +198,17 @@ export default function DashboardSidebar() {
         profileDataRef.current = data.profile;
         setHasLocation(location.trim().length > 0);
         console.log("✅ Location saved successfully:", location.trim());
+        
+        // Reload profile data to ensure consistency
+        try {
+          const reloadResponse = await fetch("/api/profile");
+          if (reloadResponse.ok) {
+            const reloadData = await reloadResponse.json();
+            profileDataRef.current = reloadData.profile || {};
+          }
+        } catch (reloadError) {
+          console.error("Error reloading profile:", reloadError);
+        }
       } else {
         console.error("Failed to save location:", response.status);
       }

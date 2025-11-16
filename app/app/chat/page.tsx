@@ -94,7 +94,7 @@ function HeroSection({ onStartChat }: { onStartChat: () => void }) {
             <div className="flex flex-wrap gap-4">
               <motion.button
                 onClick={onStartChat}
-                className="px-8 py-4 rounded-xl flex items-center gap-2 bg-lime-400 text-black font-semibold hover:bg-lime-300 transition-all shadow-lg hover:shadow-lime-400/20"
+                className="px-8 py-4 rounded-full flex items-center gap-2 bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -330,7 +330,7 @@ export default function ChatPage() {
                   onClick={() => setShowChat(true)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 rounded-xl flex items-center gap-2 mx-auto transition-all bg-lime-400 text-black font-semibold hover:bg-lime-300 shadow-lg hover:shadow-lime-400/20"
+                  className="px-8 py-4 rounded-full flex items-center gap-2 mx-auto transition-colors bg-lime-400 text-neutral-950 hover:bg-lime-300"
                 >
                   Open Chat Interface
                   <ArrowRight className="w-5 h-5" />
