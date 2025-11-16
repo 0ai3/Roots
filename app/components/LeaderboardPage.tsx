@@ -171,9 +171,7 @@ export default function LeaderboardPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: i * 0.1 }}
-                    className={`rounded-2xl p-6 backdrop-blur-sm border ${
-                      "bg-white border-neutral-200 shadow-lg"
-                    }`}
+                    className="rounded-2xl p-6 backdrop-blur-sm border bg-white border-neutral-200 shadow-lg"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div
@@ -190,30 +188,25 @@ export default function LeaderboardPage() {
                         <stat.icon
                           className={`w-6 h-6 ${
                             stat.color === "lime"
-                              ? "text-lime-400"
+                              ? "text-lime-600"
                               : stat.color === "yellow"
-                              ? "text-yellow-400"
+                              ? "text-yellow-600"
                               : stat.color === "orange"
-                              ? "text-orange-400"
-                              : "text-blue-400"
+                              ? "text-orange-600"
+                              : "text-blue-600"
                           }`}
                         />
                       </div>
                       <div className="text-right">
-                        <p
-                          className={`text-3xl font-bold ${
-                            "text-neutral-900"
-                          }`}
-                        >
+                        <p className="text-3xl font-bold text-neutral-900">
                           {stat.value}
                         </p>
                       </div>
                     </div>
-                    <p
-                      className={`text-xs ${
-                        "text-neutral-500"
-                      }`}
-                    >
+                    <p className="text-sm font-medium text-neutral-700 mb-1">
+                      {stat.label}
+                    </p>
+                    <p className="text-xs text-neutral-500">
                       {stat.desc}
                     </p>
                   </motion.div>
@@ -231,25 +224,13 @@ export default function LeaderboardPage() {
                 viewport={{ once: true }}
                 className="text-center mb-12"
               >
-                <h2
-                  className={`text-4xl font-bold mb-4 ${
-                    "text-white"
-                  }`}
-                >
+                <h2 className="text-4xl font-bold mb-4 text-white">
                   Top{" "}
-                  <span
-                    className={
-                      "text-lime-400"
-                    }
-                  >
+                  <span className="text-lime-400">
                     Champions
                   </span>
                 </h2>
-                <p
-                  className={`text-lg ${
-                    "text-neutral-400"
-                  }`}
-                >
+                <p className="text-lg text-neutral-400">
                   Leading the cultural exploration movement
                 </p>
               </motion.div>
@@ -262,45 +243,23 @@ export default function LeaderboardPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.1 }}
-                    className={`rounded-2xl p-6 text-center border backdrop-blur-sm ${
-                      "bg-white border-gray-300 shadow-lg"
-                    } md:mt-8`}
+                    className="rounded-2xl p-6 text-center border backdrop-blur-sm bg-white border-gray-300 shadow-lg md:mt-8"
                   >
                     <div className="relative inline-block mb-4">
-                      <div
-                        className={`w-20 h-20 rounded-full flex items-center justify-center ${
-                          "bg-gray-100"
-                        }`}
-                      >
-                        <Medal
-                          className={`w-10 h-10 ${
-                            "text-gray-600"
-                          }`}
-                        />
+                      <div className="w-20 h-20 rounded-full flex items-center justify-center bg-gray-100">
+                        <Medal className="w-10 h-10 text-gray-600" />
                       </div>
                       <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-gray-400 text-white font-bold flex items-center justify-center text-sm">
                         2
                       </div>
                     </div>
-                    <h3
-                      className={`font-bold text-lg mb-2 ${
-                        "text-white"
-                      }`}
-                    >
+                    <h3 className="font-bold text-lg mb-2 text-neutral-900">
                       {entries[1].name}
                     </h3>
-                    <p
-                      className={`text-2xl font-bold mb-1 ${
-                        "text-gray-600"
-                      }`}
-                    >
+                    <p className="text-2xl font-bold mb-1 text-gray-600">
                       {entries[1].points.toLocaleString()}
                     </p>
-                    <p
-                      className={`text-sm ${
-                        "text-neutral-500"
-                      }`}
-                    >
+                    <p className="text-sm text-neutral-500">
                       points
                     </p>
                   </motion.div>
@@ -310,45 +269,23 @@ export default function LeaderboardPage() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className={`rounded-2xl p-6 text-center border backdrop-blur-sm ${
-                      "bg-linear-to-br from-yellow-50 to-amber-50 border-yellow-300 shadow-xl"
-                    }`}
+                    className="rounded-2xl p-6 text-center border backdrop-blur-sm bg-linear-to-br from-yellow-50 to-amber-50 border-yellow-300 shadow-xl"
                   >
                     <div className="relative inline-block mb-4">
-                      <div
-                        className={`w-24 h-24 rounded-full flex items-center justify-center ${
-                          "bg-yellow-100"
-                        }`}
-                      >
-                        <Crown
-                          className={`w-12 h-12 ${
-                            "text-yellow-600"
-                          }`}
-                        />
+                      <div className="w-24 h-24 rounded-full flex items-center justify-center bg-yellow-100">
+                        <Crown className="w-12 h-12 text-yellow-600" />
                       </div>
                       <div className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-yellow-400 text-black font-bold flex items-center justify-center">
                         1
                       </div>
                     </div>
-                    <h3
-                      className={`font-bold text-xl mb-2 ${
-                        "text-white"
-                      }`}
-                    >
+                    <h3 className="font-bold text-xl mb-2 text-neutral-900">
                       {entries[0].name}
                     </h3>
-                    <p
-                      className={`text-3xl font-bold mb-1 ${
-                        "text-yellow-600"
-                      }`}
-                    >
+                    <p className="text-3xl font-bold mb-1 text-yellow-600">
                       {entries[0].points.toLocaleString()}
                     </p>
-                    <p
-                      className={`text-sm ${
-                        "text-yellow-700"
-                      }`}
-                    >
+                    <p className="text-sm text-yellow-700">
                       points
                     </p>
                   </motion.div>
@@ -359,45 +296,23 @@ export default function LeaderboardPage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.2 }}
-                    className={`rounded-2xl p-6 text-center border backdrop-blur-sm ${
-                      "bg-white border-amber-300 shadow-lg"
-                    } md:mt-8`}
+                    className="rounded-2xl p-6 text-center border backdrop-blur-sm bg-white border-amber-300 shadow-lg md:mt-8"
                   >
                     <div className="relative inline-block mb-4">
-                      <div
-                        className={`w-20 h-20 rounded-full flex items-center justify-center ${
-                          "bg-amber-100"
-                        }`}
-                      >
-                        <Medal
-                          className={`w-10 h-10 ${
-                            "text-amber-600"
-                          }`}
-                        />
+                      <div className="w-20 h-20 rounded-full flex items-center justify-center bg-amber-100">
+                        <Medal className="w-10 h-10 text-amber-600" />
                       </div>
                       <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-amber-600 text-white font-bold flex items-center justify-center text-sm">
                         3
                       </div>
                     </div>
-                    <h3
-                      className={`font-bold text-lg mb-2 ${
-                        "text-white"
-                      }`}
-                    >
+                    <h3 className="font-bold text-lg mb-2 text-neutral-900">
                       {entries[2].name}
                     </h3>
-                    <p
-                      className={`text-2xl font-bold mb-1 ${
-                        "text-amber-600"
-                      }`}
-                    >
+                    <p className="text-2xl font-bold mb-1 text-amber-600">
                       {entries[2].points.toLocaleString()}
                     </p>
-                    <p
-                      className={`text-sm ${
-                        "text-neutral-500"
-                      }`}
-                    >
+                    <p className="text-sm text-neutral-500">
                       points
                     </p>
                   </motion.div>

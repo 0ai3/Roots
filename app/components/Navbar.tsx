@@ -10,9 +10,12 @@ import Link from "next/link";
 interface NavbarProps {scrollY?: number;}
 
 export default function Navbar(e: NavbarProps) {
-  const { theme } = useTheme();
+  const { theme, mounted } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
+
+  // Use dark theme until mounted to prevent hydration mismatch
+  const currentTheme = mounted ? theme : "dark";
 
   // Update scrollY on client only
   useEffect(() => {
@@ -38,7 +41,7 @@ export default function Navbar(e: NavbarProps) {
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? theme === "dark"
+          ? currentTheme === "dark"
             ? "bg-neutral-950/90 backdrop-blur-lg border-b border-neutral-800"
             : "bg-white/90 backdrop-blur-lg border-b border-neutral-200 shadow-sm"
           : "bg-transparent"
@@ -52,7 +55,7 @@ export default function Navbar(e: NavbarProps) {
           <motion.div className="flex items-center gap-2" whileHover={{ scale: 1.02 }}>
             <div
               className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                theme === "dark" ? "bg-lime-400" : "bg-emerald-600"
+                currentTheme === "dark" ? "bg-lime-400" : "bg-emerald-600"
               }`}
             >
               <svg
@@ -61,7 +64,7 @@ export default function Navbar(e: NavbarProps) {
                 viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className={theme === "dark" ? "text-neutral-950" : "text-white"}
+                className={currentTheme === "dark" ? "text-neutral-950" : "text-white"}
               >
                 <path
                   d="M12 2C12 2 9 6 9 10C9 12.2091 10.7909 14 13 14C15.2091 14 17 12.2091 17 10C17 6 14 2 14 2H12Z"
@@ -82,7 +85,7 @@ export default function Navbar(e: NavbarProps) {
             <Link
               href="/"
               className={`text-xl ${
-                theme === "dark" ? "text-white" : "text-neutral-900"
+                currentTheme === "dark" ? "text-white" : "text-neutral-900"
               }`}
             >
               Roots
@@ -95,7 +98,7 @@ export default function Navbar(e: NavbarProps) {
                 key={link.name}
                 href={link.href}
                 className={`text-sm transition-colors ${
-                  theme === "dark"
+                  currentTheme === "dark"
                     ? "text-neutral-300 hover:text-lime-400"
                     : "text-neutral-700 hover:text-emerald-600"
                 }`}
@@ -105,7 +108,7 @@ export default function Navbar(e: NavbarProps) {
             ))}
             <motion.button
               className={`px-6 py-2.5 rounded-full transition-colors ${
-                theme === "dark"
+                currentTheme === "dark"
                   ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
                   : "bg-emerald-600 text-white hover:bg-emerald-700"
               }`}
@@ -118,7 +121,7 @@ export default function Navbar(e: NavbarProps) {
 
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`md:hidden p-2 ${theme === "dark" ? "text-white" : "text-neutral-900"}`}
+            className={`md:hidden p-2 ${currentTheme === "dark" ? "text-white" : "text-neutral-900"}`}
           >
             {isMenuOpen ? <XIcon className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
           </button>
@@ -129,7 +132,7 @@ export default function Navbar(e: NavbarProps) {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             className={`md:hidden py-4 border-t ${
-              theme === "dark" ? "border-neutral-800" : "border-neutral-200"
+              currentTheme === "dark" ? "border-neutral-800" : "border-neutral-200"
             }`}
           >
             {navLinks.map((link) => (
@@ -137,7 +140,7 @@ export default function Navbar(e: NavbarProps) {
                 key={link.name}
                 href={link.href}
                 className={`block py-3 text-sm transition-colors ${
-                  theme === "dark"
+                  currentTheme === "dark"
                     ? "text-neutral-300 hover:text-lime-400"
                     : "text-neutral-700 hover:text-emerald-600"
                 }`}
@@ -148,7 +151,7 @@ export default function Navbar(e: NavbarProps) {
             ))}
             <button
               className={`w-full mt-4 px-6 py-2.5 rounded-full transition-colors ${
-                theme === "dark" ? "bg-lime-400 text-neutral-950" : "bg-emerald-600 text-white"
+                currentTheme === "dark" ? "bg-lime-400 text-neutral-950" : "bg-emerald-600 text-white"
               }`}
             >
               Get Started

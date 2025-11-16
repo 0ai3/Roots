@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { I18nProvider } from "./components/I18nProvider";
+import { ThemeProvider } from "./components/ThemeProvider";
 import LanguageSwitcher from "./components/LanguageSwitcher";
 import { getRequestLocale } from "@/app/lib/i18n/server";
 import type { LocaleCode } from "@/app/lib/i18n/languages";
@@ -34,10 +35,12 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
         suppressHydrationWarning
       >
-        <I18nProvider initialLocale={initialLocale}>
-          <LanguageSwitcher />
-          {children}
-        </I18nProvider>
+        <ThemeProvider>
+          <I18nProvider initialLocale={initialLocale}>
+            <LanguageSwitcher />
+            {children}
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -17,6 +17,7 @@ import {
 import DashboardPageLayout from "../../components/DashboardPageLayout";
 import AttractionPlanner from "../../components/AttractionPlanner";
 import Image from "next/image";
+import { useExperiencePoints } from "../../hooks/useExperiencePoints";
 
 type Attraction = {
   id: string;
@@ -144,7 +145,7 @@ function FeaturedAttractionsSection({
   const [locationError, setLocationError] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [radius, setRadius] = useState(5000);
-  const [userId] = useState<string | null>(null);
+  const { userId } = useExperiencePoints();
 
   const fetchAttractions = useCallback(async (lat: number, lon: number, rad: number) => {
     setLoading(true);

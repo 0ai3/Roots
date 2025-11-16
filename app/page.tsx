@@ -12,16 +12,19 @@ import {
   Building2,
   Palette,
   MapPin,
+  Play,
 } from "lucide-react";
 import Navbar from "./components/Navbar";
 import Image from "next/image";
 import Link from "next/link";
+import { useI18n } from "./hooks/useI18n";
 
 interface HeroSectionProps {
   scrollY: number;
 }
 
 function HeroSection({ scrollY }: HeroSectionProps) {
+  const { t } = useI18n();
   const parallaxY = scrollY * 0.5;
 
   return (
@@ -46,20 +49,18 @@ function HeroSection({ scrollY }: HeroSectionProps) {
               <motion.div className="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full border bg-lime-400/10 border-lime-400/20">
                 <div className="w-2 h-2 rounded-full bg-lime-400" />
                 <span className="text-sm text-lime-400">
-                  Discover Your Heritage
+                  {t("home.hero.badge")}
                 </span>
               </motion.div>
 
               <h1 className="mb-6 text-white">
-                Connect with
+                {t("home.hero.title")}
                 <br />
-                <span className="text-lime-400">Your Roots</span>
+                <span className="text-lime-400">{t("home.hero.titleHighlight")}</span>
               </h1>
 
               <p className="text-lg mb-8 max-w-xl text-neutral-300">
-                Explore traditions, discover authentic cuisines, visit cultural
-                museums, and experience the world&rsquo;s rich heritage through
-                an interactive journey.
+                {t("home.hero.description")}
               </p>
 
               <div className="flex flex-wrap gap-4">
@@ -68,7 +69,7 @@ function HeroSection({ scrollY }: HeroSectionProps) {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Start Exploring
+                  {t("home.hero.cta.explore")}
                   <ArrowRight className="w-5 h-5" />
                 </motion.button>
 
@@ -78,7 +79,7 @@ function HeroSection({ scrollY }: HeroSectionProps) {
                   whileTap={{ scale: 0.95 }}
                 >
                   <Play className="w-5 h-5" />
-                  Watch Video
+                  {t("home.hero.cta.video")}
                 </motion.button>
               </div>
 
@@ -252,7 +253,7 @@ function FeaturesSection() {
                     </motion.span>
                   </div>
                 </div>
-              </Link>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -333,7 +334,7 @@ function ExploreSection() {
                     {region.traditions} traditions
                   </p>
                 </div>
-              </Link>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -665,7 +666,7 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
               whileTap={{ scale: 0.95 }}
             >
               Learn More
-            </Link>
+            </motion.button>
           </div>
         </motion.div>
       </div>

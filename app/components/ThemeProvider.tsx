@@ -6,6 +6,7 @@ import React, {
   ReactNode,
   useCallback,
   useMemo,
+  useEffect,
 } from "react";
 
 type Theme = "light" | "dark";
@@ -14,27 +15,36 @@ interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
+  mounted: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => {
+  // Always start with dark to match the server render
+  const [theme, setThemeState] = useState<Theme>("dark");
+  const [mounted, setMounted] = useState(false);
+
+  // Load theme from localStorage after mount
+  useEffect(() => {
+    setMounted(true);
     try {
       const saved = localStorage.getItem("theme") as Theme | null;
       if (saved) {
+        setThemeState(saved);
         if (saved === "dark") {
           document.documentElement.classList.add("dark");
         } else {
           document.documentElement.classList.remove("dark");
         }
-        return saved;
+      } else {
+        // Default to dark if no saved preference
+        document.documentElement.classList.add("dark");
       }
     } catch {
-      // Ignore
+      document.documentElement.classList.add("dark");
     }
-    return "light";
-  });
+  }, []);
 
   const setTheme = useCallback((newTheme: Theme) => {
     setThemeState(newTheme);
@@ -60,8 +70,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme, setTheme]);
 
   const value = useMemo(
-    () => ({ theme, setTheme, toggleTheme }),
-    [theme, setTheme, toggleTheme]
+    () => ({ theme, setTheme, toggleTheme, mounted }),
+    [theme, setTheme, toggleTheme, mounted]
   );
 
   return (

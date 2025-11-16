@@ -31,7 +31,7 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <label className="fixed top-4 right-20 z-[9999] flex items-center gap-2 rounded-full border border-white/20 bg-neutral-900/70 px-4 py-2 text-xs text-white/80 shadow-lg backdrop-blur">
+    <label className="fixed bottom-4 right-4 z-9999 flex items-center gap-2 rounded-full border border-white/20 bg-neutral-900/70 px-4 py-2 text-xs text-white/80 shadow-lg backdrop-blur">
       <span className="sr-only">{t("languageSwitcher.label")}</span>
       <select
         value={locale}
