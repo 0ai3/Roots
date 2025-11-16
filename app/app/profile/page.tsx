@@ -15,12 +15,10 @@ export default async function ProfilePage() {
       description={t("profile.description")}
       isDarkMode={true}
     >
-      <div className="profile-light">
-        <ProfileForm
-          initialPoints={experience.points}
-          initialUserId={experience.userId}
-        />
-      </div>
+      <ProfileForm
+        initialPoints={experience.points}
+        initialUserId={experience.userId}
+      />
     </DashboardPageLayout>
   );
 }

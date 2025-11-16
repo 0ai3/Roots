@@ -6,6 +6,7 @@ import { setStoredUserId } from "../lib/userId";
 import { useI18n } from "../../app/hooks/useI18n";
 import { Loader2, MapPin, Heart, CheckCircle, AlertCircle } from "lucide-react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 type Props = {
   initialPoints?: number;
@@ -333,106 +334,199 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
   };
 
   return (
-    <section className={`min-h-screen bg-black text-white transition-colors duration-300`}>
-      <div className="space-y-8 p-6">
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className={`rounded-3xl border p-5 border-white/10 bg-white/5`}>
-            <p className={`text-xs uppercase tracking-wide text-white/70`}>
-              {t("dashboard.content.pointsLabel")}
-            </p>
-            <p className={`text-4xl font-semibold text-white`}>{formattedPoints}</p>
-            <p className={`text-xs text-white/70`}>{t("profile.pointsHint")}</p>
-          </div>
-
-          <div className={`rounded-3xl border p-5 border-white/10 bg-white/5`}>
-            <p className={`text-xs uppercase tracking-wide text-white/70`}>
-              {t("profile.accountLabel")}
-            </p>
-            <p className={`text-base font-semibold text-white`}>{profileMeta?.email || "—"}</p>
-            <dl className="mt-4 space-y-2 text-sm">
-              <div className="flex items-center justify-between">
-                <dt className={`uppercase tracking-wide text-white/70`}>
-                  {t("dashboard.content.roleLabel")}
-                </dt>
-                <dd className={`rounded-full border px-3 py-1 text-xs border-white/15 text-white`}>
-                  {profileRoleLabel}
-                </dd>
-              </div>
-              <div className="flex items-center justify-between">
-                <dt className={`uppercase tracking-wide text-white/70`}>
-                  {t("dashboard.content.memberSince")}
-                </dt>
-                <dd className={`text-white/70`}>{formattedCreatedAt ?? "—"}</dd>
-              </div>
-              <div className="flex items-center justify-between">
-                <dt className={`uppercase tracking-wide text-white/70`}>
-                  {t("common.lastUpdated")}
-                </dt>
-                <dd className={`text-white/70`}>{formattedUpdatedAt ?? "—"}</dd>
-              </div>
-            </dl>
-          </div>
+    <div className="relative min-h-screen bg-neutral-950">
+      {/* Hero Section */}
+      <section className="relative min-h-[40vh] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="https://images.unsplash.com/photo-1511895426328-dc8714191300?w=1920&q=80"
+            alt="Profile background"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-linear-to-br from-black/80 via-black/60 to-transparent" />
         </div>
 
-        {errorMessage && (
-          <div className={`rounded-2xl border px-4 py-3 text-sm border-red-500/40 bg-red-500/10 text-red-200`}>
-            {errorMessage}
-          </div>
-        )}
+        <div className="relative z-10 max-w-5xl mx-auto px-6 py-16 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-lime-400/10 border border-lime-400/20 mb-6"
+          >
+            <Heart className="w-4 h-4 text-lime-400" />
+            <span className="text-sm font-medium text-lime-400">
+              Your Cultural Profile
+            </span>
+          </motion.div>
 
-        {statusMessage && !errorMessage && (
-          <div className={`rounded-2xl border px-4 py-3 text-sm border-emerald-400/40 bg-emerald-400/10 text-emerald-200`}>
-            {statusMessage}
-          </div>
-        )}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight"
+          >
+            Manage Your{" "}
+            <span className="text-lime-400">Profile</span>
+          </motion.h1>
 
-        <form
-          onSubmit={handleSubmit}
-          className={`space-y-5 rounded-3xl border p-6 backdrop-blur border-white/10 bg-white/5`}
-        >
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className={`space-y-2 text-sm font-medium text-white/70`}>
-              <span>{t("profile.fields.name")}</span>
-              <input
-                type="text"
-                value={formState.name}
-                onChange={handleChange("name")}
-                placeholder={t("profile.fields.namePlaceholder")}
-                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:text-white/70 focus:border-emerald-300 focus:outline-none disabled:opacity-50 border-white/10 bg-black/40 text-white`}
-                disabled={isFormDisabled}
-                required
-              />
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-lg text-white/80 max-w-2xl mx-auto"
+          >
+            Update your information and track your cultural journey
+          </motion.p>
+        </div>
+      </section>
+
+      {/* Content Section */}
+      <section className="relative z-20 -mt-12 pb-20">
+        <div className="max-w-5xl mx-auto px-6 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="grid gap-6 md:grid-cols-2"
+          >
+            <motion.div
+              whileHover={{ y: -5 }}
+              className="bg-neutral-900 rounded-2xl p-6 shadow-xl border border-neutral-800"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-lime-400/20 flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6 text-lime-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-neutral-400">
+                    {t("dashboard.content.pointsLabel")}
+                  </p>
+                  <p className="text-3xl font-bold text-white">{formattedPoints}</p>
+                </div>
+              </div>
+              <p className="text-xs text-neutral-500">{t("profile.pointsHint")}</p>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ y: -5 }}
+              className="bg-neutral-900 rounded-2xl p-6 shadow-xl border border-neutral-800"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-emerald-400/20 flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-emerald-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-neutral-400">
+                    {t("profile.accountLabel")}
+                  </p>
+                  <p className="text-base font-semibold text-white truncate">{profileMeta?.email || "—"}</p>
+                </div>
+              </div>
+              <dl className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <dt className="text-neutral-400">
+                    {t("dashboard.content.roleLabel")}
+                  </dt>
+                  <dd className="rounded-full border px-3 py-1 text-xs border-lime-400/30 bg-lime-400/10 text-lime-400">
+                    {profileRoleLabel}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-neutral-400">
+                    {t("dashboard.content.memberSince")}
+                  </dt>
+                  <dd className="text-white/80">{formattedCreatedAt ?? "—"}</dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-neutral-400">
+                    {t("common.lastUpdated")}
+                  </dt>
+                  <dd className="text-white/80">{formattedUpdatedAt ?? "—"}</dd>
+                </div>
+              </dl>
+            </motion.div>
+          </motion.div>
+
+          {errorMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-red-900/20 border border-red-500/30 rounded-xl px-5 py-4 text-sm text-red-200 flex items-center gap-3"
+            >
+              <AlertCircle className="w-5 h-5 text-red-400" />
+              {errorMessage}
+            </motion.div>
+          )}
+
+          {statusMessage && !errorMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-emerald-900/20 border border-emerald-500/30 rounded-xl px-5 py-4 text-sm text-emerald-200 flex items-center gap-3"
+            >
+              <CheckCircle className="w-5 h-5 text-emerald-400" />
+              {statusMessage}
+            </motion.div>
+          )}
+
+          <motion.form
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            onSubmit={handleSubmit}
+            className="space-y-6 bg-neutral-900 rounded-2xl p-8 shadow-xl border border-neutral-800"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-lg bg-purple-400/20 flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-purple-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-white">Personal Information</h2>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2">
+              <label className="space-y-2">
+                <span className="text-sm font-medium text-neutral-400">{t("profile.fields.name")}</span>
+                <input
+                  type="text"
+                  value={formState.name}
+                  onChange={handleChange("name")}
+                  placeholder={t("profile.fields.namePlaceholder")}
+                  className="w-full rounded-xl border px-4 py-3 text-base placeholder:text-neutral-600 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 focus:outline-none disabled:opacity-50 transition-all border-neutral-700 bg-neutral-800/50 text-white"
+                  disabled={isFormDisabled}
+                  required
+                />
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-sm font-medium text-neutral-400">{t("profile.fields.email")}</span>
+                <input
+                  type="email"
+                  value={formState.email}
+                  onChange={handleChange("email")}
+                  placeholder={t("profile.fields.emailPlaceholder")}
+                  className="w-full rounded-xl border px-4 py-3 text-base placeholder:text-neutral-600 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 focus:outline-none disabled:opacity-50 transition-all border-neutral-700 bg-neutral-800/50 text-white"
+                  disabled={isFormDisabled}
+                  required
+                />
             </label>
+          </div>
 
-            <label className={`space-y-2 text-sm font-medium text-white/70`}>
-              <span>{t("profile.fields.email")}</span>
-              <input
-                type="email"
-                value={formState.email}
-                onChange={handleChange("email")}
-                placeholder={t("profile.fields.emailPlaceholder")}
-                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:text-white/70 focus:border-emerald-300 focus:outline-none disabled:opacity-50 border-white/10 bg-black/40 text-white`}
-                disabled={isFormDisabled}
-                required
-              />
-          </label>
-        </div>
-
-          <div className="grid gap-4 md:grid-cols-1">
-            <label className={`space-y-2 text-sm font-medium text-white/70`}>
-              <span>{t("profile.fields.homeCountry")}</span>
+            <label className="space-y-2">
+              <span className="text-sm font-medium text-neutral-400">{t("profile.fields.homeCountry")}</span>
               <div className="relative">
                 <input
                   type="text"
                   value={formState.homeCountry}
                   onChange={handleChange("homeCountry")}
                   placeholder={t("profile.fields.homeCountryPlaceholder")}
-                  className={`w-full rounded-2xl border px-4 py-3 pr-12 text-base placeholder:text-white/70 focus:border-emerald-300 focus:outline-none disabled:opacity-50 ${
+                  className={`w-full rounded-xl border px-4 py-3 pr-12 text-base placeholder:text-neutral-600 focus:outline-none disabled:opacity-50 transition-all ${
                     homeCountryValidation === "invalid"
-                      ? "border-red-400/50 bg-red-950/20"
+                      ? "border-red-400/50 bg-red-950/20 focus:border-red-400 focus:ring-2 focus:ring-red-400/20"
                       : homeCountryValidation === "valid"
-                      ? "border-emerald-400/50 bg-emerald-950/20"
-                      : "border-white/10 bg-black/40 text-white"
+                      ? "border-emerald-400/50 bg-emerald-950/20 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
+                      : "border-neutral-700 bg-neutral-800/50 text-white focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20"
                   }`}
                   disabled={isFormDisabled}
                 />
@@ -440,142 +534,168 @@ export default function ProfileForm({ initialPoints, initialUserId }: Props = {}
                   {getValidationIcon()}
                 </div>
               </div>
-              <p className={`text-xs text-white/70`}>
+              <p className="text-xs text-neutral-500">
                 {t("profile.fields.homeCountryHelper")}
               </p>
             </label>
-          </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className={`space-y-2 text-sm font-medium text-white/70`}>
-              <span>{t("profile.fields.favoriteMuseums")}</span>
+            <div className="grid gap-6 md:grid-cols-2">
+              <label className="space-y-2">
+                <span className="text-sm font-medium text-neutral-400">{t("profile.fields.favoriteMuseums")}</span>
+                <textarea
+                  value={formState.favoriteMuseums}
+                  onChange={handleChange("favoriteMuseums")}
+                  placeholder={t("profile.fields.favoriteMuseumsPlaceholder")}
+                  rows={4}
+                  className="w-full rounded-xl border px-4 py-3 text-base placeholder:text-neutral-600 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 focus:outline-none disabled:opacity-50 transition-all border-neutral-700 bg-neutral-800/50 text-white resize-none"
+                  disabled={isFormDisabled}
+                />
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-sm font-medium text-neutral-400">{t("profile.fields.favoriteRecipes")}</span>
+                <textarea
+                  value={formState.favoriteRecipes}
+                  onChange={handleChange("favoriteRecipes")}
+                  placeholder={t("profile.fields.favoriteRecipesPlaceholder")}
+                  rows={4}
+                  className="w-full rounded-xl border px-4 py-3 text-base placeholder:text-neutral-600 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 focus:outline-none disabled:opacity-50 transition-all border-neutral-700 bg-neutral-800/50 text-white resize-none"
+                  disabled={isFormDisabled}
+                />
+              </label>
+            </div>
+
+            <label className="space-y-2">
+              <span className="text-sm font-medium text-neutral-400">{t("profile.fields.bio")}</span>
               <textarea
-                value={formState.favoriteMuseums}
-                onChange={handleChange("favoriteMuseums")}
-                placeholder={t("profile.fields.favoriteMuseumsPlaceholder")}
+                value={formState.bio}
+                onChange={handleChange("bio")}
+                placeholder={t("profile.fields.bioPlaceholder")}
                 rows={4}
-                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:text-white/70 focus:border-emerald-300 focus:outline-none disabled:opacity-50 border-white/10 bg-black/40 text-white`}
+                className="w-full rounded-xl border px-4 py-3 text-base placeholder:text-neutral-600 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 focus:outline-none disabled:opacity-50 transition-all border-neutral-700 bg-neutral-800/50 text-white resize-none"
                 disabled={isFormDisabled}
               />
             </label>
 
-            <label className={`space-y-2 text-sm font-medium text-white/70`}>
-              <span>{t("profile.fields.favoriteRecipes")}</span>
-              <textarea
-                value={formState.favoriteRecipes}
-                onChange={handleChange("favoriteRecipes")}
-                placeholder={t("profile.fields.favoriteRecipesPlaceholder")}
-                rows={4}
-                className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:text-white/70 focus:border-emerald-300 focus:outline-none disabled:opacity-50 border-white/10 bg-black/40 text-white`}
+            <label className="space-y-2">
+              <span className="text-sm font-medium text-neutral-400">{t("profile.fields.socialHandle")}</span>
+              <input
+                type="text"
+                value={formState.socialHandle}
+                onChange={handleChange("socialHandle")}
+                placeholder={t("profile.fields.socialHandlePlaceholder")}
+                className="w-full rounded-xl border px-4 py-3 text-base placeholder:text-neutral-600 focus:border-lime-400 focus:ring-2 focus:ring-lime-400/20 focus:outline-none disabled:opacity-50 transition-all border-neutral-700 bg-neutral-800/50 text-white"
                 disabled={isFormDisabled}
               />
             </label>
-          </div>
 
-          <label className={`space-y-2 text-sm font-medium text-white/70`}>
-            <span>{t("profile.fields.bio")}</span>
-            <textarea
-              value={formState.bio}
-              onChange={handleChange("bio")}
-              placeholder={t("profile.fields.bioPlaceholder")}
-              rows={4}
-              className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:text-white/70 focus:border-emerald-300 focus:outline-none disabled:opacity-50 border-white/10 bg-black/40 text-white`}
-              disabled={isFormDisabled}
-            />
-          </label>
-
-          <label className={`space-y-2 text-sm font-medium text-white/70`}>
-            <span>{t("profile.fields.socialHandle")}</span>
-            <input
-              type="text"
-              value={formState.socialHandle}
-              onChange={handleChange("socialHandle")}
-              placeholder={t("profile.fields.socialHandlePlaceholder")}
-              className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:text-white/70 focus:border-emerald-300 focus:outline-none disabled:opacity-50 border-white/10 bg-black/40 text-white`}
-              disabled={isFormDisabled}
-            />
-          </label>
-
-          <div className="flex flex-wrap gap-3 pt-2">
-            <button
-              type="submit"
-              disabled={isFormDisabled || (formState.homeCountry !== "" && homeCountryValidation === "invalid")}
-              className="rounded-full bg-emerald-500 px-6 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isSaving
-                ? t("profile.status.saving")
-                : isLoading
-                  ? t("profile.status.loading")
-                  : t("profile.actions.save")}
-            </button>
-            <p className={`text-xs text-white/70`}>
-              {t("profile.actions.helper")}
-            </p>
-          </div>
-        </form>
-
-        {/* Favorite Attractions Section */}
-        <div className={`space-y-4 rounded-3xl border p-6 backdrop-blur border-white/10 bg-white/5`}>
-          <div className="flex items-center gap-2 mb-4">
-            <Heart className={`w-5 h-5 text-lime-400 fill-lime-400`} />
-            <h3 className={`text-xl font-semibold text-white`}>
-              Favorite Attractions
-            </h3>
-          </div>
-
-          {loadingFavorites ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className={`w-8 h-8 animate-spin text-white/70`} />
+            <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-neutral-800">
+              <button
+                type="submit"
+                disabled={isFormDisabled || (formState.homeCountry !== "" && homeCountryValidation === "invalid")}
+                className="px-8 py-3 bg-lime-400 text-black rounded-xl font-semibold transition-all hover:bg-lime-300 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {t("profile.status.saving")}
+                  </>
+                ) : isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {t("profile.status.loading")}
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    {t("profile.actions.save")}
+                  </>
+                )}
+              </button>
+              <p className="text-xs text-neutral-500">
+                {t("profile.actions.helper")}
+              </p>
             </div>
-          ) : favorites.length === 0 ? (
-            <div className={`text-center py-8 text-white/70`}>
-              <MapPin className="w-12 h-12 mx-auto mb-2 opacity-30" />
-              <p className="text-sm">No favorite attractions yet</p>
-              <p className="text-xs mt-1">Visit the Attractions page to add favorites</p>
+          </motion.form>
+
+          {/* Favorite Attractions Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="bg-neutral-900 rounded-2xl p-8 shadow-xl border border-neutral-800"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-lg bg-pink-400/20 flex items-center justify-center">
+                <Heart className="w-5 h-5 text-pink-400 fill-pink-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-white">
+                Favorite Attractions
+              </h3>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {favorites.map((fav) => (
-                <div
-                  key={fav.attractionId}
-                  className="group relative overflow-hidden rounded-2xl border border-white/10 hover:border-lime-400/30 transition-all"
-                >
-                  <div className="relative h-40 overflow-hidden">
-                    <Image
-                      src={fav.attraction.image}
-                      alt={fav.attraction.title}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-linear-to-t from-neutral-900 via-neutral-900/40 to-transparent" />
-                    <button
-                      onClick={() => removeFavorite(fav.attractionId)}
-                      className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm transition bg-red-500/80 hover:bg-red-600/90"
-                      title="Remove from favorites"
-                    >
-                      <Heart className="w-4 h-4 text-white fill-white" />
-                    </button>
-                  </div>
-                  <div className="p-4 bg-black/40">
-                    <h4 className="font-semibold mb-1 text-white text-sm line-clamp-1">
-                      {fav.attraction.title}
-                    </h4>
-                    <div className="flex items-center gap-1 mb-2">
-                      <MapPin className="w-3 h-3 text-lime-400" />
-                      <span className="text-xs text-white/70 line-clamp-1">
-                        {fav.attraction.location}
-                      </span>
-                    </div>
-                    <p className="text-xs text-white/70 line-clamp-2">
-                      {fav.attraction.description}
-                    </p>
-                  </div>
+
+            {loadingFavorites ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-lime-400" />
+              </div>
+            ) : favorites.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-20 h-20 rounded-2xl bg-neutral-800/50 flex items-center justify-center mx-auto mb-4">
+                  <MapPin className="w-10 h-10 text-neutral-600" />
                 </div>
-              ))}
-            </div>
-          )}
+                <p className="text-base font-medium text-white mb-1">No favorite attractions yet</p>
+                <p className="text-sm text-neutral-500">Visit the Attractions page to add favorites</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {favorites.map((fav, index) => (
+                  <motion.div
+                    key={fav.attractionId}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    whileHover={{ y: -5 }}
+                    className="group relative overflow-hidden rounded-xl border border-neutral-800 hover:border-lime-400/50 transition-all bg-neutral-800/30"
+                  >
+                    <div className="relative h-48 overflow-hidden">
+                      <Image
+                        src={fav.attraction.image}
+                        alt={fav.attraction.title}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent" />
+                      <button
+                        onClick={() => removeFavorite(fav.attractionId)}
+                        className="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md transition-all bg-red-500/90 hover:bg-red-600 hover:scale-110"
+                        title="Remove from favorites"
+                      >
+                        <Heart className="w-4 h-4 text-white fill-white" />
+                      </button>
+                    </div>
+                    <div className="p-5">
+                      <h4 className="font-bold mb-2 text-white text-base line-clamp-1">
+                        {fav.attraction.title}
+                      </h4>
+                      <div className="flex items-center gap-2 mb-3">
+                        <MapPin className="w-4 h-4 text-lime-400" />
+                        <span className="text-sm text-neutral-400 line-clamp-1">
+                          {fav.attraction.location}
+                        </span>
+                      </div>
+                      <p className="text-sm text-neutral-500 line-clamp-2">
+                        {fav.attraction.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </motion.div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }
