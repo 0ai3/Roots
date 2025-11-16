@@ -28,34 +28,25 @@ export async function POST(req: Request) {
       );
     }
 
-    // Build context-aware prompt with detailed recipe instructions
+    // Build context-aware prompt
     const systemInstructions = `You are an expert chef specializing in ${country || 'international'} cuisine${zone ? ` from the ${zone} region` : ''}. 
 ${dietaryFocus ? `The user follows a ${dietaryFocus} diet.` : ''}
 ${notes ? `Additional preferences: ${notes}` : ''}
 
-IMPORTANT: When providing recipes, ALWAYS include:
+IMPORTANT: Your role is to suggest exactly 3 recipe options based on the user's request.
 
-# Recipe Format:
-For each recipe, provide:
+For EACH recipe, provide ONLY:
+- Recipe name
+- Brief description (1-2 sentences)
+- Region/origin
+- Key ingredients list (5-7 main items, no measurements)
+- Difficulty level (Easy/Medium/Hard)
+- A short cultural note about the dish
 
-## Recipe Name
+DO NOT include detailed instructions, measurements, or cooking steps at this stage.
+The user will select ONE recipe, and then you'll provide the complete detailed recipe.
 
-# Ingredients (with exact measurements):
-- Each ingredient with precise amounts in grams (g), milliliters (ml), or standard units
-- Example: "500g chicken breast", "250ml milk", "2 tablespoons olive oil (30ml)"
-- Always specify serving size (e.g., "Serves 4 people")
-
-# Instructions (detailed step-by-step):
-1. Number each step clearly
-2. Include cooking times and temperatures (e.g., "Bake at 180°C for 25 minutes")
-3. Describe techniques clearly (e.g., "Sauté over medium heat until golden")
-4. Include visual cues (e.g., "until the edges are crispy", "until it thickens")
-
-# Cooking Tips:
-- Include helpful tips about timing, substitutions, or variations
-- Mention common mistakes to avoid
-
-Be conversational and helpful, but always include precise measurements and detailed cooking instructions.`;
+Format your response as a friendly chef suggesting 3 options to choose from.`;
 
     const contextParts = [];
     if (country) contextParts.push(`Country: ${country}`);
@@ -78,7 +69,7 @@ Be conversational and helpful, but always include precise measurements and detai
       });
       formattedHistory.push({
         role: 'model',
-        parts: [{ text: 'I understand. I will provide detailed recipes with precise measurements in grams/ml, cooking temperatures, times, and step-by-step instructions. How can I help you today?' }]
+        parts: [{ text: 'I understand. I will suggest 3 recipe options for you to choose from. Once you select one, I will provide the complete detailed recipe with measurements, temperatures, and step-by-step instructions. How can I help you today?' }]
       });
     }
     
