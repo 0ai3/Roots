@@ -2,6 +2,8 @@
 
 import { FormEvent, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { Sparkles, Globe, Heart } from "lucide-react";
 import {
   checkEmailAction,
   loginAction,
@@ -105,8 +107,21 @@ export default function AuthLogin() {
   const isPasswordStage = stage === "login" || stage === "register";
 
   return (
-    <section className="flex min-h-screen items-center justify-center bg-slate-950 px-4 text-white">
-      <div className="w-full max-w-md space-y-6 rounded-2xl border border-white/10 bg-white/5 p-8 shadow-xl backdrop-blur">
+    <section className="relative flex min-h-screen items-center justify-center bg-black px-4 text-white overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1920&q=80"
+          alt="Cultural diversity and exploration"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-linear-to-br from-black/80 via-black/60 to-black/80" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 w-full max-w-md space-y-6 rounded-2xl border border-neutral-800 bg-neutral-900/30 p-8 shadow-xl backdrop-blur">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-semibold">{titleByStage[stage]}</h1>
           <p className="text-sm text-white/70">{descriptionByStage[stage]}</p>
@@ -119,7 +134,7 @@ export default function AuthLogin() {
         )}
 
         {statusMessage && !errorMessage && (
-          <p className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
+          <p className="rounded-md border border-lime-400/30 bg-lime-400/10 px-3 py-2 text-sm text-lime-200">
             {statusMessage}
           </p>
         )}
@@ -130,7 +145,7 @@ export default function AuthLogin() {
               <span>Email</span>
               <input
                 type="email"
-                className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-base text-white placeholder:text-white/50 focus:border-emerald-400 focus:outline-none"
+                className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-base text-white placeholder:text-white/50 focus:border-lime-400 focus:outline-none"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
@@ -142,7 +157,7 @@ export default function AuthLogin() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full rounded-lg bg-emerald-500 py-2 text-center text-base font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-lg bg-lime-400 py-2 text-center text-base font-semibold text-slate-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isPending ? "Checking..." : "Continue"}
             </button>
@@ -159,7 +174,7 @@ export default function AuthLogin() {
               <span>Password</span>
               <input
                 type="password"
-                className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-base text-white placeholder:text-white/50 focus:border-emerald-400 focus:outline-none"
+                className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-base text-white placeholder:text-white/50 focus:border-lime-400 focus:outline-none"
                 placeholder="Enter a secure password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -171,7 +186,7 @@ export default function AuthLogin() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full rounded-lg bg-emerald-500 py-2 text-center text-base font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-lg bg-lime-400 py-2 text-center text-base font-semibold text-slate-950 transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isPending
                 ? "Please wait..."
