@@ -87,7 +87,7 @@ export default function NewsletterSignup() {
                 <div className="w-10 h-10 rounded-full bg-lime-400 flex items-center justify-center">
                   <Check className="w-6 h-6 text-neutral-950" />
                 </div>
-                <h4 className="text-xl font-semibold text-lime-400">You're all set!</h4>
+                <h4 className="text-xl font-semibold text-lime-400">You&apos;re all set!</h4>
               </div>
               <p className="text-neutral-300">
                 {message}
