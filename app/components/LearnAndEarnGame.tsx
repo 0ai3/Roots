@@ -12,6 +12,22 @@ type QuizQuestion = {
   explanation: string;
 };
 
+// Add type for API response
+type APIQuestionResponse = {
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+  points?: number;
+};
+
+type APIResponse = {
+  questions?: APIQuestionResponse[];
+  module?: LearnEarnModule;
+  warning?: string;
+  error?: string;
+};
+
 type LearnEarnModule = {
   country: string;
   summary: string;
@@ -47,6 +63,7 @@ export default function LearnAndEarnGame({
 
   const { addPoints } = useExperiencePoints({ initialPoints, initialUserId });
   const [countryInput, setCountryInput] = useState("");
+  const [quizType, setQuizType] = useState("cultural");
   const [moduleData, setModuleData] = useState<LearnEarnModule | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
@@ -106,21 +123,55 @@ export default function LearnAndEarnGame({
       const response = await fetch("/api/games/learn-earn", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ country: trimmedCountry }),
+        body: JSON.stringify({
+          country: trimmedCountry,
+          type: quizType,
+          difficulty: "medium",
+          questionCount: 10
+        }),
       });
 
-      const data = await response.json();
+      const data: APIResponse = await response.json();
+      
       if (!response.ok) {
         throw new Error(data?.error ?? "Unable to generate module.");
       }
 
-      if (!data?.module?.quiz || data.module.quiz.length === 0) {
-        throw new Error("Gemini returned an empty module. Try a different country.");
+      // Check if we got questions (new format) or module (old format)
+      if (data.questions && Array.isArray(data.questions)) {
+        // New format from updated API
+        const formattedModule: LearnEarnModule = {
+          country: trimmedCountry,
+          summary: `Cultural Quiz for ${trimmedCountry}`,
+          reading: [
+            `Welcome to the ${trimmedCountry} cultural quiz!`,
+            "Test your knowledge about this fascinating culture.",
+          ],
+          quiz: data.questions.map((q: APIQuestionResponse, index: number) => ({
+            id: `q${index + 1}`,
+            question: q.question,
+            options: q.options,
+            answer: q.correctAnswer,
+            explanation: q.explanation,
+          })),
+        };
+        setModuleData(formattedModule);
+        
+        // Show warning if using fallback
+        if (data.warning) {
+          console.warn(data.warning);
+        }
+      } else if (data.module) {
+        // Old format
+        setModuleData(data.module);
+      } else {
+        throw new Error("Invalid response format from API.");
       }
-
-      setModuleData(data.module);
-    } catch {
-      // ignore
+    } catch (error) {
+      console.error("Module generation error:", error);
+      setGenerateError(
+        error instanceof Error ? error.message : "Failed to generate module"
+      );
     } finally {
       setIsGenerating(false);
     }
@@ -235,6 +286,18 @@ export default function LearnAndEarnGame({
               placeholder="e.g., Peru, Thailand, Brazil"
               className={`flex-1 rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-amber-300 focus:outline-none ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
             />
+            <select
+              value={quizType}
+              onChange={(event) => setQuizType(event.target.value)}
+              className={`rounded-2xl border px-4 py-3 text-base focus:border-amber-300 focus:outline-none ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
+            >
+              <option value="cultural">Cultural</option>
+              <option value="geography">Geography</option>
+              <option value="tradition">Traditions</option>
+              <option value="language">Language</option>
+              <option value="history">History</option>
+              <option value="speed">Speed Quiz</option>
+            </select>
             <button
               type="submit"
               disabled={isGenerating}

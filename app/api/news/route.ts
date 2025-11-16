@@ -34,20 +34,6 @@ interface ImportantLaw {
   sourceUrl: string;
 }
 
-interface NewsData {
-  location: string;
-  date: string;
-  culturalNews: Array<{
-    title: string;
-    summary: string;
-    category: string;
-    date: string;
-    source: string;
-    url: string;
-  }>;
-  importantLaws: ImportantLaw[];
-  culturalTips: string[];
-}
 
 async function fetchNewsFromGemini(location: string, homeCountry: string) {
   const apiKey = process.env.GEMINI_API_KEY;

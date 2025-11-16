@@ -50,7 +50,7 @@ function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/80 via-neutral-950/70 to-neutral-950" />
+        <div className="absolute inset-0 bg-liniar-to-b from-neutral-950/80 via-neutral-950/70 to-neutral-950" />
       </div>
 
       <div className="relative z-10 w-full px-6 lg:px-12 py-20">
@@ -208,7 +208,6 @@ function FeaturedAttractionsSection({
     if (userId) {
       fetchFavorites();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const fetchFavorites = async () => {
@@ -423,7 +422,7 @@ function FeaturedAttractionsSection({
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/40 to-transparent" />
+                    <div className="absolute inset-0 bg-liniar-to-t from-neutral-900 via-neutral-900/40 to-transparent" />
 
                     <div className="absolute top-4 right-4 flex gap-2">
                       <button
@@ -533,7 +532,7 @@ export default function AttractionsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="rounded-3xl border p-12 bg-gradient-to-br from-neutral-900 to-neutral-800 border-neutral-700"
+                className="rounded-3xl border p-12 bg-liniar-to-br from-neutral-900 to-neutral-800 border-neutral-700"
               >
                 <Compass className="w-16 h-16 mx-auto mb-6 text-lime-400" />
                 <h2 className="text-3xl font-bold mb-4 text-white">
