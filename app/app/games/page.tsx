@@ -169,7 +169,7 @@ export default function GamesPage() {
                   title: "Cultural Quiz",
                   description: "Answer questions about world cultures and traditions",
                   difficulty: "Medium",
-                  points: "50-200",
+                  points: "5-10",
                   color: "lime",
                 },
                 {

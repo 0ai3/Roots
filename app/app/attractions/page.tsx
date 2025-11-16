@@ -62,8 +62,7 @@ function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
             className="max-w-3xl"
           >
             <h1 className="text-5xl lg:text-6xl font-bold mb-6 text-white">
-              Discover{" "}
-              <span className="text-lime-400">Global Attractions</span>
+              Discover <span className="text-lime-400">Global Attractions</span>
             </h1>
 
             <p className="text-lg mb-8 text-neutral-300">
@@ -120,9 +119,7 @@ function StatsSection() {
                     : "text-yellow-400"
                 }`}
               />
-              <p className="text-3xl font-bold mb-1 text-white">
-                {stat.value}
-              </p>
+              <p className="text-3xl font-bold mb-1 text-white">{stat.value}</p>
               <p className="text-sm text-neutral-400">{stat.label}</p>
             </motion.div>
           ))}
@@ -143,35 +140,43 @@ function FeaturedAttractionsSection({
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
   const [radius, setRadius] = useState(5000);
   const { userId } = useExperiencePoints();
 
-  const fetchAttractions = useCallback(async (lat: number, lon: number, rad: number) => {
-    setLoading(true);
-    setLocationError(null);
-    try {
-      const response = await fetch(
-        `/api/attractions/nearby?lat=${lat}&lon=${lon}&radius=${rad}`
-      );
-      const _data = await response.json();
-      if (response.ok) {
-        setAttractions(_data.attractions || []);
-        onLoadAttractions?.(_data.attractions?.length || 0);
-      } else {
-        const errorMsg = _data.details
-          ? `${_data.error} (${_data.details})`
-          : _data.error || "Failed to fetch attractions";
-        setLocationError(errorMsg);
-        console.error("API error:", _data);
+  const fetchAttractions = useCallback(
+    async (lat: number, lon: number, rad: number) => {
+      setLoading(true);
+      setLocationError(null);
+      try {
+        const response = await fetch(
+          `/api/attractions/nearby?lat=${lat}&lon=${lon}&radius=${rad}`
+        );
+        const _data = await response.json();
+        if (response.ok) {
+          setAttractions(_data.attractions || []);
+          onLoadAttractions?.(_data.attractions?.length || 0);
+        } else {
+          const errorMsg = _data.details
+            ? `${_data.error} (${_data.details})`
+            : _data.error || "Failed to fetch attractions";
+          setLocationError(errorMsg);
+          console.error("API error:", _data);
+        }
+      } catch (error) {
+        console.error("Fetch attractions error:", error);
+        setLocationError(
+          "Failed to load nearby attractions. Please check your internet connection."
+        );
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Fetch attractions error:", error);
-      setLocationError("Failed to load nearby attractions. Please check your internet connection.");
-    } finally {
-      setLoading(false);
-    }
-  }, [onLoadAttractions]);
+    },
+    [onLoadAttractions]
+  );
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -227,7 +232,7 @@ function FeaturedAttractionsSection({
 
   const toggleFavorite = async (attraction: Attraction) => {
     if (!userId) {
-      window.location.href = '/login';
+      window.location.href = "/login";
       return;
     }
 
@@ -249,7 +254,7 @@ function FeaturedAttractionsSection({
           });
         } else {
           if (response.status === 401) {
-            window.location.href = '/login';
+            window.location.href = "/login";
           }
         }
       } else {
@@ -263,7 +268,7 @@ function FeaturedAttractionsSection({
           setFavoriteIds((prev) => new Set(prev).add(attraction.id));
         } else {
           if (response.status === 401) {
-            window.location.href = '/login';
+            window.location.href = "/login";
           }
         }
       }
@@ -313,7 +318,8 @@ function FeaturedAttractionsSection({
             <div className="flex items-center justify-center gap-2 text-sm text-neutral-400">
               <MapPinned className="w-4 h-4" />
               <span>
-                Showing attractions near your location ({radius / 1000}km radius)
+                Showing attractions near your location ({radius / 1000}km
+                radius)
                 {userId && <span className="ml-2 text-xs">• Logged in ✓</span>}
               </span>
             </div>
@@ -343,7 +349,9 @@ function FeaturedAttractionsSection({
               onChange={(e) => setRadius(Number(e.target.value))}
               className="w-full h-2 rounded-lg appearance-none cursor-pointer"
               style={{
-                background: `linear-gradient(to right, #84cc16 0%, #84cc16 ${((radius - 1000) / 49000) * 100}%, #404040 ${((radius - 1000) / 49000) * 100}%, #404040 100%)`
+                background: `linear-gradient(to right, #84cc16 0%, #84cc16 ${
+                  ((radius - 1000) / 49000) * 100
+                }%, #404040 ${((radius - 1000) / 49000) * 100}%, #404040 100%)`,
               }}
             />
             <div className="flex justify-between text-xs mt-1">
@@ -379,11 +387,15 @@ function FeaturedAttractionsSection({
         {locationError && !loading && (
           <div className="text-center py-20 px-6 rounded-3xl border bg-red-950/20 border-red-900/30 text-red-400">
             <MapPin className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-semibold mb-2">Unable to Load Attractions</p>
+            <p className="text-lg font-semibold mb-2">
+              Unable to Load Attractions
+            </p>
             <p className="text-sm mb-4">{locationError}</p>
             {userLocation && (
               <button
-                onClick={() => fetchAttractions(userLocation.lat, userLocation.lon, radius)}
+                onClick={() =>
+                  fetchAttractions(userLocation.lat, userLocation.lon, radius)
+                }
                 className="px-6 py-2 rounded-full text-sm font-semibold transition bg-lime-400 text-neutral-950 hover:bg-lime-300"
               >
                 Try Again
@@ -472,8 +484,8 @@ function FeaturedAttractionsSection({
                         <div className="flex items-center gap-1">
                           <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                           <span className="text-sm font-semibold text-white">
-                            {typeof attraction.rating === 'number' 
-                              ? attraction.rating.toFixed(1) 
+                            {typeof attraction.rating === "number"
+                              ? attraction.rating.toFixed(1)
                               : attraction.rating}
                           </span>
                         </div>
@@ -509,9 +521,9 @@ export default function AttractionsPage() {
   const [showPlanner, setShowPlanner] = useState(false);
 
   const scrollToPlanningSection = () => {
-    const planningSection = document.getElementById('planning-cta-section');
+    const planningSection = document.getElementById("planning-cta-section");
     if (planningSection) {
-      planningSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      planningSection.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
 
