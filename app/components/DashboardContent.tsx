@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   MapPin,
@@ -8,8 +8,6 @@ import {
   Utensils,
   Building2,
   Palette,
-  Sun,
-  Moon,
 } from "lucide-react";
 import DashboardSidebar from "./DashboardSidebar";
 import { useI18n } from "../../app/hooks/useI18n";
@@ -64,7 +62,7 @@ export default function DashboardContent({ user }: Props) {
   );
 
   return (
-    <main className="bg-gradient-to-br from-neutral-950 to-neutral-900 text-white min-h-screen px-6 py-8 transition-all duration-500">
+    <main className="bg-liniar-to-br from-neutral-950 to-neutral-900 text-white min-h-screen px-6 py-8 transition-all duration-500">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 lg:flex-row">
         <DashboardSidebar />
 

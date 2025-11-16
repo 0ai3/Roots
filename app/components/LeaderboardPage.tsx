@@ -9,15 +9,12 @@ import {
   Medal,
   Crown,
   Star,
-  Sun,
-  Moon,
   ArrowRight,
-  TrendingUp,
   Users,
   Award,
   Zap,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useI18n } from "@/app/hooks/useI18n";
 import Image from "next/image";
 
