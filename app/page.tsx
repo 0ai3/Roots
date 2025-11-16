@@ -427,15 +427,17 @@ function FeaturesSection() {
                   <p className="mb-4 text-neutral-400 text-base leading-relaxed">
                     {feature.description}
                   </p>
-                  <div className="flex items-center gap-2 text-sm text-lime-400">
-                    <span>Explore more</span>
-                    <motion.span
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      →
-                    </motion.span>
-                  </div>
+                  <Link href="/login">
+                    <div className="flex items-center gap-2 text-sm text-lime-400 cursor-pointer">
+                      <span>Explore more</span>
+                      <motion.span
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        →
+                      </motion.span>
+                    </div>
+                  </Link>
                 </div>
               </div>
             </motion.div>
@@ -510,28 +512,30 @@ function ExploreSection() {
               whileHover={{ y: -8, scale: 1.02 }}
               className="group cursor-pointer relative"
             >
-              <div className="relative overflow-hidden rounded-3xl border border-neutral-800 bg-neutral-900 hover:border-lime-400/40 hover:shadow-lime-400/10 transition-all">
-                <div className="relative h-56 overflow-hidden">
-                  <ImageWithFallback
-                    src={region.image}
-                    alt={region.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-neutral-950 via-transparent to-transparent" />
+              <Link href="/login" aria-label={`Explore ${region.name}`}>
+                <div className="relative overflow-hidden rounded-3xl border border-neutral-800 bg-neutral-900 hover:border-lime-400/40 hover:shadow-lime-400/10 transition-all">
+                  <div className="relative h-56 overflow-hidden">
+                    <ImageWithFallback
+                      src={region.image}
+                      alt={region.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-neutral-950 via-transparent to-transparent" />
+                  </div>
+
+                  <div className="p-6 text-center">
+                    <h3 className="text-xl font-semibold text-white mb-1 font-serif">
+                      {region.name}
+                    </h3>
+                    <p className="text-sm text-neutral-400 tracking-wide">
+                      {region.traditions} traditions
+                    </p>
+                  </div>
                 </div>
 
-                <div className="p-6 text-center">
-                  <h3 className="text-xl font-semibold text-white mb-1 font-serif">
-                    {region.name}
-                  </h3>
-                  <p className="text-sm text-neutral-400 tracking-wide">
-                    {region.traditions} traditions
-                  </p>
-                </div>
-              </div>
-
-              {/* Subtle glow hover effect */}
-              <div className="absolute -inset-1 rounded-3xl opacity-0 group-hover:opacity-40 bg-linear-to-r from-lime-400 via-yellow-300 to-lime-400 blur-2xl transition-opacity duration-500" />
+                {/* Subtle glow hover effect */}
+                <div className="absolute -inset-1 rounded-3xl opacity-0 group-hover:opacity-40 bg-linear-to-r from-lime-400 via-yellow-300 to-lime-400 blur-2xl transition-opacity duration-500" />
+              </Link>
             </motion.div>
           ))}
         </div>

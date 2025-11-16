@@ -64,47 +64,93 @@ const FALLBACK_ATTRACTIONS = [
   },
 ];
 
-// Function to fetch real images from Wikimedia Commons
-async function fetchWikimediaImage(name: string, tags: Record<string, string | undefined>): Promise<string> {
+// Function to fetch real images using improved Wikipedia search + Wikimedia Commons
+async function fetchLocationImage(name: string, category: string, city?: string, tags?: Record<string, string>): Promise<string> {
+  // First priority: Direct Wikipedia tag from OSM
   try {
-    // Try to get image from Wikipedia if available
-    if (tags.wikipedia) {
-      const wikiTitle = tags.wikipedia.split(':')[1] || tags.wikipedia;
+    if (tags?.wikipedia) {
+      const wikiTitle = tags.wikipedia.includes(':') 
+        ? tags.wikipedia.split(':')[1] 
+        : tags.wikipedia;
+      
       const wikiApiUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(wikiTitle)}&prop=pageimages&format=json&pithumbsize=800&origin=*`;
       
-      const wikiResponse = await fetch(wikiApiUrl);
+      const wikiResponse = await fetch(wikiApiUrl, { signal: AbortSignal.timeout(2000) });
       if (wikiResponse.ok) {
         const wikiData = await wikiResponse.json();
         const pages = wikiData.query?.pages;
         const pageId = Object.keys(pages)[0];
         if (pages[pageId]?.thumbnail?.source) {
+          console.log(`✓ Wikipedia image for ${name}`);
           return pages[pageId].thumbnail.source;
         }
       }
     }
+  } catch (error) {
+    // Continue to next method
+  }
 
-    // Try Wikimedia Commons search
-    const searchQuery = encodeURIComponent(name);
-    const commonsUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch=${searchQuery}&gsrlimit=3&prop=imageinfo&iiprop=url&iiurlwidth=800&format=json&origin=*`;
+  // Second priority: Wikimedia Commons direct search
+  try {
+    const searchQuery = city && city !== 'Near you' 
+      ? `${name} ${city}` 
+      : name;
     
-    const commonsResponse = await fetch(commonsUrl);
+    const commonsUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch=${encodeURIComponent(searchQuery)}&gsrlimit=5&prop=imageinfo&iiprop=url&iiurlwidth=800&format=json&origin=*`;
+    
+    const commonsResponse = await fetch(commonsUrl, { signal: AbortSignal.timeout(3000) });
     if (commonsResponse.ok) {
       const commonsData = await commonsResponse.json();
       const pages = commonsData.query?.pages;
       if (pages) {
         const pageIds = Object.keys(pages);
         for (const pageId of pageIds) {
-          const imageUrl = pages[pageId]?.imageinfo?.[0]?.thumburl;
-          if (imageUrl && !imageUrl.includes('.svg')) {
+          const imageUrl = pages[pageId]?.imageinfo?.[0]?.thumburl || pages[pageId]?.imageinfo?.[0]?.url;
+          if (imageUrl && !imageUrl.toLowerCase().includes('.svg')) {
+            console.log(`✓ Wikimedia Commons image for ${name}`);
             return imageUrl;
           }
         }
       }
     }
   } catch (error) {
-    console.error('Error fetching Wikimedia image:', error);
+    // Continue to next method
+  }
+
+  // Third priority: Wikipedia search with location context
+  try {
+    const searchQuery = city && city !== 'Near you' 
+      ? `${name} ${city}` 
+      : name;
+    
+    const wikiSearchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchQuery)}&format=json&origin=*&srlimit=3`;
+    const wikiSearchResponse = await fetch(wikiSearchUrl, { signal: AbortSignal.timeout(2000) });
+    
+    if (wikiSearchResponse.ok) {
+      const wikiSearchData = await wikiSearchResponse.json();
+      const results = wikiSearchData.query?.search || [];
+      
+      for (const result of results) {
+        const wikiTitle = result.title;
+        const wikiApiUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(wikiTitle)}&prop=pageimages&format=json&pithumbsize=800&origin=*`;
+        
+        const wikiResponse = await fetch(wikiApiUrl, { signal: AbortSignal.timeout(2000) });
+        if (wikiResponse.ok) {
+          const wikiData = await wikiResponse.json();
+          const pages = wikiData.query?.pages;
+          const pageId = Object.keys(pages)[0];
+          if (pages[pageId]?.thumbnail?.source) {
+            console.log(`✓ Wikipedia search image for ${name}`);
+            return pages[pageId].thumbnail.source;
+          }
+        }
+      }
+    }
+  } catch (error) {
+    // Will use fallback
   }
   
+  console.log(`✗ No image found for ${name}, using fallback`);
   return '';
 }
 
@@ -192,12 +238,20 @@ export async function GET(request: NextRequest) {
         const data = await response.json();
         const elements = data.elements || [];
 
-        // Fetch images for all attractions in parallel
-        const attractionsWithImages = await Promise.all(
-          elements
-            .filter((el: OSMElement) => el.tags?.name && el.lat && el.lon)
-            .slice(0, 30)
-            .map(async (el: OSMElement) => {
+        // Process attractions with proper image fetching
+        const filteredElements = elements
+          .filter((el: OSMElement) => el.tags?.name && el.lat && el.lon)
+          .slice(0, 30);
+
+        // Fetch images in batches to avoid timeout
+        const batchSize = 10;
+        const attractionsWithImages: Attraction[] = [];
+
+        for (let i = 0; i < filteredElements.length; i += batchSize) {
+          const batch = filteredElements.slice(i, i + batchSize);
+          
+          const batchResults = await Promise.all(
+            batch.map(async (el: OSMElement) => {
               const tags = el.tags || {};
               const category = 
                 tags.tourism || 
@@ -205,9 +259,8 @@ export async function GET(request: NextRequest) {
                 tags.amenity || 
                 'Attraction';
 
-              // Fetch real image from Wikimedia
-              const realImage = await fetchWikimediaImage(tags.name, tags);
-              const fallbackImage = getImageForCategory(category);
+              const city = tags['addr:city'] || tags['addr:suburb'];
+              const categoryName = category.charAt(0).toUpperCase() + category.slice(1).replace(/_/g, ' ');
 
               // Calculate approximate distance
               const R = 6371e3; // Earth's radius in meters
@@ -221,15 +274,25 @@ export async function GET(request: NextRequest) {
               const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
               const distance = R * c;
 
+              // Try to fetch real image (with timeout)
+              let imageUrl = '';
+              try {
+                imageUrl = await fetchLocationImage(tags.name, categoryName, city, tags);
+              } catch (error) {
+                console.error(`Failed to fetch image for ${tags.name}:`, error);
+              }
+              
+              const fallbackImage = getImageForCategory(category);
+
               return {
                 id: `osm-${el.id}`,
                 title: tags.name,
-                location: `${tags['addr:city'] || tags['addr:suburb'] || 'Near you'}, ${tags['addr:country'] || ''}`.trim().replace(/,\s*$/, ''),
-                category: category.charAt(0).toUpperCase() + category.slice(1).replace(/_/g, ' '),
+                location: `${city || 'Near you'}, ${tags['addr:country'] || ''}`.trim().replace(/,\s*$/, ''),
+                category: categoryName,
                 rating: parseFloat((4.0 + Math.random() * 0.9).toFixed(1)),
                 visitors: distance < 1000 ? "100K+" : distance < 3000 ? "50K+" : "25K+",
-                image: realImage || fallbackImage,
-                description: tags.description || tags.wikipedia || `Historic and cultural ${category}`,
+                image: imageUrl || fallbackImage,
+                description: tags.description || tags.wikipedia || `Historic and cultural ${categoryName.toLowerCase()}`,
                 coordinates: {
                   lat: el.lat,
                   lon: el.lon,
@@ -237,7 +300,10 @@ export async function GET(request: NextRequest) {
                 distance: Math.round(distance),
               };
             })
-        );
+          );
+          
+          attractionsWithImages.push(...batchResults);
+        }
 
         const attractions = attractionsWithImages
           .sort((a: Attraction, b: Attraction) => a.distance - b.distance);
