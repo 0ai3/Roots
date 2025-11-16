@@ -827,98 +827,6 @@ function CTASection({ userId }: CTASectionProps) {
       {/* Subtle background glows */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[90%] h-[90%] bg-[radial-gradient(ellipse_at_center,rgba(132,204,22,0.1),transparent_70%)] blur-3xl" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-linear-to-tr from-yellow-400/10 to-transparent blur-3xl" />
-
-      <div className="max-w-7xl mx-auto relative">
-        {/* CTA Card */}
-        <div className="relative rounded-3xl overflow-hidden bg-linear-to-br from-neutral-900 to-neutral-800 border border-neutral-800 shadow-2xl shadow-lime-400/10">
-          {/* Decorative glows */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-linear-to-br from-lime-400/20 to-transparent rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-80 h-80 bg-linear-to-tr from-yellow-400/20 to-transparent rounded-full blur-3xl" />
-
-          {/* Content */}
-          <div className="relative px-8 lg:px-16 py-16 lg:py-20">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Left Side - Text & Email Input */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-              >
-                <h2 className="text-white text-4xl lg:text-5xl font-serif font-semibold mb-6 leading-tight">
-                  Start Your{" "}
-                  <span className="bg-linear-to-r from-lime-400 via-yellow-300 to-lime-400 bg-clip-text text-transparent">
-                    Cultural Journey
-                  </span>{" "}
-                  Today
-                </h2>
-
-                <p className="mb-10 text-lg text-neutral-300 leading-relaxed">
-                  Join thousands of explorers discovering the world’s diverse
-                  heritage of traditions, cuisine, and stories. Sign up for free
-                  and begin your adventure.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-4">
-                  {/* Email Input */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 px-5 py-4 rounded-full backdrop-blur-sm border bg-neutral-800/50 border-neutral-700 focus-within:border-lime-400/40 transition-colors">
-                      <Mail className="w-5 h-5 text-neutral-400" />
-                      <input
-                        type="email"
-                        placeholder="Enter your email"
-                        className="flex-1 bg-transparent outline-none placeholder:text-neutral-500 text-white text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  {/* CTA Button */}
-                  <motion.button
-                    className="px-8 py-4 rounded-full flex items-center justify-center gap-2 bg-linear-to-r from-lime-400 to-yellow-300 text-neutral-950 font-semibold shadow-md hover:shadow-lime-400/30 transition-transform"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Get Started
-                    <ArrowRight className="w-5 h-5" />
-                  </motion.button>
-                </div>
-              </motion.div>
-
-              {/* Right Side - Stats */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="grid grid-cols-2 gap-6"
-              >
-                {[
-                  { label: "Active Learners", value: "100K+" },
-                  { label: "Languages", value: "50+" },
-                  { label: "Recipes", value: "1,000+" },
-                  { label: "To Start", value: "Free" },
-                ].map((stat, i) => (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="p-6 rounded-2xl backdrop-blur-sm border bg-neutral-900/50 border-neutral-800 hover:border-lime-400/40 transition-all text-center"
-                  >
-                    <div className="text-2xl font-semibold text-lime-400 mb-2">
-                      {stat.value}
-                    </div>
-                    <div className="text-sm text-neutral-300 tracking-wide uppercase">
-                      {stat.label}
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </div>
-          </div>
-        </div>
-
         {/* Footer Links */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -946,7 +854,7 @@ function CTASection({ userId }: CTASectionProps) {
             Connecting cultures, preserving heritage.
           </p>
         </motion.div>
-      </div>
+      
     </section>
   );
 }

@@ -169,7 +169,7 @@ export default function NewsletterSignup() {
                     <Check className="w-8 h-8 text-neutral-950" />
                   </div>
                   <h4 className="text-2xl font-bold mb-2 text-white">
-                    You're all set! 🎉
+                    You&apos;re all set! 🎉
                   </h4>
                   <p className="text-neutral-300 leading-relaxed">{message}</p>
                 </div>

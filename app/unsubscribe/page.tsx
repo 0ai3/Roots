@@ -8,7 +8,7 @@ import Link from "next/link";
 
 function UnsubscribeContent() {
   const searchParams = useSearchParams();
-  const emailFromUrl = searchParams.get("email");
+  const emailFromUrl = searchParams?.get("email");
 
   const [email, setEmail] = useState(emailFromUrl || "");
   const [status, setStatus] = useState<
@@ -17,9 +17,11 @@ function UnsubscribeContent() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    if (emailFromUrl) {
-      setEmail(emailFromUrl);
+    if (!emailFromUrl) {
+      return;
     }
+    const frame = requestAnimationFrame(() => setEmail(emailFromUrl));
+    return () => cancelAnimationFrame(frame);
   }, [emailFromUrl]);
 
   const handleUnsubscribe = async (e: React.FormEvent) => {
