@@ -24,7 +24,6 @@ import {
 } from "lucide-react";
 
 const mainNavLinks = [
-  { label: "nav.dashboard", href: "/app/dashboard", icon: Home },
   { label: "nav.chat", href: "/app/chat", icon: MessageCircle },
   { label: "nav.map", href: "/app/map", icon: Map },
   { label: "nav.games", href: "/app/games", icon: Gamepad2 },
@@ -34,6 +33,7 @@ const mainNavLinks = [
 ];
 
 const profileDropdownLinks = [
+  { label: "nav.dashboard", href: "/app/dashboard", icon: Home },
   { label: "nav.logs", href: "/app/logs", icon: BookOpen },
   { label: "nav.leaderboard", href: "/app/leaderboard", icon: Trophy },
   { label: "nav.offers", href: "/app/offerts", icon: Gift },
@@ -361,7 +361,7 @@ export default function DashboardSidebar() {
             <div className="relative group">
               <button
                 className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-colors ${
-                  pathname === "/app/profile" || pathname === "/app/logs" || pathname === "/app/leaderboard" || pathname === "/app/offerts"
+                  pathname === "/app/profile" || pathname === "/app/logs" || pathname === "/app/leaderboard" || pathname === "/app/offerts" || pathname === "/app/dashboard"
                     ? isDarkLocal
                       ? "text-lime-400 bg-lime-400/10"
                       : "text-emerald-600 bg-emerald-50"
