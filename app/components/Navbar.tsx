@@ -7,10 +7,14 @@ import { Menu as MenuIcon, X as XIcon } from "lucide-react";
 
 import Link from "next/link";
 
-interface NavbarProps {scrollY?: number;}
+interface NavbarProps {
+  scrollY?: number;
+  userId?: string | null;
+}
 
 export default function Navbar(e: NavbarProps) {
   const { theme, mounted } = useTheme();
+  const userId = e.userId;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
 
@@ -31,10 +35,10 @@ export default function Navbar(e: NavbarProps) {
   const isScrolled = scrollPosition > 50;
 
   const navLinks = [
-    { name: "Traditions", href: "#traditions" },
-    { name: "Food & Culture", href: "#food" },
-    { name: "Museums", href: "#museums" },
-    { name: "Attractions", href: "#attractions" },
+    { name: "Traditions", href: userId ? "/app/map" : "/login" },
+    { name: "Food & Culture", href: userId ? "/app/map" : "/login" },
+    { name: "Museums", href: userId ? "/app/map" : "/login" },
+    { name: "Attractions", href: userId ? "/app/attractions" : "/login" },
   ];
 
   return (
@@ -94,7 +98,7 @@ export default function Navbar(e: NavbarProps) {
 
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
                 href={link.href}
                 className={`text-sm transition-colors ${
@@ -104,19 +108,21 @@ export default function Navbar(e: NavbarProps) {
                 }`}
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
-            <motion.button
-              className={`px-6 py-2.5 rounded-full transition-colors ${
-                currentTheme === "dark"
-                  ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
-                  : "bg-emerald-600 text-white hover:bg-emerald-700"
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Get Started
-            </motion.button>
+            <Link href={userId ? "/app/dashboard" : "/login"}>
+              <motion.button
+                className={`px-6 py-2.5 rounded-full transition-colors ${
+                  currentTheme === "dark"
+                    ? "bg-lime-400 text-neutral-950 hover:bg-lime-300"
+                    : "bg-emerald-600 text-white hover:bg-emerald-700"
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Get Started
+              </motion.button>
+            </Link>
           </div>
 
           <button
@@ -136,7 +142,7 @@ export default function Navbar(e: NavbarProps) {
             }`}
           >
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
                 href={link.href}
                 className={`block py-3 text-sm transition-colors ${
@@ -147,15 +153,17 @@ export default function Navbar(e: NavbarProps) {
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
-            <button
-              className={`w-full mt-4 px-6 py-2.5 rounded-full transition-colors ${
-                currentTheme === "dark" ? "bg-lime-400 text-neutral-950" : "bg-emerald-600 text-white"
-              }`}
-            >
-              Get Started
-            </button>
+            <Link href={userId ? "/app/dashboard" : "/login"}>
+              <button
+                className={`w-full mt-4 px-6 py-2.5 rounded-full transition-colors ${
+                  currentTheme === "dark" ? "bg-lime-400 text-neutral-950" : "bg-emerald-600 text-white"
+                }`}
+              >
+                Get Started
+              </button>
+            </Link>
           </motion.div>
         )}
       </div>

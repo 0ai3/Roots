@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  Mail,
   Compass,
   BookOpen,
   Share2,
@@ -12,18 +11,19 @@ import {
   Building2,
   Palette,
   MapPin,
-  Play,
 } from "lucide-react";
 import Navbar from "./components/Navbar";
 import Image from "next/image";
 import Link from "next/link";
 import { useI18n } from "./hooks/useI18n";
+import { useExperiencePoints } from "./hooks/useExperiencePoints";
 
 interface HeroSectionProps {
   scrollY: number;
+  userId: string | null;
 }
 
-function HeroSection({ scrollY }: HeroSectionProps) {
+function HeroSection({ scrollY, userId }: HeroSectionProps) {
   const { t } = useI18n();
   const parallaxY = scrollY * 0.5;
 
@@ -64,30 +64,23 @@ function HeroSection({ scrollY }: HeroSectionProps) {
               </p>
 
               <div className="flex flex-wrap gap-4">
-                <motion.button
-                  className="px-8 py-4 rounded-full flex items-center gap-2 bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {t("home.hero.cta.explore")}
-                  <ArrowRight className="w-5 h-5" />
-                </motion.button>
-
-                <motion.button
-                  className="px-8 py-4 rounded-full backdrop-blur-sm border bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50 transition-colors flex items-center gap-2"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Play className="w-5 h-5" />
-                  {t("home.hero.cta.video")}
-                </motion.button>
+                <Link href={userId ? "/app/dashboard" : "/login"}>
+                  <motion.button
+                    className="px-8 py-4 rounded-full flex items-center gap-2 bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {t("home.hero.cta.explore")}
+                    <ArrowRight className="w-5 h-5" />
+                  </motion.button>
+                </Link>
               </div>
 
               <div className="grid grid-cols-3 gap-6 mt-12">
                 {[
-                  { label: "Countries", value: "195+" },
-                  { label: "Traditions", value: "10K+" },
-                  { label: "Attractions", value: "5K+" },
+                  { label: t("home.hero.stats.countries"), value: "195+" },
+                  { label: t("home.hero.stats.traditions"), value: "10K+" },
+                  { label: t("home.hero.stats.attractions"), value: "5K+" },
                 ].map((stat) => (
                   <div key={stat.label}>
                     <div className="text-white text-2xl mb-1">
@@ -154,7 +147,11 @@ function HeroSection({ scrollY }: HeroSectionProps) {
   );
 }
 
-function FeaturesSection() {
+interface FeaturesSectionProps {
+  userId: string | null;
+}
+
+function FeaturesSection({ userId }: FeaturesSectionProps) {
   const features = [
     {
       icon: Utensils,
@@ -243,15 +240,17 @@ function FeaturesSection() {
                   <p className="mb-4 text-sm text-neutral-400">
                     {feature.description}
                   </p>
-                  <div className="flex items-center gap-2 text-sm text-lime-400">
-                    <span>Explore more</span>
-                    <motion.span
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      →
-                    </motion.span>
-                  </div>
+                  <Link href={userId ? "/app/dashboard" : "/login"}>
+                    <div className="flex items-center gap-2 text-sm text-lime-400 cursor-pointer">
+                      <span>Explore more</span>
+                      <motion.span
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        →
+                      </motion.span>
+                    </div>
+                  </Link>
                 </div>
               </div>
             </motion.div>
@@ -388,6 +387,7 @@ function ExploreSection() {
 
 interface InteractiveGardenProps {
   mousePosition: { x: number; y: number };
+  userId: string | null;
 }
 
 interface PlantItem {
@@ -400,7 +400,7 @@ interface PlantItem {
   culture: string;
 }
 
-function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
+function InteractiveGarden({ mousePosition, userId }: InteractiveGardenProps) {
   const [viewportSize, setViewportSize] = useState<{
     width: number;
     height: number;
@@ -653,20 +653,24 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
           className="relative z-20 mt-auto"
         >
           <div className="flex flex-col sm:flex-row gap-4 items-center">
-            <motion.button
-              className="px-8 py-4 rounded-full bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Join Community
-            </motion.button>
-            <motion.button
-              className="px-8 py-4 rounded-full backdrop-blur-sm border bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50 transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Learn More
-            </motion.button>
+            <Link href={userId ? "/app/dashboard" : "/login"}>
+              <motion.button
+                className="px-8 py-4 rounded-full bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Join Community
+              </motion.button>
+            </Link>
+            <Link href="/contact">
+              <motion.button
+                className="px-8 py-4 rounded-full backdrop-blur-sm border bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50 transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Learn More
+              </motion.button>
+            </Link>
           </div>
         </motion.div>
       </div>
@@ -676,7 +680,43 @@ function InteractiveGarden({ mousePosition }: InteractiveGardenProps) {
   );
 }
 
-function CTASection() {
+interface CTASectionProps {
+  userId: string | null;
+}
+
+function CTASection({ userId }: CTASectionProps) {
+  const [email, setEmail] = useState("");
+  const [sending, setSending] = useState(false);
+  const [result, setResult] = useState<null | "success" | "error">(null);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setSending(true);
+    setResult(null);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, type: "newsletter" }),
+      });
+
+      if (response.ok) {
+        setResult("success");
+        setEmail("");
+      } else {
+        setResult("error");
+      }
+    } catch (error) {
+      console.error("Newsletter error:", error);
+      setResult("error");
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <section className="relative py-24 px-6 lg:px-12 overflow-hidden bg-neutral-950">
       <div className="max-w-7xl mx-auto">
@@ -701,26 +741,41 @@ function CTASection() {
                   for free and begin your adventure.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4">
+                <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 px-5 py-4 rounded-full backdrop-blur-sm border bg-neutral-800/50 border-neutral-600">
-                      <Mail className="w-5 h-5 text-neutral-400" />
                       <input
                         type="email"
                         placeholder="Enter your email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={sending}
                         className="flex-1 bg-transparent outline-none placeholder:text-neutral-500 text-white"
+                        required
                       />
                     </div>
                   </div>
                   <motion.button
-                    className="px-8 py-4 rounded-full flex items-center justify-center gap-2 bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    type="submit"
+                    disabled={sending}
+                    className="px-8 py-4 rounded-full flex items-center justify-center gap-2 bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors disabled:opacity-50"
+                    whileHover={{ scale: sending ? 1 : 1.05 }}
+                    whileTap={{ scale: sending ? 1 : 0.95 }}
                   >
-                    Get Started
+                    {sending ? "Subscribing..." : "Subscribe"}
                     <ArrowRight className="w-5 h-5" />
                   </motion.button>
-                </div>
+                </form>
+                {result === "success" && (
+                  <p className="mt-4 text-sm text-lime-400">
+                    ✓ Thanks for subscribing! We&apos;ll be in touch.
+                  </p>
+                )}
+                {result === "error" && (
+                  <p className="mt-4 text-sm text-red-400">
+                    ✗ Something went wrong. Please try again.
+                  </p>
+                )}
               </motion.div>
 
               <motion.div
@@ -815,6 +870,7 @@ export default function App() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const { userId } = useExperiencePoints();
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -842,12 +898,12 @@ export default function App() {
 
   return (
     <div className="relative">
-      <Navbar scrollY={scrollY} />
-      <HeroSection scrollY={scrollY} />
-      <FeaturesSection />
+      <Navbar scrollY={scrollY} userId={userId} />
+      <HeroSection scrollY={scrollY} userId={userId} />
+      <FeaturesSection userId={userId} />
       <ExploreSection />
-      {mounted && <InteractiveGarden mousePosition={mousePosition} />}
-      <CTASection />
+      {mounted && <InteractiveGarden mousePosition={mousePosition} userId={userId} />}
+      <CTASection userId={userId} />
     </div>
   );
 }
