@@ -27,23 +27,27 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   // Load theme from localStorage after mount
   useEffect(() => {
-    setMounted(true);
-    try {
-      const saved = localStorage.getItem("theme") as Theme | null;
-      if (saved) {
-        setThemeState(saved);
-        if (saved === "dark") {
-          document.documentElement.classList.add("dark");
+    const frame = requestAnimationFrame(() => {
+      setMounted(true);
+      try {
+        const saved = localStorage.getItem("theme") as Theme | null;
+        if (saved) {
+          setThemeState(saved);
+          if (saved === "dark") {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
         } else {
-          document.documentElement.classList.remove("dark");
+          // Default to dark if no saved preference
+          document.documentElement.classList.add("dark");
         }
-      } else {
-        // Default to dark if no saved preference
+      } catch {
         document.documentElement.classList.add("dark");
       }
-    } catch {
-      document.documentElement.classList.add("dark");
-    }
+    });
+
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   const setTheme = useCallback((newTheme: Theme) => {
