@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
   MessageCircle,
   Globe2,
@@ -51,6 +52,7 @@ const conversationTopics = [
 ];
 
 function HeroSection() {
+  const router = useRouter(); // ensure router is defined inside this component
   return (
     <section className="relative min-h-[60vh] flex items-center overflow-hidden">
       <div className="absolute inset-0">
@@ -93,21 +95,13 @@ function HeroSection() {
 
             <div className="flex flex-wrap gap-4">
               <motion.button
+                onClick={() => router.push("/app/chat")}
                 className="px-8 py-4 rounded-full flex items-center gap-2 bg-lime-400 text-neutral-950 hover:bg-lime-300 transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <MessageCircle className="w-5 h-5" />
                 Start Chatting
-              </motion.button>
-
-              <motion.button
-                className="px-8 py-4 rounded-full backdrop-blur-sm border bg-neutral-800/50 text-white border-neutral-700 hover:bg-neutral-700/50 transition-colors flex items-center gap-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Sparkles className="w-5 h-5" />
-                View Examples
               </motion.button>
             </div>
           </motion.div>
@@ -304,6 +298,7 @@ function FeaturesSection() {
 
 export default function ChatPage() {
   const [showChat, setShowChat] = useState(false);
+  const router = useRouter();
 
   return (
     <DashboardPageLayout>
@@ -336,7 +331,7 @@ export default function ChatPage() {
                   cultures, traditions, and languages from around the world
                 </p>
                 <motion.button
-                  onClick={() => setShowChat(true)}
+                  onClick={() => router.push("/app/chat")}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="px-8 py-4 rounded-full flex items-center gap-2 mx-auto transition-colors bg-lime-400 text-neutral-950 hover:bg-lime-300"
