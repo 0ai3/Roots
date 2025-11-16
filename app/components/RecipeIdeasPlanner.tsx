@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import { useExperiencePoints } from "../hooks/useExperiencePoints";
 import { useI18n } from "../../app/hooks/useI18n";
 import { Loader2 } from "lucide-react";
@@ -103,7 +109,9 @@ function buildSpeechScript(detail: RecipeDetail) {
     parts.push(`Serves ${detail.servings}.`);
   }
   if (detail.prepTime || detail.cookTime) {
-    const timeBits = [detail.prepTime, detail.cookTime].filter(Boolean).join(" and ");
+    const timeBits = [detail.prepTime, detail.cookTime]
+      .filter(Boolean)
+      .join(" and ");
     if (timeBits) {
       parts.push(`Timing: ${timeBits}.`);
     }
@@ -170,26 +178,114 @@ function MessageBubble({
   }
 
   return (
-    <div className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+    <div
+      className={`flex ${
+        message.role === "user" ? "justify-end" : "justify-start"
+      }`}
+    >
       <div
         className={`max-w-2xl rounded-3xl border px-5 py-4 text-sm leading-relaxed shadow-md ${
           message.role === "user"
             ? "border-amber-400/50 bg-amber-400/10 text-amber-800 dark:text-amber-50"
-            : isDarkMode 
-              ? "border-white/10 bg-white/5 text-white/90"
-              : "border-slate-200 bg-slate-50 text-slate-900"
+            : isDarkMode
+            ? "border-white/10 bg-white/5 text-white/90"
+            : "border-slate-200 bg-slate-50 text-slate-900"
         }`}
       >
-        <p className={`mb-2 text-xs uppercase tracking-wide ${
-          message.role === "user" 
-            ? "text-amber-700 dark:text-amber-300" 
-            : isDarkMode 
-              ? "text-white/60" 
+        <p
+          className={`mb-2 text-xs uppercase tracking-wide ${
+            message.role === "user"
+              ? "text-amber-700 dark:text-amber-300"
+              : isDarkMode
+              ? "text-white/60"
               : "text-slate-600"
-        }`}>
-          {message.role === "user" ? t("planner.roles.you") : t("planner.roles.kitchen")}
+          }`}
+        >
+          {message.role === "user"
+            ? t("planner.roles.you")
+            : t("planner.roles.kitchen")}
         </p>
-        <p className="whitespace-pre-line">{message.content}</p>
+        <div className="prose prose-sm max-w-none dark:prose-invert">
+          {message.content.split("\n").map((line, idx) => {
+            // Handle bold text (**text** or __text__)
+            const boldRegex = /(\*\*|__)(.*?)\1/g;
+            const parts = [];
+            let lastIndex = 0;
+            let match;
+
+            while ((match = boldRegex.exec(line)) !== null) {
+              if (match.index > lastIndex) {
+                parts.push(
+                  <span key={`text-${idx}-${lastIndex}`}>
+                    {line.slice(lastIndex, match.index)}
+                  </span>
+                );
+              }
+              parts.push(
+                <strong
+                  key={`bold-${idx}-${match.index}`}
+                  className="font-semibold text-amber-600 dark:text-amber-400"
+                >
+                  {match[2]}
+                </strong>
+              );
+              lastIndex = match.index + match[0].length;
+            }
+
+            if (lastIndex < line.length) {
+              parts.push(
+                <span key={`text-${idx}-${lastIndex}`}>
+                  {line.slice(lastIndex)}
+                </span>
+              );
+            }
+
+            // Handle different line types
+            const trimmedLine = line.trim();
+            const cleanedLine = trimmedLine.replace(/^#+\s*/, "");
+            const cleanedParts = parts.length > 0 ? parts : cleanedLine;
+
+            if (trimmedLine.startsWith("##")) {
+              return (
+                <h3
+                  key={idx}
+                  className="mt-4 mb-2 text-base font-bold text-amber-700 dark:text-amber-300"
+                >
+                  {cleanedParts}
+                </h3>
+              );
+            } else if (trimmedLine.startsWith("#")) {
+              return (
+                <h2
+                  key={idx}
+                  className="mt-5 mb-3 text-lg font-bold text-amber-800 dark:text-amber-200"
+                >
+                  {cleanedParts}
+                </h2>
+              );
+            } else if (
+              trimmedLine.startsWith("-") ||
+              trimmedLine.startsWith("*") ||
+              trimmedLine.match(/^\d+\./)
+            ) {
+              return (
+                <li key={idx} className="ml-6 mb-1 list-disc">
+                  {parts.length > 0
+                    ? parts
+                    : trimmedLine.replace(/^[-*]\s*|\d+\.\s*/, "")}
+                </li>
+              );
+            } else if (trimmedLine === "") {
+              return <br key={idx} />;
+            } else {
+              return (
+                <p key={idx} className="mb-2">
+                  {parts.length > 0 ? parts : line}
+                </p>
+              );
+            }
+          })}
+        </div>
       </div>
     </div>
   );
@@ -222,33 +318,44 @@ function AssistantCard({
   const recipes = payload.recipes ?? [];
 
   return (
-    <div className={`rounded-3xl border p-6 shadow-xl ${
-      isDarkMode 
-        ? "border-amber-200/30 bg-slate-900/70" 
-        : "border-amber-300/30 bg-amber-50/50"
-    }`}>
+    <div
+      className={`rounded-3xl border p-6 shadow-xl ${
+        isDarkMode
+          ? "border-amber-200/30 bg-slate-900/70"
+          : "border-amber-300/30 bg-amber-50/50"
+      }`}
+    >
       {payload.intro && (
-        <p className={`text-base ${
-          isDarkMode ? "text-amber-50" : "text-slate-900"
-        }`}>
+        <p
+          className={`text-base ${
+            isDarkMode ? "text-amber-50" : "text-slate-900"
+          }`}
+        >
           {payload.intro}
         </p>
       )}
 
       {tips.length > 0 && (
         <div className="mt-6">
-          <p className={`text-xs uppercase tracking-wide ${
-            isDarkMode ? "text-white/40" : "text-slate-600"
-          }`}>
+          <p
+            className={`text-xs uppercase tracking-wide ${
+              isDarkMode ? "text-white/40" : "text-slate-600"
+            }`}
+          >
             {t("planner.recipes.chefTips")}
           </p>
-          <ul className={`mt-3 flex flex-wrap gap-2 text-sm ${
-            isDarkMode ? "text-white/70" : "text-slate-700"
-          }`}>
+          <ul
+            className={`mt-3 flex flex-wrap gap-2 text-sm ${
+              isDarkMode ? "text-white/70" : "text-slate-700"
+            }`}
+          >
             {tips.map((tip) => (
-              <li key={tip} className={`rounded-full border px-3 py-1 ${
-                isDarkMode ? "border-white/10" : "border-slate-300"
-              }`}>
+              <li
+                key={tip}
+                className={`rounded-full border px-3 py-1 ${
+                  isDarkMode ? "border-white/10" : "border-slate-300"
+                }`}
+              >
                 {tip}
               </li>
             ))}
@@ -259,92 +366,121 @@ function AssistantCard({
       {recipes.length > 0 && (
         <div className="mt-8 space-y-4">
           {recipes.map((recipe) => {
-            const detailState = recipeDetails[recipe.name] ?? { status: "idle" as const };
+            const detailState = recipeDetails[recipe.name] ?? {
+              status: "idle" as const,
+            };
             const isLoadingDetail = detailState.status === "loading";
-            const hasDetail = detailState.status === "ready" && Boolean(detailState.detail);
+            const hasDetail =
+              detailState.status === "ready" && Boolean(detailState.detail);
             const selectLabel = isLoadingDetail
               ? t("planner.recipes.detailLoading")
               : hasDetail
-                ? t("planner.recipes.detailSelected")
-                : t("planner.recipes.selectButton");
+              ? t("planner.recipes.detailSelected")
+              : t("planner.recipes.selectButton");
 
             return (
               <article
                 key={recipe.name}
                 className={`rounded-2xl border p-5 ${
-                  isDarkMode ? "border-white/10 bg-white/5" : "border-slate-200 bg-white"
+                  isDarkMode
+                    ? "border-white/10 bg-white/5"
+                    : "border-slate-200 bg-white"
                 }`}
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <p className={`text-lg font-semibold ${
-                      isDarkMode ? "text-white" : "text-slate-900"
-                    }`}>
+                    <p
+                      className={`text-lg font-semibold ${
+                        isDarkMode ? "text-white" : "text-slate-900"
+                      }`}
+                    >
                       {recipe.name}
                     </p>
                     {recipe.region && (
-                      <p className={`text-xs uppercase tracking-wide ${
-                        isDarkMode ? "text-white/40" : "text-slate-600"
-                      }`}>
+                      <p
+                        className={`text-xs uppercase tracking-wide ${
+                          isDarkMode ? "text-white/40" : "text-slate-600"
+                        }`}
+                      >
                         {recipe.region}
                       </p>
                     )}
                   </div>
                   {recipe.flavorProfile && (
-                    <span className={`rounded-full border px-3 py-1 text-xs ${
-                      isDarkMode 
-                        ? "border-amber-200/40 text-amber-100" 
-                        : "border-amber-400/40 text-amber-700"
-                    }`}>
+                    <span
+                      className={`rounded-full border px-3 py-1 text-xs ${
+                        isDarkMode
+                          ? "border-amber-200/40 text-amber-100"
+                          : "border-amber-400/40 text-amber-700"
+                      }`}
+                    >
                       {recipe.flavorProfile}
                     </span>
                   )}
                 </div>
 
                 {recipe.description && (
-                  <p className={`mt-3 text-sm ${
-                    isDarkMode ? "text-white/80" : "text-slate-700"
-                  }`}>
+                  <p
+                    className={`mt-3 text-sm ${
+                      isDarkMode ? "text-white/80" : "text-slate-700"
+                    }`}
+                  >
                     {recipe.description}
                   </p>
                 )}
 
-                {Array.isArray(recipe.keyIngredients) && recipe.keyIngredients.length > 0 && (
-                  <div className="mt-4">
-                    <p className={`text-xs uppercase tracking-wide ${
-                      isDarkMode ? "text-white/40" : "text-slate-600"
-                    }`}>
-                      {t("planner.recipes.keyIngredients")}
-                    </p>
-                    <ul className={`mt-2 flex flex-wrap gap-2 text-xs ${
-                      isDarkMode ? "text-white/70" : "text-slate-700"
-                    }`}>
-                      {recipe.keyIngredients.map((ingredient) => (
-                        <li key={ingredient} className={`rounded-full border px-3 py-1 ${
-                          isDarkMode ? "border-white/10" : "border-slate-300"
-                        }`}>
-                          {ingredient}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                {Array.isArray(recipe.keyIngredients) &&
+                  recipe.keyIngredients.length > 0 && (
+                    <div className="mt-4">
+                      <p
+                        className={`text-xs uppercase tracking-wide ${
+                          isDarkMode ? "text-white/40" : "text-slate-600"
+                        }`}
+                      >
+                        {t("planner.recipes.keyIngredients")}
+                      </p>
+                      <ul
+                        className={`mt-2 flex flex-wrap gap-2 text-xs ${
+                          isDarkMode ? "text-white/70" : "text-slate-700"
+                        }`}
+                      >
+                        {recipe.keyIngredients.map((ingredient) => (
+                          <li
+                            key={ingredient}
+                            className={`rounded-full border px-3 py-1 ${
+                              isDarkMode
+                                ? "border-white/10"
+                                : "border-slate-300"
+                            }`}
+                          >
+                            {ingredient}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                 {recipe.culturalNote && (
-                  <p className={`mt-3 text-sm ${
-                    isDarkMode ? "text-white/70" : "text-slate-600"
-                  }`}>
+                  <p
+                    className={`mt-3 text-sm ${
+                      isDarkMode ? "text-white/70" : "text-slate-600"
+                    }`}
+                  >
                     {recipe.culturalNote}
                   </p>
                 )}
 
-                <div className={`mt-3 flex flex-wrap items-center gap-3 text-xs ${
-                  isDarkMode ? "text-white/60" : "text-slate-600"
-                }`}>
+                <div
+                  className={`mt-3 flex flex-wrap items-center gap-3 text-xs ${
+                    isDarkMode ? "text-white/60" : "text-slate-600"
+                  }`}
+                >
                   {recipe.difficulty && (
-                    <span className={`rounded-full border px-3 py-1 ${
-                      isDarkMode ? "border-white/15" : "border-slate-300"
-                    }`}>
+                    <span
+                      className={`rounded-full border px-3 py-1 ${
+                        isDarkMode ? "border-white/15" : "border-slate-300"
+                      }`}
+                    >
                       {recipe.difficulty}
                     </span>
                   )}
@@ -371,8 +507,8 @@ function AssistantCard({
                           ? "border border-emerald-400/60 text-emerald-100"
                           : "border border-emerald-500/60 text-emerald-700"
                         : isDarkMode
-                          ? "border border-white/30 text-white hover:border-amber-200 hover:text-amber-100 disabled:opacity-60"
-                          : "border border-slate-400 text-slate-700 hover:border-amber-400 hover:text-amber-600 disabled:opacity-60"
+                        ? "border border-white/30 text-white hover:border-amber-200 hover:text-amber-100 disabled:opacity-60"
+                        : "border border-slate-400 text-slate-700 hover:border-amber-400 hover:text-amber-600 disabled:opacity-60"
                     }`}
                   >
                     {selectLabel}
@@ -380,11 +516,13 @@ function AssistantCard({
                 </div>
 
                 {detailState.status === "error" && detailState.error && (
-                  <p className={`mt-3 rounded-2xl border px-4 py-3 text-xs ${
-                    isDarkMode 
-                      ? "border-rose-400/40 bg-rose-400/10 text-rose-100" 
-                      : "border-rose-400/40 bg-rose-400/10 text-rose-700"
-                  }`}>
+                  <p
+                    className={`mt-3 rounded-2xl border px-4 py-3 text-xs ${
+                      isDarkMode
+                        ? "border-rose-400/40 bg-rose-400/10 text-rose-100"
+                        : "border-rose-400/40 bg-rose-400/10 text-rose-700"
+                    }`}
+                  >
                     {detailState.error}
                   </p>
                 )}
@@ -416,9 +554,11 @@ function AssistantCard({
       )}
 
       {payload.closing && (
-        <p className={`mt-6 text-sm ${
-          isDarkMode ? "text-white/70" : "text-slate-600"
-        }`}>
+        <p
+          className={`mt-6 text-sm ${
+            isDarkMode ? "text-white/70" : "text-slate-600"
+          }`}
+        >
           {payload.closing}
         </p>
       )}
@@ -459,34 +599,51 @@ function RecipeDetailPanel({
 }) {
   const ingredients = detail.ingredients?.filter(Boolean) ?? [];
   const steps = detail.steps?.filter(Boolean) ?? [];
-  const scrubberId = `audio-scrubber-${detail.name.replace(/\s+/g, "-").toLowerCase()}`;
+  const scrubberId = `audio-scrubber-${detail.name
+    .replace(/\s+/g, "-")
+    .toLowerCase()}`;
   const metaChips = [
-    detail.servings ? `${t("planner.recipes.servingsLabel")}: ${detail.servings}` : null,
-    detail.prepTime ? `${t("planner.recipes.prepTimeLabel")}: ${detail.prepTime}` : null,
-    detail.cookTime ? `${t("planner.recipes.cookTimeLabel")}: ${detail.cookTime}` : null,
+    detail.servings
+      ? `${t("planner.recipes.servingsLabel")}: ${detail.servings}`
+      : null,
+    detail.prepTime
+      ? `${t("planner.recipes.prepTimeLabel")}: ${detail.prepTime}`
+      : null,
+    detail.cookTime
+      ? `${t("planner.recipes.cookTimeLabel")}: ${detail.cookTime}`
+      : null,
   ].filter(Boolean) as string[];
 
   return (
-    <div className={`mt-5 space-y-4 rounded-2xl border p-4 text-sm ${
-      isDarkMode 
-        ? "border-amber-200/20 bg-slate-950/40 text-white/80" 
-        : "border-amber-300/20 bg-amber-50 text-slate-800"
-    }`}>
+    <div
+      className={`mt-5 space-y-4 rounded-2xl border p-4 text-sm ${
+        isDarkMode
+          ? "border-amber-200/20 bg-slate-950/40 text-white/80"
+          : "border-amber-300/20 bg-amber-50 text-slate-800"
+      }`}
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className={`text-xs uppercase tracking-wide ${
-            isDarkMode ? "text-white/50" : "text-slate-600"
-          }`}>
+          <p
+            className={`text-xs uppercase tracking-wide ${
+              isDarkMode ? "text-white/50" : "text-slate-600"
+            }`}
+          >
             {t("planner.recipes.instructionsTitle")}
           </p>
           {metaChips.length > 0 && (
-            <div className={`mt-2 flex flex-wrap gap-2 text-[11px] uppercase tracking-wide ${
-              isDarkMode ? "text-white/40" : "text-slate-500"
-            }`}>
+            <div
+              className={`mt-2 flex flex-wrap gap-2 text-[11px] uppercase tracking-wide ${
+                isDarkMode ? "text-white/40" : "text-slate-500"
+              }`}
+            >
               {metaChips.map((chip) => (
-                <span key={chip} className={`rounded-full border px-3 py-1 ${
-                  isDarkMode ? "border-white/15" : "border-slate-300"
-                }`}>
+                <span
+                  key={chip}
+                  className={`rounded-full border px-3 py-1 ${
+                    isDarkMode ? "border-white/15" : "border-slate-300"
+                  }`}
+                >
                   {chip}
                 </span>
               ))}
@@ -499,8 +656,8 @@ function RecipeDetailPanel({
             onClick={onListen}
             disabled={audioState.isGenerating}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition hover:border-amber-200 hover:text-white disabled:opacity-60 ${
-              isDarkMode 
-                ? "border-amber-300/60 text-amber-100 hover:border-amber-200" 
+              isDarkMode
+                ? "border-amber-300/60 text-amber-100 hover:border-amber-200"
                 : "border-amber-400/60 text-amber-700 hover:border-amber-500 hover:text-amber-800"
             }`}
           >
@@ -513,8 +670,8 @@ function RecipeDetailPanel({
             onClick={onPause}
             disabled={!audioState.hasAudio || !audioState.isPlaying}
             className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition hover:border-amber-200 disabled:opacity-50 ${
-              isDarkMode 
-                ? "border-white/20 text-white/80 hover:text-amber-100" 
+              isDarkMode
+                ? "border-white/20 text-white/80 hover:text-amber-100"
                 : "border-slate-400 text-slate-600 hover:border-amber-400 hover:text-amber-600"
             }`}
           >
@@ -535,14 +692,18 @@ function RecipeDetailPanel({
             max={audioState.duration || 0}
             step={0.1}
             value={
-              Number.isFinite(audioState.currentTime) ? audioState.currentTime : 0
+              Number.isFinite(audioState.currentTime)
+                ? audioState.currentTime
+                : 0
             }
             onChange={(event) => onSeek(Number(event.target.value))}
             className="w-full accent-amber-500 dark:accent-amber-300"
           />
-          <div className={`flex items-center justify-between text-[11px] uppercase tracking-wide ${
-            isDarkMode ? "text-white/50" : "text-slate-500"
-          }`}>
+          <div
+            className={`flex items-center justify-between text-[11px] uppercase tracking-wide ${
+              isDarkMode ? "text-white/50" : "text-slate-500"
+            }`}
+          >
             <span>{formatTime(audioState.currentTime)}</span>
             <span>{formatTime(audioState.duration)}</span>
           </div>
@@ -551,14 +712,18 @@ function RecipeDetailPanel({
 
       {ingredients.length > 0 && (
         <div>
-          <p className={`text-xs uppercase tracking-wide ${
-            isDarkMode ? "text-white/50" : "text-slate-600"
-          }`}>
+          <p
+            className={`text-xs uppercase tracking-wide ${
+              isDarkMode ? "text-white/50" : "text-slate-600"
+            }`}
+          >
             {t("planner.recipes.ingredientsTitle")}
           </p>
-          <ul className={`mt-2 list-disc space-y-1 pl-5 text-sm ${
-            isDarkMode ? "text-white/80" : "text-slate-700"
-          }`}>
+          <ul
+            className={`mt-2 list-disc space-y-1 pl-5 text-sm ${
+              isDarkMode ? "text-white/80" : "text-slate-700"
+            }`}
+          >
             {ingredients.map((ingredient, index) => (
               <li key={`${ingredient}-${index}`}>{ingredient}</li>
             ))}
@@ -568,14 +733,18 @@ function RecipeDetailPanel({
 
       {steps.length > 0 && (
         <div>
-          <p className={`text-xs uppercase tracking-wide ${
-            isDarkMode ? "text-white/50" : "text-slate-600"
-          }`}>
+          <p
+            className={`text-xs uppercase tracking-wide ${
+              isDarkMode ? "text-white/50" : "text-slate-600"
+            }`}
+          >
             {t("planner.recipes.stepsTitle")}
           </p>
-          <ol className={`mt-2 list-decimal space-y-2 pl-5 text-sm ${
-            isDarkMode ? "text-white/80" : "text-slate-700"
-          }`}>
+          <ol
+            className={`mt-2 list-decimal space-y-2 pl-5 text-sm ${
+              isDarkMode ? "text-white/80" : "text-slate-700"
+            }`}
+          >
             {steps.map((step, index) => (
               <li key={`${step}-${index}`}>{step}</li>
             ))}
@@ -584,9 +753,11 @@ function RecipeDetailPanel({
       )}
 
       {detail.tips && (
-        <p className={`text-xs ${
-          isDarkMode ? "text-white/60" : "text-slate-600"
-        }`}>
+        <p
+          className={`text-xs ${
+            isDarkMode ? "text-white/60" : "text-slate-600"
+          }`}
+        >
           <span className="font-semibold uppercase tracking-wide">
             {t("planner.recipes.detailTip")}{" "}
           </span>
@@ -594,9 +765,11 @@ function RecipeDetailPanel({
         </p>
       )}
 
-      <div className={`flex flex-wrap items-center justify-between gap-3 border-t pt-4 ${
-        isDarkMode ? "border-white/10" : "border-slate-200"
-      }`}>
+      <div
+        className={`flex flex-wrap items-center justify-between gap-3 border-t pt-4 ${
+          isDarkMode ? "border-white/10" : "border-slate-200"
+        }`}
+      >
         <button
           type="button"
           onClick={onLogRecipe}
@@ -607,20 +780,24 @@ function RecipeDetailPanel({
                 ? "border border-emerald-300/40 text-emerald-100"
                 : "border border-emerald-500/40 text-emerald-700"
               : isDarkMode
-                ? "border border-white/20 text-white hover:border-amber-200 hover:text-amber-100 disabled:opacity-60"
-                : "border border-slate-400 text-slate-700 hover:border-amber-400 hover:text-amber-600 disabled:opacity-60"
+              ? "border border-white/20 text-white hover:border-amber-200 hover:text-amber-100 disabled:opacity-60"
+              : "border border-slate-400 text-slate-700 hover:border-amber-400 hover:text-amber-600 disabled:opacity-60"
           }`}
         >
-          {isCooked ? t("planner.recipes.logged") : t("planner.recipes.cookedButton")}
+          {isCooked
+            ? t("planner.recipes.logged")
+            : t("planner.recipes.cookedButton")}
         </button>
       </div>
 
       {speechError && (
-        <p className={`rounded-2xl border px-4 py-3 text-xs ${
-          isDarkMode 
-            ? "border-rose-400/40 bg-rose-400/10 text-rose-100" 
-            : "border-rose-400/40 bg-rose-400/10 text-rose-700"
-        }`}>
+        <p
+          className={`rounded-2xl border px-4 py-3 text-xs ${
+            isDarkMode
+              ? "border-rose-400/40 bg-rose-400/10 text-rose-100"
+              : "border-rose-400/40 bg-rose-400/10 text-rose-700"
+          }`}
+        >
           {speechError}
         </p>
       )}
@@ -628,7 +805,10 @@ function RecipeDetailPanel({
   );
 }
 
-export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Props = {}) {
+export default function RecipeIdeasPlanner({
+  initialPoints,
+  initialUserId,
+}: Props = {}) {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Theme management
@@ -640,7 +820,9 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
           const dark = saved === "dark";
           setIsDarkMode(dark);
         } else {
-          const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const systemDark = window.matchMedia(
+            "(prefers-color-scheme: dark)"
+          ).matches;
           setIsDarkMode(systemDark);
         }
       } catch {
@@ -654,20 +836,23 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
       setIsDarkMode(event.detail.isDark);
     };
 
-    window.addEventListener('theme-change', handleThemeChange as EventListener);
-    
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    window.addEventListener("theme-change", handleThemeChange as EventListener);
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleSystemThemeChange = (e: MediaQueryListEvent) => {
       if (!localStorage.getItem("theme")) {
         setIsDarkMode(e.matches);
       }
     };
 
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    mediaQuery.addEventListener("change", handleSystemThemeChange);
 
     return () => {
-      window.removeEventListener('theme-change', handleThemeChange as EventListener);
-      mediaQuery.removeEventListener('change', handleSystemThemeChange);
+      window.removeEventListener(
+        "theme-change",
+        handleThemeChange as EventListener
+      );
+      mediaQuery.removeEventListener("change", handleSystemThemeChange);
     };
   }, []);
 
@@ -719,7 +904,10 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
   const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
   const audioCleanupRefs = useRef<Record<string, (() => void) | undefined>>({});
   const audioUrlRefs = useRef<Record<string, string | null>>({});
-  const { points, addPoints } = useExperiencePoints({ initialPoints, initialUserId });
+  const { points, addPoints } = useExperiencePoints({
+    initialPoints,
+    initialUserId,
+  });
   const updateRecipeDetailState = (
     name: string,
     updater: (prev: RecipeDetailState | undefined) => RecipeDetailState
@@ -730,7 +918,9 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
     }));
   };
 
-  const hasAssistantReply = messages.some((message) => message.role === "assistant");
+  const hasAssistantReply = messages.some(
+    (message) => message.role === "assistant"
+  );
   const showSetupForm = !hasAssistantReply;
 
   useEffect(() => {
@@ -915,7 +1105,9 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
         }));
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : t("planner.recipes.audioError");
+          error instanceof Error
+            ? error.message
+            : t("planner.recipes.audioError");
         updateRecipeDetailState(recipeName, (prev) => ({
           ...(prev ?? { status: "idle" as const }),
           speechError: message,
@@ -1001,12 +1193,15 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
     }
   }, []);
 
-  const handleSeekRecipeAudio = useCallback((recipeName: string, time: number) => {
-    const audio = audioRefs.current[recipeName];
-    if (audio) {
-      audio.currentTime = time;
-    }
-  }, []);
+  const handleSeekRecipeAudio = useCallback(
+    (recipeName: string, time: number) => {
+      const audio = audioRefs.current[recipeName];
+      if (audio) {
+        audio.currentTime = time;
+      }
+    },
+    []
+  );
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -1066,14 +1261,22 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
   };
 
   return (
-    <section className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}>
+    <section
+      className={`min-h-screen ${getBgColor()} ${getTextColor()} transition-colors duration-300`}
+    >
       <div className="space-y-6 p-6">
-        <div className={`rounded-3xl border p-5 ${getBorderColor()} ${getCardBg()}`}>
-          <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+        <div
+          className={`rounded-3xl border p-5 ${getBorderColor()} ${getCardBg()}`}
+        >
+          <p
+            className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}
+          >
             {t("dashboard.content.pointsLabel")}
           </p>
           <p className="text-3xl font-semibold">{points}</p>
-          <p className={`text-xs ${getMutedTextColor()}`}>{t("planner.common.pointsHint")}</p>
+          <p className={`text-xs ${getMutedTextColor()}`}>
+            {t("planner.common.pointsHint")}
+          </p>
         </div>
 
         {showSetupForm && (
@@ -1082,7 +1285,9 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
             className={`space-y-5 rounded-3xl border p-6 backdrop-blur ${getBorderColor()} ${getCardBg()}`}
           >
             <div className="grid gap-4 md:grid-cols-2">
-              <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+              <label
+                className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}
+              >
                 <span>{t("planner.recipes.countryLabel")}</span>
                 <input
                   type="text"
@@ -1093,7 +1298,9 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
                 />
               </label>
 
-              <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+              <label
+                className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}
+              >
                 <span>{t("planner.recipes.zoneLabel")}</span>
                 <input
                   type="text"
@@ -1105,7 +1312,9 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
               </label>
             </div>
 
-            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+            <label
+              className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}
+            >
               <span>{t("planner.recipes.focusLabel")}</span>
               <input
                 type="text"
@@ -1116,7 +1325,9 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
               />
             </label>
 
-            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+            <label
+              className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}
+            >
               <span>{t("planner.recipes.notesLabel")}</span>
               <textarea
                 value={notes}
@@ -1127,7 +1338,9 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
               />
             </label>
 
-            <label className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}>
+            <label
+              className={`space-y-2 text-sm font-medium ${getMutedTextColor()}`}
+            >
               <span>{t("planner.recipes.requestLabel")}</span>
               <textarea
                 value={input}
@@ -1144,15 +1357,23 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
                 disabled={!canSubmit}
                 className="flex items-center gap-2 rounded-full bg-amber-500 dark:bg-amber-400 px-6 py-2 text-sm font-semibold uppercase tracking-wide text-slate-950 transition hover:bg-amber-600 dark:hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isLoading ? t("planner.recipes.loading") : t("planner.recipes.submit")}
+                {isLoading
+                  ? t("planner.recipes.loading")
+                  : t("planner.recipes.submit")}
               </button>
-              <p className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+              <p
+                className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}
+              >
                 {t("common.poweredByGemini")}
               </p>
             </div>
 
-            <div className={`flex flex-wrap gap-2 text-sm ${getMutedTextColor()}`}>
-              <div className={`w-full text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+            <div
+              className={`flex flex-wrap gap-2 text-sm ${getMutedTextColor()}`}
+            >
+              <div
+                className={`w-full text-xs uppercase tracking-wide ${getMutedTextColor()}`}
+              >
                 {t("planner.common.sampleLabel")}
               </div>
               {samplePrompts.map((prompt) => (
@@ -1173,11 +1394,13 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
             </div>
 
             {error && (
-              <p className={`rounded-2xl border px-4 py-3 text-sm ${
-                isDarkMode 
-                  ? "border-rose-400/40 bg-rose-400/10 text-rose-100" 
-                  : "border-rose-400/40 bg-rose-400/10 text-rose-700"
-              }`}>
+              <p
+                className={`rounded-2xl border px-4 py-3 text-sm ${
+                  isDarkMode
+                    ? "border-rose-400/40 bg-rose-400/10 text-rose-100"
+                    : "border-rose-400/40 bg-rose-400/10 text-rose-700"
+                }`}
+              >
                 {error}
               </p>
             )}
@@ -1187,15 +1410,19 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
         <div
           className={`rounded-3xl border p-6 ${
             showSetupForm
-              ? isDarkMode ? "bg-slate-950/50" : "bg-slate-100"
+              ? isDarkMode
+                ? "bg-slate-950/50"
+                : "bg-slate-100"
               : isDarkMode
-                ? "bg-[radial-gradient(circle_at_top,rgba(251,191,36,0.15),rgba(2,6,23,0.95))]"
-                : "bg-[radial-gradient(circle_at_top,rgba(251,191,36,0.1),rgba(255,255,255,0.95))]"
+              ? "bg-[radial-gradient(circle_at_top,rgba(251,191,36,0.15),rgba(2,6,23,0.95))]"
+              : "bg-[radial-gradient(circle_at_top,rgba(251,191,36,0.1),rgba(255,255,255,0.95))]"
           } ${getBorderColor()}`}
         >
           <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className={`text-sm font-semibold uppercase tracking-wide ${getMutedTextColor()}`}>
+              <p
+                className={`text-sm font-semibold uppercase tracking-wide ${getMutedTextColor()}`}
+              >
                 {showSetupForm
                   ? t("planner.recipes.conversationTitle")
                   : t("planner.recipes.kitchenTitle")}
@@ -1207,22 +1434,30 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
               </p>
             </div>
             {hasAssistantReply && (
-              <div className={`flex flex-wrap items-center gap-3 text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
-                <span className={`rounded-full border px-3 py-1 ${
-                  isDarkMode ? "border-white/20" : "border-slate-300"
-                }`}>
+              <div
+                className={`flex flex-wrap items-center gap-3 text-xs uppercase tracking-wide ${getMutedTextColor()}`}
+              >
+                <span
+                  className={`rounded-full border px-3 py-1 ${
+                    isDarkMode ? "border-white/20" : "border-slate-300"
+                  }`}
+                >
                   {country || t("planner.recipes.countrySet")}
                 </span>
-                <span className={`rounded-full border px-3 py-1 ${
-                  isDarkMode ? "border-white/20" : "border-slate-300"
-                }`}>
+                <span
+                  className={`rounded-full border px-3 py-1 ${
+                    isDarkMode ? "border-white/20" : "border-slate-300"
+                  }`}
+                >
                   {zone || t("planner.recipes.zoneSet")}
                 </span>
                 <button
                   type="button"
                   onClick={handleReset}
                   className={`rounded-full border px-3 py-1 transition hover:border-rose-500 dark:hover:border-rose-300 hover:text-rose-600 dark:hover:text-white ${
-                    isDarkMode ? "border-white/20 text-white/80" : "border-slate-400 text-slate-600"
+                    isDarkMode
+                      ? "border-white/20 text-white/80"
+                      : "border-slate-400 text-slate-600"
                   }`}
                 >
                   {t("planner.recipes.reset")}
@@ -1255,22 +1490,30 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
                 />
               ))}
               {isLoading && (
-                <div className={`flex items-center gap-3 rounded-3xl border px-5 py-4 ${
-                  isDarkMode ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-100"
-                }`}>
+                <div
+                  className={`flex items-center gap-3 rounded-3xl border px-5 py-4 ${
+                    isDarkMode
+                      ? "border-white/10 bg-white/5"
+                      : "border-slate-200 bg-slate-100"
+                  }`}
+                >
                   <Loader2 className="h-5 w-5 animate-spin text-amber-500 dark:text-amber-400" />
-                  <p className={`text-sm ${getMutedTextColor()}`}>Roots Test Kitchen is thinking...</p>
+                  <p className={`text-sm ${getMutedTextColor()}`}>
+                    Roots Test Kitchen is thinking...
+                  </p>
                 </div>
               )}
             </div>
           )}
 
           {error && !showSetupForm && (
-            <p className={`mt-4 rounded-2xl border px-4 py-3 text-sm ${
-              isDarkMode 
-                ? "border-rose-400/40 bg-rose-400/10 text-rose-100" 
-                : "border-rose-400/40 bg-rose-400/10 text-rose-700"
-            }`}>
+            <p
+              className={`mt-4 rounded-2xl border px-4 py-3 text-sm ${
+                isDarkMode
+                  ? "border-rose-400/40 bg-rose-400/10 text-rose-100"
+                  : "border-rose-400/40 bg-rose-400/10 text-rose-700"
+              }`}
+            >
               {error}
             </p>
           )}
@@ -1288,14 +1531,18 @@ export default function RecipeIdeasPlanner({ initialPoints, initialUserId }: Pro
                 disabled={isLoading}
                 className={`w-full rounded-2xl border px-4 py-3 text-base placeholder:${getMutedTextColor()} focus:border-amber-500 dark:focus:border-amber-300 focus:outline-none ${getBorderColor()} ${getInputBg()} ${getTextColor()}`}
               />
-              <div className={`flex items-center justify-between text-xs uppercase tracking-wide ${getMutedTextColor()}`}>
+              <div
+                className={`flex items-center justify-between text-xs uppercase tracking-wide ${getMutedTextColor()}`}
+              >
                 <span>{t("common.poweredByGemini")}</span>
                 <button
                   type="submit"
                   disabled={!canSubmit}
                   className="flex items-center gap-2 rounded-full bg-amber-500 dark:bg-amber-400 px-5 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-600 dark:hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {isLoading ? t("planner.recipes.replyLoading") : t("planner.recipes.replySubmit")}
+                  {isLoading
+                    ? t("planner.recipes.replyLoading")
+                    : t("planner.recipes.replySubmit")}
                 </button>
               </div>
             </form>
