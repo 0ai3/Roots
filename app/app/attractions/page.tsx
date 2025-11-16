@@ -50,7 +50,7 @@ function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-liniar-to-b from-neutral-950/80 via-neutral-950/70 to-neutral-950" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/90 via-black/80 to-neutral-950" />
       </div>
 
       <div className="relative z-10 w-full px-6 lg:px-12 py-20">
