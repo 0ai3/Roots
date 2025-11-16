@@ -104,6 +104,7 @@ function FeaturesSectionWithAuth({ userId }: FeaturesSectionProps) {
                   <ImageWithFallback
                     src={feature.image}
                     alt={feature.title}
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-neutral-900 via-neutral-900/40 to-transparent" />
@@ -164,6 +165,7 @@ type ImageWithFallbackProps = {
   className?: string;
   width?: number;
   height?: number;
+  sizes?: string;
 };
 
 function ImageWithFallback({
@@ -172,9 +174,18 @@ function ImageWithFallback({
   className,
   width,
   height,
+  sizes,
 }: ImageWithFallbackProps) {
   if (!width || !height) {
-    return <Image src={src} alt={alt} fill className={className} />;
+    return (
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes={sizes ?? "100vw"}
+        className={className}
+      />
+    );
   }
 
   return (
@@ -183,6 +194,7 @@ function ImageWithFallback({
       alt={alt}
       width={width}
       height={height}
+      sizes={sizes}
       className={className}
     />
   );
@@ -197,6 +209,7 @@ function HeroSection({ scrollY, userId }: HeroSectionProps) {
         <ImageWithFallback
           src="https://images.unsplash.com/photo-1588437385796-9d13c337040b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3NzJTIwbmF0dXJlJTIwbWFjcm98ZW58MXx8fHwxNzYyODg3MzUyfDA&ixlib=rb-4.1.0&q=80&w=1080"
           alt="Nature background"
+          sizes="100vw"
           className="w-full h-[120vh] object-cover"
         />
         <div className="absolute inset-0 bg-linear-to-b from-neutral-950/70 via-neutral-950/80 to-neutral-950" />
@@ -272,11 +285,12 @@ function HeroSection({ scrollY, userId }: HeroSectionProps) {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative hidden lg:block"
             >
-              <div className="relative">
+              <div className="relative h-[500px]">
                 <div className="absolute -inset-4 rounded-3xl blur-2xl opacity-30 bg-lime-400" />
                 <ImageWithFallback
                   src="https://images.unsplash.com/photo-1761124739933-009df5603fbf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
                   alt="Cultural celebration"
+                  sizes="(max-width: 1024px) 100vw, 45vw"
                   className="relative rounded-3xl shadow-2xl w-full h-[500px] object-cover"
                 />
 

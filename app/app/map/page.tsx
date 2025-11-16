@@ -34,6 +34,7 @@ export default function MapPage() {
                 src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2074"
                 alt="World map"
                 fill
+                sizes="100vw"
                 className="object-cover"
                 priority
               />

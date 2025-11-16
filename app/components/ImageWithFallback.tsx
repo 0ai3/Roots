@@ -7,9 +7,15 @@ type Props = {
   className?: string;
   width?: number | string;
   height?: number | string;
+  sizes?: string;
 };
 
-export function ImageWithFallback({ src, alt = "", className }: Props) {
+export function ImageWithFallback({
+  src,
+  alt = "",
+  className,
+  sizes,
+}: Props) {
   const [currentSrc, setCurrentSrc] = React.useState(src);
 
   const handleError = () => {
@@ -22,6 +28,7 @@ export function ImageWithFallback({ src, alt = "", className }: Props) {
       src={currentSrc}
       alt={alt}
       fill
+      sizes={sizes ?? "100vw"}
       className={className}
       onError={handleError}
     />

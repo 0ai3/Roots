@@ -74,6 +74,26 @@ type SavedAttractionResponse = {
   attractions: SavedAttraction[];
 };
 
+type FavoriteAttraction = {
+  attractionId: string;
+  attraction: {
+    id: string;
+    title?: string;
+    location?: string;
+    category?: string;
+    description?: string;
+    coordinates?: {
+      lat: number;
+      lon: number;
+    };
+  };
+  createdAt?: string;
+};
+
+type FavoriteAttractionResponse = {
+  favorites: FavoriteAttraction[];
+};
+
 const savedAttractionFetcher = async (url: string) => {
   const response = await fetch(url);
   const data = (await response.json().catch(() => null)) ?? {};
@@ -84,6 +104,42 @@ const savedAttractionFetcher = async (url: string) => {
   return data as SavedAttractionResponse;
 };
 
+const favoritesFetcher = async (url: string) => {
+  const response = await fetch(url);
+  const data = (await response.json().catch(() => null)) ?? {};
+  if (!response.ok) {
+    const message = (data as { error?: string })?.error;
+    throw new Error(message ?? "Unable to load favorite attractions.");
+  }
+  return data as FavoriteAttractionResponse;
+};
+
+function convertFavoriteToSaved(attraction: FavoriteAttraction): SavedAttraction | null {
+  const coords = attraction.attraction?.coordinates;
+  const latitude = typeof coords?.lat === "number" ? coords.lat : null;
+  const longitude = typeof coords?.lon === "number" ? coords.lon : null;
+  if (latitude === null || longitude === null) {
+    return null;
+  }
+
+  const title = attraction.attraction?.title?.trim();
+  const location = attraction.attraction?.location?.trim();
+  const label = title || location || "Favorite destination";
+  const description = attraction.attraction?.description ?? location;
+  const category = attraction.attraction?.category?.toLowerCase();
+
+  return {
+    id: `favorite-${attraction.attractionId || attraction.attraction.id}`,
+    label,
+    latitude,
+    longitude,
+    createdAt: attraction.createdAt ?? new Date().toISOString(),
+    source: "favorites",
+    category,
+    description,
+  };
+}
+
 type MapStatus = {
   message: string;
   tone: "info" | "success" | "error";
@@ -91,6 +147,12 @@ type MapStatus = {
 
 const FALLBACK_CENTER: CoordinateTuple = [40.7128, -74.006];
 const DEFAULT_HEIGHT = "600px";
+const MAP_CONTAINER_ID = "live-location-map";
+
+type LeafletDomElement = HTMLElement & {
+  _leaflet_id?: string | number;
+  __leaflet_id?: string | number;
+};
 const PROFILE_OPTIONS: Array<{ label: string; value: RouteProfile }> = [
   { label: "Walking", value: "walking" },
   { label: "Cycling", value: "cycling" },
@@ -206,6 +268,7 @@ export default function LiveLocationMap({
   });
   const [isRouting, setIsRouting] = useState(false);
   const [followMode, setFollowMode] = useState(true);
+  const [isMapReady, setIsMapReady] = useState(false);
   const mapRef = useRef<LeafletMap | null>(null);
   const watchIdRef = useRef<number | null>(null);
   const followModeRef = useRef(followMode);
@@ -220,10 +283,41 @@ export default function LiveLocationMap({
     savedAttractionFetcher,
     { revalidateOnFocus: false }
   );
-  const savedAttractions = useMemo(
+  const {
+    data: favoritesData,
+    error: favoritesError,
+    isLoading: favoritesLoading,
+  } = useSWR<FavoriteAttractionResponse>(
+    "/api/attractions/favorites",
+    favoritesFetcher,
+    { revalidateOnFocus: false }
+  );
+  const profileSavedAttractions = useMemo(
     () => savedData?.attractions ?? [],
     [savedData]
   );
+  const favoriteSavedAttractions = useMemo(
+    () =>
+      (favoritesData?.favorites ?? [])
+        .map(convertFavoriteToSaved)
+        .filter((item): item is SavedAttraction => item !== null),
+    [favoritesData]
+  );
+  const savedAttractions = useMemo(() => {
+    if (favoriteSavedAttractions.length === 0) {
+      return profileSavedAttractions;
+    }
+    const merged = [...profileSavedAttractions];
+    const existingIds = new Set(profileSavedAttractions.map((item) => item.id));
+    for (const favorite of favoriteSavedAttractions) {
+      if (!existingIds.has(favorite.id)) {
+        merged.push(favorite);
+      }
+    }
+    return merged;
+  }, [favoriteSavedAttractions, profileSavedAttractions]);
+  const savedLoadingState = savedLoading || favoritesLoading;
+  const savedErrorState = savedError ?? favoritesError;
     const getCategoryIcon = useCallback(
       (attraction: SavedAttraction) => {
         const key = deriveCategory(
@@ -494,6 +588,38 @@ export default function LiveLocationMap({
     ? formatCoordinate(selectedDestination)
     : "--";
 
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setIsMapReady(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    if (!isMapReady) {
+      return;
+    }
+    const container = document.getElementById(MAP_CONTAINER_ID) as LeafletDomElement | null;
+    if (container && (container.__leaflet_id || container._leaflet_id)) {
+      delete container.__leaflet_id;
+      delete container._leaflet_id;
+      container.replaceChildren();
+    }
+  }, [isMapReady]);
+
+  useEffect(() => {
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+      const container = document.getElementById(MAP_CONTAINER_ID) as LeafletDomElement | null;
+      if (container) {
+        delete container._leaflet_id;
+        delete container.__leaflet_id;
+        container.replaceChildren();
+      }
+    };
+  }, []);
+
   return (
     <section className="space-y-6">
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
@@ -561,9 +687,9 @@ export default function LiveLocationMap({
                 className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-base text-white focus:border-emerald-300 focus:outline-none"
               >
                 <option value="" className="bg-slate-900 text-white/70">
-                  {savedLoading
+                  {savedLoadingState
                     ? "Loading saved attractions..."
-                    : savedError
+                    : savedErrorState
                     ? "Unable to load attractions"
                     : savedAttractions.length === 0
                     ? "No saved attractions yet"
@@ -588,9 +714,9 @@ export default function LiveLocationMap({
                   );
                 })}
               </select>
-              {savedError && (
+              {savedErrorState && (
                 <p className="text-xs text-rose-200">
-                  {savedError.message || "Sign in to sync saved attractions."}
+                  {savedErrorState.message || "Sign in to sync saved attractions."}
                 </p>
               )}
               <p className="text-xs text-white/60">
@@ -697,51 +823,62 @@ export default function LiveLocationMap({
       )}
 
       <div className="overflow-hidden rounded-3xl border border-white/10">
-        <MapContainer
-          center={mapCenter}
-          zoom={defaultZoom}
-          scrollWheelZoom
-          style={{ height, width: "100%" }}
-          ref={(mapInstance: LeafletMap | null) => {
-            mapRef.current = mapInstance;
-          }}
-        >
-          <TileLayer
-            attribution='
-              &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
-              contributors
-            '
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-
-          {userLocation && (
-            <Marker position={userLocation} title="You are here" />
-          )}
-
-          {savedAttractions.map((attraction) => (
-            <Marker
-              key={attraction.id}
-              position={[attraction.latitude, attraction.longitude]}
-              icon={getCategoryIcon(attraction)}
-              eventHandlers={{
-                click: () => {
-                  void handleSavedMarkerClick(attraction);
-                },
-              }}
+        {isMapReady ? (
+          <MapContainer
+            id={MAP_CONTAINER_ID}
+            key="live-map"
+            center={mapCenter}
+            zoom={defaultZoom}
+            scrollWheelZoom
+            style={{ height, width: "100%" }}
+            ref={(mapInstance: LeafletMap | null) => {
+              mapRef.current = mapInstance;
+            }}
+          >
+            <TileLayer
+              attribution='
+                &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
+                contributors
+              '
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-          ))}
 
-          {selectedDestination && (
-            <Marker position={selectedDestination} icon={destinationIcon} />
-          )}
+            {userLocation && (
+              <Marker position={userLocation} title="You are here" />
+            )}
 
-          {pendingCandidate && (
-            <Marker position={pendingCandidate} icon={pendingMarkerIcon} />
-          )}
+            {savedAttractions.map((attraction) => (
+              <Marker
+                key={attraction.id}
+                position={[attraction.latitude, attraction.longitude]}
+                icon={getCategoryIcon(attraction)}
+                eventHandlers={{
+                  click: () => {
+                    void handleSavedMarkerClick(attraction);
+                  },
+                }}
+              />
+            ))}
 
-          <RouteLine coordinates={routeInfo?.coordinates ?? []} />
-          <MapClickHandler onSelectDestination={handleMapDestination} />
-        </MapContainer>
+            {selectedDestination && (
+              <Marker position={selectedDestination} icon={destinationIcon} />
+            )}
+
+            {pendingCandidate && (
+              <Marker position={pendingCandidate} icon={pendingMarkerIcon} />
+            )}
+
+            <RouteLine coordinates={routeInfo?.coordinates ?? []} />
+            <MapClickHandler onSelectDestination={handleMapDestination} />
+          </MapContainer>
+        ) : (
+          <div
+            style={{ height, width: "100%" }}
+            className="flex items-center justify-center bg-slate-900/60 text-sm text-white/70"
+          >
+            Preparing map experience...
+          </div>
+        )}
       </div>
 
       {routeInfo && (
