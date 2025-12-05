@@ -53,7 +53,9 @@ export default function MapPage() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6"
               >
                 <MapPin className="w-4 h-4 text-lime-400" />
-                <span className="text-sm font-medium">{t("map.hero.badge")}</span>
+                <span className="text-sm font-medium">
+                  {t("map.hero.badge")}
+                </span>
               </motion.div>
 
               <motion.h1
@@ -62,7 +64,10 @@ export default function MapPage() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-5xl md:text-6xl font-bold mb-6 leading-tight"
               >
-                {t("map.hero.title")} <span className="text-lime-400">{t("map.hero.titleHighlight")}</span>
+                {t("map.hero.title")}{" "}
+                <span className="text-lime-400">
+                  {t("map.hero.titleHighlight")}
+                </span>
               </motion.h1>
 
               <motion.p

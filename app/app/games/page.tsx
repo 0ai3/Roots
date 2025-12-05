@@ -78,7 +78,9 @@ export default function GamesPage() {
               className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-white"
             >
               {t("games.hero.title")}{" "}
-              <span className="text-lime-400">{t("games.hero.titleHighlight")}</span>
+              <span className="text-lime-400">
+                {t("games.hero.titleHighlight")}
+              </span>
             </motion.h1>
 
             <motion.p
@@ -125,10 +127,30 @@ export default function GamesPage() {
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {[
-                { label: t("games.stats.activeGames"), value: "50+", icon: Gamepad2, color: "lime" },
-                { label: t("games.stats.players"), value: "25K+", icon: Users, color: "blue" },
-                { label: t("games.stats.countries"), value: "195", icon: Globe, color: "purple" },
-                { label: t("games.stats.totalRewards"), value: "1M+", icon: Award, color: "lime" },
+                {
+                  label: t("games.stats.activeGames"),
+                  value: "50+",
+                  icon: Gamepad2,
+                  color: "lime",
+                },
+                {
+                  label: t("games.stats.players"),
+                  value: "25K+",
+                  icon: Users,
+                  color: "blue",
+                },
+                {
+                  label: t("games.stats.countries"),
+                  value: "195",
+                  icon: Globe,
+                  color: "purple",
+                },
+                {
+                  label: t("games.stats.totalRewards"),
+                  value: "1M+",
+                  icon: Award,
+                  color: "lime",
+                },
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}
@@ -138,8 +160,12 @@ export default function GamesPage() {
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   className="relative overflow-hidden rounded-3xl border bg-neutral-900 border-neutral-800 p-6 backdrop-blur"
                 >
-                  <stat.icon className={`w-8 h-8 mb-3 text-${stat.color}-400`} />
-                  <p className="text-3xl font-bold mb-1 text-white">{stat.value}</p>
+                  <stat.icon
+                    className={`w-8 h-8 mb-3 text-${stat.color}-400`}
+                  />
+                  <p className="text-3xl font-bold mb-1 text-white">
+                    {stat.value}
+                  </p>
                   <p className="text-sm text-neutral-400">{stat.label}</p>
                 </motion.div>
               ))}
@@ -158,7 +184,9 @@ export default function GamesPage() {
             >
               <h2 className="text-4xl font-bold mb-4 text-white">
                 {t("games.featured.title")}{" "}
-                <span className="text-lime-400">{t("games.featured.titleHighlight")}</span>
+                <span className="text-lime-400">
+                  {t("games.featured.titleHighlight")}
+                </span>
               </h2>
               <p className="text-lg max-w-2xl mx-auto text-neutral-400">
                 {t("games.featured.subtitle")}
@@ -226,7 +254,9 @@ export default function GamesPage() {
                   className="rounded-2xl p-6 shadow-lg border bg-neutral-900 border-neutral-800 hover:border-lime-400/50 cursor-pointer group"
                   onClick={() => setShowGame(true)}
                 >
-                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 bg-${game.color}-400/20`}>
+                  <div
+                    className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 bg-${game.color}-400/20`}
+                  >
                     <game.icon className={`w-7 h-7 text-${game.color}-400`} />
                   </div>
                   <h3 className="text-xl font-bold mb-2 text-white">
@@ -236,13 +266,15 @@ export default function GamesPage() {
                     {game.description}
                   </p>
                   <div className="flex items-center justify-between">
-                    <span className={`text-xs px-3 py-1 rounded-full ${
-                      game.difficulty === "Easy"
-                        ? "bg-green-400/20 text-green-400"
-                        : game.difficulty === "Medium"
-                        ? "bg-yellow-400/20 text-yellow-400"
-                        : "bg-red-400/20 text-red-400"
-                    }`}>
+                    <span
+                      className={`text-xs px-3 py-1 rounded-full ${
+                        game.difficulty === "Easy"
+                          ? "bg-green-400/20 text-green-400"
+                          : game.difficulty === "Medium"
+                          ? "bg-yellow-400/20 text-yellow-400"
+                          : "bg-red-400/20 text-red-400"
+                      }`}
+                    >
                       {game.difficulty}
                     </span>
                     <span className="text-sm font-semibold text-lime-400">
@@ -250,7 +282,9 @@ export default function GamesPage() {
                     </span>
                   </div>
                   <div className="mt-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity text-lime-400">
-                    <span className="text-sm font-semibold">{t("games.card.playNow")}</span>
+                    <span className="text-sm font-semibold">
+                      {t("games.card.playNow")}
+                    </span>
                     <ArrowRight className="w-4 h-4" />
                   </div>
                 </motion.div>
@@ -269,8 +303,7 @@ export default function GamesPage() {
               className="text-center mb-12"
             >
               <h2 className="text-4xl font-bold mb-4 text-white">
-                Why Play{" "}
-                <span className="text-lime-400">Cultural Games</span>?
+                Why Play <span className="text-lime-400">Cultural Games</span>?
               </h2>
               <p className="text-lg max-w-2xl mx-auto text-neutral-400">
                 Learning about world cultures has never been this fun and

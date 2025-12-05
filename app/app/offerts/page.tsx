@@ -213,12 +213,7 @@ export default function OffertsPage() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
               >
-                Special{" "}
-                <span
-                  className="text-lime-400"
-                >
-                  Offers
-                </span>
+                Special <span className="text-lime-400">Offers</span>
               </motion.h1>
 
               <motion.p
@@ -241,9 +236,7 @@ export default function OffertsPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowBrowse(false)}
-                  className={`px-8 py-4 rounded-xl font-semibold flex items-center gap-2 transition-colors ${
-                    "bg-lime-400 text-black hover:bg-lime-300"
-                  }`}
+                  className={`px-8 py-4 rounded-xl font-semibold flex items-center gap-2 transition-colors ${"bg-lime-400 text-black hover:bg-lime-300"}`}
                 >
                   <Ticket className="w-5 h-5" />
                   Browse Offers
@@ -292,9 +285,7 @@ export default function OffertsPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: i * 0.1 }}
-                    className={`rounded-2xl p-6 backdrop-blur-sm border ${
-                      "bg-neutral-900/90 border-white/10"
-                    }`}
+                    className={`rounded-2xl p-6 backdrop-blur-sm border ${"bg-neutral-900/90 border-white/10"}`}
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div
@@ -321,20 +312,12 @@ export default function OffertsPage() {
                         />
                       </div>
                       <div className="text-right">
-                        <p
-                          className={`text-3xl font-bold ${
-                            "text-white"
-                          }`}
-                        >
+                        <p className={`text-3xl font-bold ${"text-white"}`}>
                           {stat.value}
                         </p>
                       </div>
                     </div>
-                    <p
-                      className={`text-xs ${
-                        "text-neutral-500"
-                      }`}
-                    >
+                    <p className={`text-xs ${"text-neutral-500"}`}>
                       {stat.desc}
                     </p>
                   </motion.div>
@@ -350,9 +333,7 @@ export default function OffertsPage() {
           <div className="flex justify-between items-center mb-6 px-6 pt-6">
             <button
               onClick={() => setShowBrowse(true)}
-              className={`px-6 py-3 rounded-xl font-semibold transition-colors ${
-                "bg-neutral-800 text-white hover:bg-neutral-700"
-              }`}
+              className={`px-6 py-3 rounded-xl font-semibold transition-colors ${"bg-neutral-800 text-white hover:bg-neutral-700"}`}
             >
               ← Back to Overview
             </button>
@@ -367,15 +348,9 @@ export default function OffertsPage() {
                 </p>
               </div>
               <div
-                className={`flex items-center gap-3 rounded-full border px-6 py-3 backdrop-blur ${
-                  "bg-linear-to-r from-emerald-500/20 to-teal-500/20 border-emerald-400/30"
-                }`}
+                className={`flex items-center gap-3 rounded-full border px-6 py-3 backdrop-blur ${"bg-linear-to-r from-emerald-500/20 to-teal-500/20 border-emerald-400/30"}`}
               >
-                <Sparkles
-                  className={`h-6 w-6 ${
-                    "text-emerald-400"
-                  }`}
-                />
+                <Sparkles className={`h-6 w-6 ${"text-emerald-400"}`} />
                 <div>
                   <p
                     className={`text-xs uppercase tracking-wide ${getMutedTextColor()}`}
@@ -391,11 +366,7 @@ export default function OffertsPage() {
             {activeCoupons.length > 0 && (
               <div className="space-y-4">
                 <h2 className="text-2xl font-bold flex items-center gap-2">
-                  <CheckCircle
-                    className={`h-6 w-6 ${
-                      "text-emerald-400"
-                    }`}
-                  />
+                  <CheckCircle className={`h-6 w-6 ${"text-emerald-400"}`} />
                   Active Coupons
                 </h2>
                 <div className="grid gap-4 md:grid-cols-2">
@@ -409,32 +380,22 @@ export default function OffertsPage() {
                         key={coupon._id}
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className={`relative overflow-hidden rounded-2xl border p-6 backdrop-blur ${
-                          "border-emerald-400/50 bg-linear-to-br from-emerald-500/20 to-teal-500/20"
-                        }`}
+                        className={`relative overflow-hidden rounded-2xl border p-6 backdrop-blur ${"border-emerald-400/50 bg-linear-to-br from-emerald-500/20 to-teal-500/20"}`}
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
                             <div
-                              className={`rounded-xl p-3 border ${
-                                "bg-emerald-400/20 border-emerald-400/30"
-                              }`}
+                              className={`rounded-xl p-3 border ${"bg-emerald-400/20 border-emerald-400/30"}`}
                             >
                               <Icon
-                                className={`h-6 w-6 ${
-                                  "text-emerald-400"
-                                }`}
+                                className={`h-6 w-6 ${"text-emerald-400"}`}
                               />
                             </div>
                             <div>
                               <h3 className="font-semibold">
                                 {coupon.couponTitle}
                               </h3>
-                              <p
-                                className={`text-sm ${
-                                  "text-emerald-400"
-                                }`}
-                              >
+                              <p className={`text-sm ${"text-emerald-400"}`}>
                                 {coupon.couponDiscount} off
                               </p>
                             </div>
@@ -448,16 +409,12 @@ export default function OffertsPage() {
                           >
                             <Clock
                               className={`h-4 w-4 ${
-                                isExpiring
-                                  ? "text-red-400"
-                                  : "text-white/70"
+                                isExpiring ? "text-red-400" : "text-white/70"
                               }`}
                             />
                             <span
                               className={`text-sm font-mono ${
-                                isExpiring
-                                  ? "text-red-400"
-                                  : "text-white/70"
+                                isExpiring ? "text-red-400" : "text-white/70"
                               }`}
                             >
                               {formatTime(remaining)}
@@ -535,9 +492,7 @@ export default function OffertsPage() {
             {isLoading ? (
               <div className="flex items-center justify-center py-20">
                 <Loader2
-                  className={`h-8 w-8 animate-spin ${
-                    "text-emerald-400"
-                  }`}
+                  className={`h-8 w-8 animate-spin ${"text-emerald-400"}`}
                 />
               </div>
             ) : filteredCoupons.length === 0 ? (
@@ -574,9 +529,7 @@ export default function OffertsPage() {
                     >
                       {/* Icon Badge */}
                       <div
-                        className={`absolute right-4 top-4 text-4xl transition-opacity ${
-                          "opacity-20 group-hover:opacity-30"
-                        }`}
+                        className={`absolute right-4 top-4 text-4xl transition-opacity ${"opacity-20 group-hover:opacity-30"}`}
                       >
                         {coupon.icon}
                       </div>
@@ -630,15 +583,11 @@ export default function OffertsPage() {
                             </span>
                           </div>
                           <div
-                            className={`h-2 overflow-hidden rounded-full ${
-                              "bg-white/10"
-                            }`}
+                            className={`h-2 overflow-hidden rounded-full ${"bg-white/10"}`}
                           >
                             <div
                               className={`h-full transition-all ${
-                                isLowStock
-                                  ? "bg-red-400"
-                                  : "bg-emerald-600"
+                                isLowStock ? "bg-red-400" : "bg-emerald-600"
                               }`}
                               style={{ width: `${percentRemaining}%` }}
                             />
@@ -654,9 +603,7 @@ export default function OffertsPage() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span
-                              className={`text-2xl font-bold ${
-                                "text-emerald-600"
-                              }`}
+                              className={`text-2xl font-bold ${"text-emerald-600"}`}
                             >
                               {coupon.pointsCost}
                             </span>
@@ -699,19 +646,13 @@ export default function OffertsPage() {
 
                       {coupon.usesRemaining === 0 && (
                         <div
-                          className={`absolute inset-0 flex items-center justify-center backdrop-blur-sm ${
-                            "bg-slate-950/80"
-                          }`}
+                          className={`absolute inset-0 flex items-center justify-center backdrop-blur-sm ${"bg-slate-950/80"}`}
                         >
                           <div
-                            className={`rounded-full border px-6 py-3 ${
-                              "bg-red-500/20 border-red-400/50"
-                            }`}
+                            className={`rounded-full border px-6 py-3 ${"bg-red-500/20 border-red-400/50"}`}
                           >
                             <p
-                              className={`font-bold flex items-center gap-2 ${
-                                "text-red-600"
-                              }`}
+                              className={`font-bold flex items-center gap-2 ${"text-red-600"}`}
                             >
                               <X className="h-5 w-5" />
                               Sold Out

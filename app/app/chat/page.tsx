@@ -52,6 +52,7 @@ const conversationTopics = [
 ];
 
 function HeroSection({ onStartChat }: { onStartChat: () => void }) {
+  const { t } = useI18n();
   return (
     <section className="relative min-h-[60vh] flex items-center overflow-hidden">
       <div className="absolute inset-0">
@@ -82,7 +83,9 @@ function HeroSection({ onStartChat }: { onStartChat: () => void }) {
 
             <h1 className="text-5xl lg:text-6xl font-bold mb-6 text-white">
               {t("chat.hero.title")}{" "}
-              <span className="text-lime-400">{t("chat.hero.titleHighlight")}</span>
+              <span className="text-lime-400">
+                {t("chat.hero.titleHighlight")}
+              </span>
             </h1>
 
             <p className="text-lg mb-8 text-neutral-300">
@@ -108,6 +111,7 @@ function HeroSection({ onStartChat }: { onStartChat: () => void }) {
 }
 
 function StatsSection() {
+  const { t } = useI18n();
   const stats = [
     {
       label: t("chat.stats.conversations"),
@@ -115,9 +119,24 @@ function StatsSection() {
       icon: MessageCircle,
       color: "blue",
     },
-    { label: t("chat.stats.languages"), value: "100+", icon: Languages, color: "purple" },
-    { label: t("chat.stats.activeUsers"), value: "10K+", icon: Users, color: "orange" },
-    { label: t("chat.stats.responseTime"), value: "<1s", icon: Zap, color: "yellow" },
+    {
+      label: t("chat.stats.languages"),
+      value: "100+",
+      icon: Languages,
+      color: "purple",
+    },
+    {
+      label: t("chat.stats.activeUsers"),
+      value: "10K+",
+      icon: Users,
+      color: "orange",
+    },
+    {
+      label: t("chat.stats.responseTime"),
+      value: "<1s",
+      icon: Zap,
+      color: "yellow",
+    },
   ];
 
   return (
@@ -144,9 +163,7 @@ function StatsSection() {
                     : "text-yellow-400"
                 }`}
               />
-              <p className="text-3xl font-bold mb-1 text-white">
-                {stat.value}
-              </p>
+              <p className="text-3xl font-bold mb-1 text-white">{stat.value}</p>
               <p className="text-sm text-neutral-400">{stat.label}</p>
             </motion.div>
           ))}
@@ -157,6 +174,7 @@ function StatsSection() {
 }
 
 function TopicsSection() {
+  const { t } = useI18n();
   return (
     <section className="py-24 px-6 lg:px-12 bg-neutral-900">
       <div className="max-w-7xl mx-auto">
@@ -280,9 +298,7 @@ function FeaturesSection() {
               <h3 className="text-lg font-bold mb-2 text-white">
                 {feature.title}
               </h3>
-              <p className="text-sm text-neutral-400">
-                {feature.description}
-              </p>
+              <p className="text-sm text-neutral-400">{feature.description}</p>
             </motion.div>
           ))}
         </div>
@@ -313,9 +329,7 @@ export default function ChatPage() {
                 viewport={{ once: true }}
                 className="rounded-3xl border p-12 bg-linear-to-br from-neutral-900 to-neutral-800 border-neutral-700"
               >
-                <MessageCircle
-                  className="w-16 h-16 mx-auto mb-6 text-lime-400"
-                />
+                <MessageCircle className="w-16 h-16 mx-auto mb-6 text-lime-400" />
                 <h2 className="text-3xl font-bold mb-4 text-white">
                   Ready to Start Your Cultural Journey?
                 </h2>

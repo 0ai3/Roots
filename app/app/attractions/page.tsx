@@ -64,7 +64,10 @@ function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
             className="max-w-3xl"
           >
             <h1 className="text-5xl lg:text-6xl font-bold mb-6 text-white">
-              {t("attractions.hero.title")} <span className="text-lime-400">{t("attractions.hero.titleHighlight")}</span>
+              {t("attractions.hero.title")}{" "}
+              <span className="text-lime-400">
+                {t("attractions.hero.titleHighlight")}
+              </span>
             </h1>
 
             <p className="text-lg mb-8 text-neutral-300">
@@ -90,10 +93,30 @@ function HeroSection({ onPlanClick }: { onPlanClick: () => void }) {
 function StatsSection() {
   const { t } = useI18n();
   const stats = [
-    { label: t("attractions.stats.attractions"), value: "5K+", icon: MapPin, color: "blue" },
-    { label: t("attractions.stats.countries"), value: "195", icon: Globe2, color: "purple" },
-    { label: t("attractions.stats.categories"), value: "50+", icon: Building2, color: "orange" },
-    { label: t("attractions.stats.reviews"), value: "1M+", icon: Star, color: "yellow" },
+    {
+      label: t("attractions.stats.attractions"),
+      value: "5K+",
+      icon: MapPin,
+      color: "blue",
+    },
+    {
+      label: t("attractions.stats.countries"),
+      value: "195",
+      icon: Globe2,
+      color: "purple",
+    },
+    {
+      label: t("attractions.stats.categories"),
+      value: "50+",
+      icon: Building2,
+      color: "orange",
+    },
+    {
+      label: t("attractions.stats.reviews"),
+      value: "1M+",
+      icon: Star,
+      color: "yellow",
+    },
   ];
 
   return (

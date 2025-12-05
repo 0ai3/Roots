@@ -238,8 +238,9 @@ function HeroSection({ scrollY, userId }: HeroSectionProps) {
               </h1>
 
               <p className="text-lg mb-10 max-w-xl text-neutral-300 leading-relaxed">
-                Dive into the world&apos; s diverse heritage — from age-old traditions
-                and authentic cuisines to living stories that define who we are.
+                Dive into the world&apos; s diverse heritage — from age-old
+                traditions and authentic cuisines to living stories that define
+                who we are.
               </p>
 
               <div className="flex flex-wrap gap-4">
@@ -390,8 +391,8 @@ function FeaturesSection() {
             </span>
           </h2>
           <p className="max-w-2xl mx-auto text-neutral-400 text-lg leading-relaxed">
-            Immerse yourself in the world&apos;s rich cultural tapestry through our
-            comprehensive platform.
+            Immerse yourself in the world&apos;s rich cultural tapestry through
+            our comprehensive platform.
           </p>
         </motion.div>
 
@@ -845,34 +846,33 @@ function CTASection({ userId }: CTASectionProps) {
       {/* Subtle background glows */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[90%] h-[90%] bg-[radial-gradient(ellipse_at_center,rgba(132,204,22,0.1),transparent_70%)] blur-3xl" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-linear-to-tr from-yellow-400/10 to-transparent blur-3xl" />
-        {/* Footer Links */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-20 pt-10 border-t border-neutral-800 text-center"
-        >
-          <div className="flex flex-wrap justify-center gap-8 mb-6">
-            {["About", "Features", "Community", "Cookies", "Terms"].map(
-              (link) => (
-                <a
-                  key={link}
-                  href="/Cookies.html"
-                  className="text-sm text-neutral-400 hover:text-lime-400 transition-colors font-medium"
-                >
-                  {link}
-                </a>
-              )
-            )}
-          </div>
+      {/* Footer Links */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        className="mt-20 pt-10 border-t border-neutral-800 text-center"
+      >
+        <div className="flex flex-wrap justify-center gap-8 mb-6">
+          {["About", "Features", "Community", "Cookies", "Terms"].map(
+            (link) => (
+              <a
+                key={link}
+                href="/Cookies.html"
+                className="text-sm text-neutral-400 hover:text-lime-400 transition-colors font-medium"
+              >
+                {link}
+              </a>
+            )
+          )}
+        </div>
 
-          <p className="text-sm text-neutral-500">
-            © 2025 <span className="text-lime-400 font-semibold">Roots</span>.
-            Connecting cultures, preserving heritage.
-          </p>
-        </motion.div>
-      
+        <p className="text-sm text-neutral-500">
+          © 2025 <span className="text-lime-400 font-semibold">Roots</span>.
+          Connecting cultures, preserving heritage.
+        </p>
+      </motion.div>
     </section>
   );
 }
