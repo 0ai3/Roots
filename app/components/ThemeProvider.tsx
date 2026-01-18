@@ -2,14 +2,11 @@
 import React, {
   createContext,
   useContext,
-  useState,
   ReactNode,
-  useCallback,
-  useMemo,
   useEffect,
 } from "react";
 
-type Theme = "light" | "dark";
+type Theme = "dark";
 
 interface ThemeContextType {
   theme: Theme;
@@ -21,62 +18,20 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // Always start with dark to match the server render
-  const [theme, setThemeState] = useState<Theme>("dark");
-  const [mounted, setMounted] = useState(false);
+  // Always dark mode - no light mode option
+  const theme: Theme = "dark";
 
-  // Load theme from localStorage after mount
+  // Force dark mode on mount
   useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      setMounted(true);
-      try {
-        const saved = localStorage.getItem("theme") as Theme | null;
-        if (saved) {
-          setThemeState(saved);
-          if (saved === "dark") {
-            document.documentElement.classList.add("dark");
-          } else {
-            document.documentElement.classList.remove("dark");
-          }
-        } else {
-          // Default to dark if no saved preference
-          document.documentElement.classList.add("dark");
-        }
-      } catch {
-        document.documentElement.classList.add("dark");
-      }
-    });
-
-    return () => cancelAnimationFrame(frame);
+    document.documentElement.classList.add("dark");
+    localStorage.setItem("theme", "dark");
   }, []);
 
-  const setTheme = useCallback((newTheme: Theme) => {
-    setThemeState(newTheme);
-    try {
-      localStorage.setItem("theme", newTheme);
-      if (newTheme === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    } catch {
-      // Ignore
-    }
-    try {
-      window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: newTheme } }));
-    } catch {
-      // Ignore
-    }
-  }, []);
+  // These functions do nothing now - always dark
+  const setTheme = () => {};
+  const toggleTheme = () => {};
 
-  const toggleTheme = useCallback(() => {
-    setTheme(theme === "light" ? "dark" : "light");
-  }, [theme, setTheme]);
-
-  const value = useMemo(
-    () => ({ theme, setTheme, toggleTheme, mounted }),
-    [theme, setTheme, toggleTheme, mounted]
-  );
+  const value = { theme, setTheme, toggleTheme, mounted: true };
 
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>

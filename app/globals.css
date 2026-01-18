@@ -1,8 +1,32 @@
 @import "tailwindcss";
 
-/* Force dark mode globally */
+/* Force dark mode globally - no light mode */
 :root {
   color-scheme: dark;
+}
+
+html {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+body {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+/* Force navbar to always be black */
+nav {
+  background-color: #0a0a0a !important;
+}
+
+/* Force all backgrounds to be dark */
+.bg-white {
+  background-color: #171717 !important;
+}
+
+.text-black {
+  color: #fff !important;
 }
 
 .profile-light * {
