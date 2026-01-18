@@ -158,6 +158,7 @@ function FeaturedAttractionsSection({
 }: {
   onLoadAttractions?: (count: number) => void;
 }) {
+  const { t } = useI18n();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [attractions, setAttractions] = useState<Attraction[]>([]);
@@ -215,14 +216,12 @@ function FeaturedAttractionsSection({
         },
         (error) => {
           console.error("Geolocation error:", error);
-          setLocationError(
-            "Unable to get your location. Please enable location services."
-          );
+          setLocationError(t("attractions.error.location"));
           setLoading(false);
         }
       );
     } else {
-      setLocationError("Geolocation is not supported by your browser.");
+      setLocationError(t("attractions.error.geolocationUnsupported"));
       setLoading(false);
     }
   }, [radius, fetchAttractions]);
@@ -326,14 +325,13 @@ function FeaturedAttractionsSection({
           className="text-center mb-16"
         >
           <div className="inline-block px-4 py-2 rounded-full mb-4 bg-lime-400/20 text-lime-400 border border-lime-400/30">
-            Featured Destinations
+            {t("attractions.featured.badge")}
           </div>
           <h2 className="text-4xl font-bold mb-4 text-white">
-            Popular Attractions Worldwide
+            {t("attractions.featured.title")}
           </h2>
           <p className="max-w-2xl mx-auto text-neutral-400">
-            Explore the most visited and beloved cultural landmarks across the
-            globe
+            {t("attractions.featured.subtitle")}
           </p>
         </motion.div>
 
@@ -353,7 +351,7 @@ function FeaturedAttractionsSection({
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-500" />
             <input
               type="text"
-              placeholder="Search nearby attractions..."
+              placeholder={t("attractions.search.placeholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-4 rounded-2xl border bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500 focus:border-lime-400/50 focus:outline-none transition-all"
@@ -404,7 +402,9 @@ function FeaturedAttractionsSection({
         {loading && (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-12 h-12 animate-spin mb-4 text-lime-400" />
-            <p className="text-neutral-400">Loading nearby attractions...</p>
+            <p className="text-neutral-400">
+              {t("attractions.loading.message")}
+            </p>
           </div>
         )}
 
@@ -412,7 +412,7 @@ function FeaturedAttractionsSection({
           <div className="text-center py-20 px-6 rounded-3xl border bg-red-950/20 border-red-900/30 text-red-400">
             <MapPin className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-semibold mb-2">
-              Unable to Load Attractions
+              {t("attractions.error.title")}
             </p>
             <p className="text-sm mb-4">{locationError}</p>
             {userLocation && (
@@ -422,7 +422,7 @@ function FeaturedAttractionsSection({
                 }
                 className="px-6 py-2 rounded-full text-sm font-semibold transition bg-lime-400 text-neutral-950 hover:bg-lime-300"
               >
-                Try Again
+                {t("attractions.error.tryAgain")}
               </button>
             )}
           </div>
@@ -431,10 +431,10 @@ function FeaturedAttractionsSection({
         {!loading && !locationError && filteredAttractions.length === 0 && (
           <div className="text-center py-20 px-6 text-neutral-400">
             <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-semibold mb-2">No attractions found</p>
-            <p className="text-sm">
-              Try adjusting your search radius or search terms
+            <p className="text-lg font-semibold mb-2">
+              {t("attractions.noResults.title")}
             </p>
+            <p className="text-sm">{t("attractions.noResults.subtitle")}</p>
           </div>
         )}
 

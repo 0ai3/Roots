@@ -229,16 +229,16 @@ export default function GamesPage() {
                 },
                 {
                   icon: Trophy,
-                  title: "History Timeline",
-                  description: "Arrange historical events in correct order",
+                  title: t("games.card.historyTimeline.title"),
+                  description: t("games.card.historyTimeline.description"),
                   difficulty: t("games.difficulty.hard"),
                   points: "150-400",
                   color: "lime",
                 },
                 {
                   icon: Zap,
-                  title: "Speed Round",
-                  description: "Quick-fire questions with time pressure",
+                  title: t("games.card.speedRound.title"),
+                  description: t("games.card.speedRound.description"),
                   difficulty: t("games.difficulty.easy"),
                   points: "20-100",
                   color: "pink",
@@ -303,11 +303,14 @@ export default function GamesPage() {
               className="text-center mb-12"
             >
               <h2 className="text-4xl font-bold mb-4 text-white">
-                Why Play <span className="text-lime-400">Cultural Games</span>?
+                {t("games.benefits.title")}{" "}
+                <span className="text-lime-400">
+                  {t("games.benefits.titleHighlight")}
+                </span>
+                ?
               </h2>
               <p className="text-lg max-w-2xl mx-auto text-neutral-400">
-                Learning about world cultures has never been this fun and
-                rewarding
+                {t("games.benefits.subtitle")}
               </p>
             </motion.div>
 
@@ -315,23 +318,23 @@ export default function GamesPage() {
               {[
                 {
                   icon: Brain,
-                  title: "Learn Faster",
-                  description: "Gamified learning improves retention by 80%",
+                  title: t("games.benefits.learnFaster.title"),
+                  description: t("games.benefits.learnFaster.description"),
                 },
                 {
                   icon: Trophy,
-                  title: "Earn Rewards",
-                  description: "Gain points and unlock achievements",
+                  title: t("games.benefits.earnRewards.title"),
+                  description: t("games.benefits.earnRewards.description"),
                 },
                 {
                   icon: Users,
-                  title: "Compete Globally",
-                  description: "Challenge players from around the world",
+                  title: t("games.benefits.competeGlobally.title"),
+                  description: t("games.benefits.competeGlobally.description"),
                 },
                 {
                   icon: TrendingUp,
-                  title: "Track Progress",
-                  description: "Monitor your cultural knowledge growth",
+                  title: t("games.benefits.trackProgress.title"),
+                  description: t("games.benefits.trackProgress.description"),
                 },
               ].map((benefit, index) => (
                 <motion.div
@@ -366,11 +369,10 @@ export default function GamesPage() {
             >
               <Sparkles className="w-16 h-16 mx-auto mb-6 opacity-90" />
               <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                Ready to Test Your Knowledge?
+                {t("games.cta.title")}
               </h2>
               <p className="text-xl mb-8 opacity-90">
-                Start playing today and become a cultural expert while earning
-                rewards
+                {t("games.cta.subtitle")}
               </p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -379,7 +381,7 @@ export default function GamesPage() {
                 className="px-10 py-5 rounded-xl font-bold text-lg flex items-center gap-3 mx-auto bg-white text-lime-600 hover:bg-neutral-100 transition-colors"
               >
                 <Gamepad2 className="w-6 h-6" />
-                Play Now
+                {t("games.cta.playNow")}
                 <ArrowRight className="w-6 h-6" />
               </motion.button>
             </motion.div>

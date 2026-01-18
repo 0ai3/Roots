@@ -13,7 +13,8 @@ export type LocaleCode =
   | "ur"
   | "id"
   | "it"
-  | "tr";
+  | "tr"
+  | "ro";
 
 export const SUPPORTED_LANGUAGES: { code: LocaleCode; label: string }[] = [
   { code: "en", label: "English" },
@@ -31,6 +32,7 @@ export const SUPPORTED_LANGUAGES: { code: LocaleCode; label: string }[] = [
   { code: "id", label: "Bahasa Indonesia" },
   { code: "it", label: "Italiano" },
   { code: "tr", label: "Türkçe" },
+  { code: "ro", label: "Română" },
 ];
 
 export const DEFAULT_LOCALE: LocaleCode = "en";

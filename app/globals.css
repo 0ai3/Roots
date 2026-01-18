@@ -39,6 +39,6 @@
   }
 
   .text-gradient {
-    @apply bg-gradient-to-r from-lime-400 via-yellow-300 to-lime-400 bg-clip-text text-transparent;
+    @apply bg-linear-to-r from-lime-400 via-yellow-300 to-lime-400 bg-clip-text text-transparent;
   }
 }

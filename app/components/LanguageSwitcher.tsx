@@ -1,12 +1,8 @@
 "use client";
 
-import { useMemo, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { useI18n } from "@/app/hooks/useI18n";
-import {
-  LOCALE_STORAGE_KEY,
-  type LocaleCode,
-} from "@/app/lib/i18n/languages";
+import type { LocaleCode } from "@/app/lib/i18n/languages";
 
 export default function LanguageSwitcher() {
   const { locale, setLocale, languages, t } = useI18n();
@@ -17,17 +13,11 @@ export default function LanguageSwitcher() {
       ),
     [languages]
   );
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
 
   const handleChange = (next: LocaleCode) => {
     setLocale(next);
-    if (typeof document !== "undefined") {
-      document.cookie = `${LOCALE_STORAGE_KEY}=${next}; path=/; max-age=31536000`;
-    }
-    startTransition(() => {
-      router.refresh();
-    });
+    // Force immediate re-render of all components
+    window.location.reload();
   };
 
   return (
@@ -36,9 +26,8 @@ export default function LanguageSwitcher() {
       <select
         value={locale}
         onChange={(event) => handleChange(event.target.value as LocaleCode)}
-        className="bg-transparent text-white/90 focus:outline-none disabled:opacity-60"
+        className="bg-transparent text-white/90 focus:outline-none"
         aria-label={t("languageSwitcher.label")}
-        disabled={isPending}
       >
         {sortedLanguages.map((language) => (
           <option

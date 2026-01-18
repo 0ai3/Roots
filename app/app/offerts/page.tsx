@@ -120,7 +120,7 @@ export default function OffertsPage() {
 
   const handleRedeem = async (couponId: string, pointsCost: number) => {
     if (userPoints < pointsCost) {
-      alert("Not enough points to redeem this coupon!");
+      alert(t("offers.alert.notEnoughPoints"));
       return;
     }
 
@@ -135,14 +135,14 @@ export default function OffertsPage() {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Coupon redeemed successfully! Check your active coupons below.");
+        alert(t("offers.alert.success"));
         loadCoupons();
       } else {
-        alert(data.error || "Failed to redeem coupon");
+        alert(data.error || t("offers.alert.error"));
       }
     } catch (error) {
       console.error("Redemption error", error);
-      alert("Failed to redeem coupon. Please try again.");
+      alert(t("offers.alert.failedToRedeem"));
     } finally {
       setIsRedeeming(null);
     }
@@ -204,7 +204,9 @@ export default function OffertsPage() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6"
               >
                 <Sparkles className="w-4 h-4 text-lime-400" />
-                <span className="text-sm font-medium">Exclusive Rewards</span>
+                <span className="text-sm font-medium">
+                  {t("offers.hero.badge")}
+                </span>
               </motion.div>
 
               <motion.h1
@@ -213,7 +215,10 @@ export default function OffertsPage() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
               >
-                Special <span className="text-lime-400">Offers</span>
+                {t("offers.hero.special")}{" "}
+                <span className="text-lime-400">
+                  {t("offers.hero.offersHighlight")}
+                </span>
               </motion.h1>
 
               <motion.p
@@ -222,8 +227,7 @@ export default function OffertsPage() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="text-xl mb-8 max-w-2xl mx-auto text-white/90"
               >
-                Redeem your points for exclusive discounts on museums,
-                restaurants, and cafes
+                {t("offers.hero.subtitleAlt")}
               </motion.p>
 
               <motion.div
@@ -239,7 +243,7 @@ export default function OffertsPage() {
                   className={`px-8 py-4 rounded-xl font-semibold flex items-center gap-2 transition-colors ${"bg-lime-400 text-black hover:bg-lime-300"}`}
                 >
                   <Ticket className="w-5 h-5" />
-                  Browse Offers
+                  {t("offers.hero.browseOffers")}
                   <ArrowRight className="w-5 h-5" />
                 </motion.button>
               </motion.div>

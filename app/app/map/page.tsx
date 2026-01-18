@@ -106,19 +106,18 @@ export default function MapPage() {
                 {[
                   {
                     icon: Navigation,
-                    title: "Live Tracking",
-                    description:
-                      "Continuous geolocation with follow-mode toggle",
+                    title: t("map.features.liveTracking.title"),
+                    description: t("map.features.liveTracking.description"),
                   },
                   {
                     icon: MapPin,
-                    title: "Pin Locations",
-                    description: "Drop pins anywhere and save them with labels",
+                    title: t("map.features.pinLocations.title"),
+                    description: t("map.features.pinLocations.description"),
                   },
                   {
                     icon: Route,
-                    title: "Smart Routing",
-                    description: "Walking, cycling, and driving directions",
+                    title: t("map.features.smartRouting.title"),
+                    description: t("map.features.smartRouting.description"),
                   },
                 ].map((feature, i) => (
                   <motion.div
@@ -155,9 +154,9 @@ export default function MapPage() {
                 true
                   ? "bg-neutral-800 text-white hover:bg-neutral-700"
                   : "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
-              }`}
+              }}`}
             >
-              ← Back to Overview
+              ← {t("map.backToOverview")}
             </button>
           </div>
           <div className="space-y-6 px-6">
@@ -173,20 +172,17 @@ export default function MapPage() {
                   true ? "text-white/40" : "text-neutral-500"
                 }`}
               >
-                Live explorer
+                {t("map.liveExplorer")}
               </p>
               <h1 className={`text-2xl font-semibold ${getTextColor()}`}>
-                Track, follow, and route in real-time
+                {t("map.trackAndRoute")}
               </h1>
               <p
                 className={`mt-3 text-sm ${
                   true ? "text-white/70" : "text-neutral-600"
                 }`}
               >
-                Share your current position, follow yourself on the map, and
-                request turn-by-turn routes to any saved attraction in your
-                Roots profile. Tap anywhere to drop a pin, save it with a label,
-                then route back to it whenever you like.
+                {t("map.description")}
               </p>
               <ul className="mt-4 grid gap-3 text-sm md:grid-cols-3">
                 <li
@@ -196,7 +192,7 @@ export default function MapPage() {
                       : "border-neutral-200 bg-white text-neutral-700"
                   }`}
                 >
-                  ✅ Continuous geolocation tracking with follow-mode toggle
+                  ✅ {t("map.feature1")}
                 </li>
                 <li
                   className={`rounded-2xl border p-3 ${
@@ -205,8 +201,7 @@ export default function MapPage() {
                       : "border-neutral-200 bg-white text-neutral-700"
                   }`}
                 >
-                  📍 Attraction Planner picks are saved automatically, and you
-                  can drop extra pins anytime
+                  📍 {t("map.feature2")}
                 </li>
                 <li
                   className={`rounded-2xl border p-3 ${
@@ -215,8 +210,7 @@ export default function MapPage() {
                       : "border-neutral-200 bg-white text-neutral-700"
                   }`}
                 >
-                  🚶‍♀️🚴‍♂️🚗 Walking, cycling, and driving profiles powered by
-                  Mapbox Directions
+                  🚶‍♀️🚴‍♂️🚗 {t("map.feature3")}
                 </li>
               </ul>
             </div>

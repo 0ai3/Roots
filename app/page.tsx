@@ -18,11 +18,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { fetchUserId } from "./lib/userId";
 import NewsletterSignup from "./components/NewsletterSignup";
-
-// Mock translation function if i18n is not set up
-const useI18n = () => ({
-  t: (key: string) => key,
-});
+import { useI18n } from "./hooks/useI18n";
 
 interface HeroSectionProps {
   scrollY: number;
@@ -34,35 +30,33 @@ interface FeaturesSectionProps {
 }
 
 function FeaturesSectionWithAuth({ userId }: FeaturesSectionProps) {
+  const { t } = useI18n();
   const features = [
     {
       icon: Utensils,
-      title: "Traditional Cuisine",
-      description:
-        "Discover authentic recipes and food heritage from around the world",
+      title: t("home.features.cuisine.title"),
+      description: t("home.features.cuisine.description"),
       image:
         "https://images.unsplash.com/photo-1650678192497-28e426bb627c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cmFkaXRpb25hbCUyMGZvb2QlMjBjdWx0dXJlfGVufDF8fHx8MTc2Mjg4Nzg0Nnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
     {
       icon: Building2,
-      title: "Museums & Heritage Sites",
-      description: "Explore cultural museums and historical landmarks globally",
+      title: t("home.features.museums.title"),
+      description: t("home.features.museums.description"),
       image:
         "https://images.unsplash.com/photo-1543633550-8c1c6a5697bd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtdXNldW0lMjBhcmNoaXRlY3R1cmV8ZW58MXx8fHwxNzYyODcyNjM3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
     {
       icon: Palette,
-      title: "Art & Exhibitions",
-      description:
-        "Experience traditional art forms and contemporary cultural exhibitions",
+      title: t("home.features.art.title"),
+      description: t("home.features.art.description"),
       image:
         "https://images.unsplash.com/photo-1719935115623-4857df23f3c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcnQlMjBleGhpYml0aW9uJTIwZ2FsbGVyeXxlbnwxfHx8fDE3NjI4MzEwOTd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
     {
       icon: MapPin,
-      title: "Tourist Attractions",
-      description:
-        "Find cultural hotspots and must-visit destinations worldwide",
+      title: t("home.features.tourist.title"),
+      description: t("home.features.tourist.description"),
       image:
         "https://images.unsplash.com/photo-1685850749074-9cf8023d7e8d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3b3JsZCUyMHRyYXZlbCUyMGRlc3RpbmF0aW9uc3xlbnwxfHx8fDE3NjI4ODc4NDd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
@@ -201,6 +195,7 @@ function ImageWithFallback({
 }
 
 function HeroSection({ scrollY, userId }: HeroSectionProps) {
+  const { t } = useI18n();
   const parallaxY = scrollY * 0.5;
 
   return (
@@ -258,9 +253,9 @@ function HeroSection({ scrollY, userId }: HeroSectionProps) {
 
               <div className="grid grid-cols-3 gap-6 mt-12 text-center">
                 {[
-                  { label: "Countries", value: "195+" },
-                  { label: "Traditions", value: "10K+" },
-                  { label: "Attractions", value: "5K+" },
+                  { label: t("home.stats.countries"), value: "195+" },
+                  { label: t("home.stats.traditions"), value: "10K+" },
+                  { label: t("home.stats.attractions"), value: "5K+" },
                 ].map((stat, i) => (
                   <motion.div
                     key={stat.label}
