@@ -1,6 +1,116 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-// import PageThemeToggle from "@/app/components/PageThemeToggle"; // Client component - do NOT import into server API routes. Move this import into a client/page component where it will be used.
+
+// Pre-generated fallback questions database
+const FALLBACK_QUESTIONS: Record<string, Array<{
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+  points: number;
+}>> = {
+  cultural: [
+    { question: "Which festival is known as the 'Festival of Lights' in India?", options: ["Holi", "Diwali", "Navratri", "Pongal"], correctAnswer: 1, explanation: "Diwali, the Festival of Lights, celebrates the victory of light over darkness and is one of India's most important festivals.", points: 75 },
+    { question: "What is the traditional Japanese tea ceremony called?", options: ["Ikebana", "Chado", "Origami", "Kabuki"], correctAnswer: 1, explanation: "Chado (or Sado) is the Japanese tea ceremony, a cultural activity involving the ceremonial preparation and presentation of matcha.", points: 100 },
+    { question: "Which country is famous for the Day of the Dead celebration?", options: ["Spain", "Brazil", "Mexico", "Peru"], correctAnswer: 2, explanation: "Dia de los Muertos (Day of the Dead) is a Mexican holiday where families welcome back the souls of deceased relatives.", points: 50 },
+    { question: "What is the traditional greeting gesture in Thailand?", options: ["Bow", "Handshake", "Wai", "Namaste"], correctAnswer: 2, explanation: "The Wai is a traditional Thai greeting performed by pressing palms together and bowing slightly.", points: 75 },
+    { question: "Which country celebrates Carnival with the largest parade?", options: ["Italy", "Brazil", "USA", "Trinidad"], correctAnswer: 1, explanation: "Brazil's Rio Carnival is the world's largest carnival, attracting millions of visitors with its spectacular parades.", points: 50 },
+    { question: "What is the significance of the Chinese New Year color red?", options: ["Wealth", "Good luck", "Health", "Wisdom"], correctAnswer: 1, explanation: "Red symbolizes good luck and fortune in Chinese culture, which is why it's prominently featured during New Year celebrations.", points: 75 },
+    { question: "Which festival marks the end of Ramadan?", options: ["Eid al-Adha", "Eid al-Fitr", "Mawlid", "Ashura"], correctAnswer: 1, explanation: "Eid al-Fitr marks the end of Ramadan, the Islamic holy month of fasting, with prayers, feasts, and celebrations.", points: 100 },
+    { question: "What is the traditional Scottish New Year celebration called?", options: ["Boxing Day", "Burns Night", "Hogmanay", "St. Andrew's Day"], correctAnswer: 2, explanation: "Hogmanay is the Scottish word for the last day of the year and is celebrated with traditions like first-footing.", points: 100 },
+    { question: "In which country did the tradition of Christmas trees originate?", options: ["England", "Germany", "Norway", "Sweden"], correctAnswer: 1, explanation: "The Christmas tree tradition originated in Germany in the 16th century before spreading throughout Europe.", points: 75 },
+    { question: "What does 'Namaste' mean in Hindi?", options: ["Hello", "I bow to you", "Welcome", "Peace"], correctAnswer: 1, explanation: "Namaste literally means 'I bow to you' and is a respectful greeting used in India and Nepal.", points: 50 },
+  ],
+  geography: [
+    { question: "What is the longest river in the world?", options: ["Amazon", "Nile", "Yangtze", "Mississippi"], correctAnswer: 1, explanation: "The Nile River, flowing through northeastern Africa, is approximately 6,650 km long, making it the world's longest river.", points: 75 },
+    { question: "Which country has the most natural lakes?", options: ["USA", "Russia", "Canada", "Finland"], correctAnswer: 2, explanation: "Canada has over 60% of the world's lakes, with an estimated 2 million lakes covering about 9% of the country.", points: 100 },
+    { question: "What is the smallest country in the world?", options: ["Monaco", "San Marino", "Vatican City", "Liechtenstein"], correctAnswer: 2, explanation: "Vatican City is the smallest country in the world at only 0.44 square kilometers.", points: 50 },
+    { question: "Which desert is the largest hot desert in the world?", options: ["Gobi", "Kalahari", "Sahara", "Arabian"], correctAnswer: 2, explanation: "The Sahara Desert in Africa is the world's largest hot desert, covering about 9 million square kilometers.", points: 50 },
+    { question: "What is the highest mountain in Africa?", options: ["Mount Kenya", "Mount Kilimanjaro", "Mount Elgon", "Simien Mountains"], correctAnswer: 1, explanation: "Mount Kilimanjaro in Tanzania stands at 5,895 meters, making it Africa's highest peak.", points: 75 },
+    { question: "Which ocean is the largest?", options: ["Atlantic", "Indian", "Pacific", "Arctic"], correctAnswer: 2, explanation: "The Pacific Ocean is the largest and deepest ocean, covering more than 30% of Earth's surface.", points: 50 },
+    { question: "What is the capital of Australia?", options: ["Sydney", "Melbourne", "Canberra", "Brisbane"], correctAnswer: 2, explanation: "Canberra is the capital of Australia, chosen as a compromise between Sydney and Melbourne.", points: 75 },
+    { question: "Which country is known as the 'Land of the Rising Sun'?", options: ["China", "Korea", "Japan", "Vietnam"], correctAnswer: 2, explanation: "Japan is called the Land of the Rising Sun because it lies to the east of the Asian continent.", points: 50 },
+    { question: "What is the deepest lake in the world?", options: ["Lake Superior", "Lake Baikal", "Lake Tanganyika", "Crater Lake"], correctAnswer: 1, explanation: "Lake Baikal in Russia is the deepest lake, reaching depths of 1,642 meters.", points: 100 },
+    { question: "Which European country has the most volcanoes?", options: ["Greece", "Italy", "Iceland", "Spain"], correctAnswer: 2, explanation: "Iceland has around 130 volcanic mountains, with about 30 active volcano systems.", points: 100 },
+  ],
+  history: [
+    { question: "In which year did World War II end?", options: ["1943", "1944", "1945", "1946"], correctAnswer: 2, explanation: "World War II ended in 1945 with Germany's surrender in May and Japan's surrender in September.", points: 50 },
+    { question: "Who was the first person to walk on the Moon?", options: ["Buzz Aldrin", "Neil Armstrong", "Michael Collins", "John Glenn"], correctAnswer: 1, explanation: "Neil Armstrong became the first human to walk on the Moon on July 20, 1969, during the Apollo 11 mission.", points: 50 },
+    { question: "Which ancient wonder was located in Alexandria?", options: ["Hanging Gardens", "Colossus", "Lighthouse", "Mausoleum"], correctAnswer: 2, explanation: "The Lighthouse of Alexandria (Pharos) was one of the Seven Wonders of the Ancient World.", points: 100 },
+    { question: "What year did the Berlin Wall fall?", options: ["1987", "1988", "1989", "1990"], correctAnswer: 2, explanation: "The Berlin Wall fell on November 9, 1989, marking a turning point in the end of the Cold War.", points: 75 },
+    { question: "Who painted the ceiling of the Sistine Chapel?", options: ["Leonardo da Vinci", "Raphael", "Michelangelo", "Donatello"], correctAnswer: 2, explanation: "Michelangelo painted the Sistine Chapel ceiling between 1508 and 1512, commissioned by Pope Julius II.", points: 75 },
+    { question: "Which empire built Machu Picchu?", options: ["Aztec", "Maya", "Inca", "Olmec"], correctAnswer: 2, explanation: "Machu Picchu was built by the Inca Empire in the 15th century as an estate for Emperor Pachacuti.", points: 75 },
+    { question: "In what year was the United Nations founded?", options: ["1943", "1945", "1947", "1950"], correctAnswer: 1, explanation: "The United Nations was founded in 1945 after World War II to promote international cooperation.", points: 100 },
+    { question: "Who was the first female Prime Minister of the UK?", options: ["Theresa May", "Margaret Thatcher", "Elizabeth II", "Queen Victoria"], correctAnswer: 1, explanation: "Margaret Thatcher became the UK's first female Prime Minister in 1979, serving until 1990.", points: 75 },
+    { question: "What was the name of the ship that sank in 1912?", options: ["Lusitania", "Olympic", "Titanic", "Britannic"], correctAnswer: 2, explanation: "The RMS Titanic sank on April 15, 1912, after hitting an iceberg during her maiden voyage.", points: 50 },
+    { question: "Which civilization built the Great Wall of China?", options: ["Ming Dynasty", "Multiple dynasties", "Qin Dynasty", "Han Dynasty"], correctAnswer: 1, explanation: "The Great Wall was built over many centuries by multiple Chinese dynasties, starting with the Qin Dynasty.", points: 100 },
+  ],
+  language: [
+    { question: "How many official languages does Switzerland have?", options: ["2", "3", "4", "5"], correctAnswer: 2, explanation: "Switzerland has four official languages: German, French, Italian, and Romansh.", points: 100 },
+    { question: "Which language has the most native speakers?", options: ["English", "Spanish", "Mandarin Chinese", "Hindi"], correctAnswer: 2, explanation: "Mandarin Chinese has the most native speakers, with over 900 million people.", points: 75 },
+    { question: "What is the official language of Brazil?", options: ["Spanish", "Portuguese", "Brazilian", "English"], correctAnswer: 1, explanation: "Portuguese is the official language of Brazil, brought by Portuguese colonizers in the 16th century.", points: 50 },
+    { question: "Which alphabet does Russian use?", options: ["Latin", "Greek", "Cyrillic", "Arabic"], correctAnswer: 2, explanation: "Russian uses the Cyrillic alphabet, which was developed in the First Bulgarian Empire in the 9th century.", points: 75 },
+    { question: "What does 'Bonjour' mean in French?", options: ["Goodbye", "Good night", "Hello/Good day", "Thank you"], correctAnswer: 2, explanation: "Bonjour means 'Hello' or 'Good day' in French, from 'bon' (good) and 'jour' (day).", points: 50 },
+    { question: "Which language family does Japanese belong to?", options: ["Sino-Tibetan", "Altaic", "Japonic", "Indo-European"], correctAnswer: 2, explanation: "Japanese belongs to the Japonic language family, which also includes Ryukyuan languages.", points: 100 },
+    { question: "How do you say 'Thank you' in German?", options: ["Bitte", "Danke", "Guten Tag", "Auf Wiedersehen"], correctAnswer: 1, explanation: "Danke means 'Thank you' in German. 'Danke schon' means 'Thank you very much'.", points: 50 },
+    { question: "Which country has 22 official languages?", options: ["China", "India", "Indonesia", "South Africa"], correctAnswer: 1, explanation: "India has 22 officially recognized languages under the Eighth Schedule of its Constitution.", points: 100 },
+    { question: "What writing direction does Arabic use?", options: ["Left to right", "Right to left", "Top to bottom", "Bottom to top"], correctAnswer: 1, explanation: "Arabic is written from right to left, one of the few major world languages with this direction.", points: 75 },
+    { question: "Which language is 'Gracias' from?", options: ["Italian", "Portuguese", "Spanish", "French"], correctAnswer: 2, explanation: "Gracias is the Spanish word for 'Thank you', derived from the Latin 'gratia'.", points: 50 },
+  ],
+  tradition: [
+    { question: "What is the traditional Japanese art of flower arranging called?", options: ["Origami", "Ikebana", "Bonsai", "Chado"], correctAnswer: 1, explanation: "Ikebana is the Japanese art of flower arrangement, emphasizing balance, harmony, and form.", points: 75 },
+    { question: "Which country is famous for the tradition of Flamenco?", options: ["Portugal", "Mexico", "Spain", "Argentina"], correctAnswer: 2, explanation: "Flamenco originated in Andalusia, Spain, combining singing, guitar playing, dance, and handclaps.", points: 50 },
+    { question: "What is the traditional Hawaiian greeting with flowers called?", options: ["Aloha", "Lei", "Hula", "Luau"], correctAnswer: 1, explanation: "A Lei is a Hawaiian garland of flowers traditionally given as a symbol of affection and greeting.", points: 75 },
+    { question: "In which country did the tradition of afternoon tea originate?", options: ["China", "Japan", "England", "India"], correctAnswer: 2, explanation: "Afternoon tea was introduced in England in the 1840s by Anna, the Duchess of Bedford.", points: 75 },
+    { question: "What is the traditional Korean fermented vegetable dish?", options: ["Sushi", "Kimchi", "Tempura", "Pho"], correctAnswer: 1, explanation: "Kimchi is a traditional Korean side dish of salted and fermented vegetables, usually cabbage or radish.", points: 50 },
+    { question: "Which culture practices the 'Quinceañera' celebration?", options: ["Brazilian", "Mexican/Latin American", "Spanish", "Portuguese"], correctAnswer: 1, explanation: "Quinceañera is a Latin American tradition celebrating a girl's 15th birthday as her transition to womanhood.", points: 75 },
+    { question: "What is the traditional Scottish musical instrument?", options: ["Violin", "Bagpipes", "Accordion", "Harp"], correctAnswer: 1, explanation: "The Great Highland Bagpipe is Scotland's national instrument, used in traditional music and ceremonies.", points: 50 },
+    { question: "Which tradition involves throwing colored powder during spring?", options: ["Carnival", "Holi", "Songkran", "Mardi Gras"], correctAnswer: 1, explanation: "Holi is the Hindu festival of colors celebrated in spring, where people throw colored powder and water.", points: 75 },
+    { question: "What is the traditional Maori greeting from New Zealand?", options: ["Handshake", "Bow", "Hongi", "Wave"], correctAnswer: 2, explanation: "The Hongi is the traditional Maori greeting where two people press their noses and foreheads together.", points: 100 },
+    { question: "Which culture is known for the tradition of Feng Shui?", options: ["Japanese", "Chinese", "Korean", "Vietnamese"], correctAnswer: 1, explanation: "Feng Shui is an ancient Chinese practice of arranging space to achieve harmony with the environment.", points: 75 },
+  ],
+  speed: [
+    { question: "What is the capital of France?", options: ["London", "Berlin", "Paris", "Rome"], correctAnswer: 2, explanation: "Paris is the capital and largest city of France.", points: 25 },
+    { question: "Which planet is known as the Red Planet?", options: ["Venus", "Mars", "Jupiter", "Saturn"], correctAnswer: 1, explanation: "Mars is called the Red Planet due to iron oxide on its surface.", points: 25 },
+    { question: "How many continents are there?", options: ["5", "6", "7", "8"], correctAnswer: 2, explanation: "There are 7 continents: Africa, Antarctica, Asia, Australia, Europe, North America, and South America.", points: 25 },
+    { question: "What is the largest mammal?", options: ["Elephant", "Blue Whale", "Giraffe", "Hippo"], correctAnswer: 1, explanation: "The Blue Whale is the largest mammal, reaching up to 100 feet in length.", points: 25 },
+    { question: "Which element has the chemical symbol 'O'?", options: ["Gold", "Silver", "Oxygen", "Iron"], correctAnswer: 2, explanation: "Oxygen has the chemical symbol O and is essential for life.", points: 25 },
+    { question: "What year did the Titanic sink?", options: ["1910", "1912", "1914", "1916"], correctAnswer: 1, explanation: "The Titanic sank on April 15, 1912.", points: 25 },
+    { question: "How many sides does a hexagon have?", options: ["5", "6", "7", "8"], correctAnswer: 1, explanation: "A hexagon has 6 sides. 'Hex' comes from the Greek word for six.", points: 25 },
+    { question: "What is the currency of Japan?", options: ["Won", "Yuan", "Yen", "Ringgit"], correctAnswer: 2, explanation: "The Yen is Japan's official currency.", points: 25 },
+    { question: "Who wrote 'Romeo and Juliet'?", options: ["Dickens", "Shakespeare", "Austen", "Hemingway"], correctAnswer: 1, explanation: "William Shakespeare wrote Romeo and Juliet around 1594-1596.", points: 25 },
+    { question: "What is the largest ocean?", options: ["Atlantic", "Indian", "Pacific", "Arctic"], correctAnswer: 2, explanation: "The Pacific Ocean is the largest, covering about 63 million square miles.", points: 25 },
+  ],
+};
+
+function generateFallbackQuestions(country: string | undefined, type: string, questionCount: number, difficulty: string) {
+  const category = type || 'cultural';
+  const questions = FALLBACK_QUESTIONS[category] || FALLBACK_QUESTIONS.cultural;
+  
+  // Shuffle and pick requested number of questions
+  const shuffled = [...questions].sort(() => Math.random() - 0.5);
+  const selected = shuffled.slice(0, Math.min(questionCount || 10, questions.length));
+  
+  const formattedQuiz = selected.map((q, index) => ({
+    id: `q${index + 1}`,
+    question: q.question,
+    options: q.options,
+    answer: q.correctAnswer,
+    explanation: q.explanation,
+  }));
+
+  return NextResponse.json({
+    module: {
+      country: country || "General",
+      summary: `${category.charAt(0).toUpperCase() + category.slice(1)} Quiz${country ? ` for ${country}` : ""}`,
+      reading: [
+        `Welcome to the ${category} quiz!`,
+        "Test your knowledge and learn something new about world cultures.",
+      ],
+      quiz: formattedQuiz,
+    },
+  });
+}
 
 // Add type for Gemini API response questions
 interface GeminiQuestionResponse {
@@ -26,12 +136,12 @@ export async function POST(req: Request) {
     const apiKey = process.env.GEMINI_API_KEY;
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    // Try models in order of preference
+    // Try models in order of preference - updated for 2026
     const modelsToTry = [
-      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+      "gemini-2.0-flash-lite",
+      "gemini-1.5-flash-8b",
       "gemini-1.5-flash",
-      "gemini-1.5-flash-latest",
-      "gemini-pro",
       "gemini-1.5-pro",
     ];
 
@@ -62,7 +172,8 @@ export async function POST(req: Request) {
 
     if (!model) {
       console.error("All models failed. Last error:", lastError);
-      throw new Error("No available Gemini models found. Please check your API key.");
+      // Return fallback questions instead of throwing error
+      return generateFallbackQuestions(country, type, questionCount, difficulty);
     }
 
     // Build more specific prompts based on type and country

@@ -7,7 +7,37 @@ declare global {
     google: any;
     googleTranslateElementInit: () => void;
     googleTranslateLoaded?: boolean;
+    __reactDomPatchApplied?: boolean;
   }
+}
+
+// Patch DOM methods to handle Google Translate conflicts with React
+function patchDomMethodsForGoogleTranslate() {
+  if (typeof window === "undefined" || window.__reactDomPatchApplied) {
+    return;
+  }
+  window.__reactDomPatchApplied = true;
+
+  const originalRemoveChild = Node.prototype.removeChild;
+  Node.prototype.removeChild = function <T extends Node>(child: T): T {
+    if (child.parentNode !== this) {
+      // Node was already moved by Google Translate, skip silently
+      return child;
+    }
+    return originalRemoveChild.call(this, child) as T;
+  };
+
+  const originalInsertBefore = Node.prototype.insertBefore;
+  Node.prototype.insertBefore = function <T extends Node>(
+    newNode: T,
+    referenceNode: Node | null
+  ): T {
+    if (referenceNode && referenceNode.parentNode !== this) {
+      // Reference node was moved by Google Translate, append instead
+      return originalInsertBefore.call(this, newNode, null) as T;
+    }
+    return originalInsertBefore.call(this, newNode, referenceNode) as T;
+  };
 }
 
 export default function GoogleTranslateWrapper() {
@@ -16,6 +46,9 @@ export default function GoogleTranslateWrapper() {
   const scriptLoadedRef = useRef(false);
 
   useEffect(() => {
+    // Apply DOM patches first
+    patchDomMethodsForGoogleTranslate();
+
     setMounted(true);
 
     // Prevent duplicate initialization

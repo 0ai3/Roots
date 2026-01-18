@@ -61,7 +61,7 @@ export async function requestRecipes(payload: RecipeRequest) {
     throw new RecipePlannerError("Gemini API key is not configured.", 500);
   }
 
-  const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+  const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash";
   const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
 
   const requestedLimit = payload.limit ?? 3;

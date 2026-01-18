@@ -69,7 +69,7 @@ export async function requestGeminiPlan(payload: PlannerRequest) {
     throw new PlannerError("Gemini API key is not configured on the server.", 500);
   }
 
-  const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+  const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash";
   const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
 
   const travelContext = `You are Roots' cultural concierge helping a user explore ${payload.location}.

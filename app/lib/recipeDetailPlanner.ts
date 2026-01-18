@@ -87,7 +87,7 @@ export async function requestRecipeDetail(
     throw new RecipeDetailError("Gemini API key is not configured.", 500);
   }
 
-  const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+  const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash";
   const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
 
   const formatInstruction = `You are an expert chef. Provide a COMPLETE detailed recipe for "${payload.recipeName}"${payload.region ? ` from ${payload.region}` : ''}${payload.description ? ` (${payload.description})` : ''}.

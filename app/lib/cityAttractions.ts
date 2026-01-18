@@ -63,7 +63,7 @@ function getGeminiApiInfo() {
     );
   }
 
-  const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+  const modelName = process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash";
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
 
   return { apiKey, endpoint, modelName };

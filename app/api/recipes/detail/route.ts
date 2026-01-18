@@ -6,7 +6,7 @@ import {
 } from "@/app/lib/recipeDetailPlanner";
 
 const apiKey = process.env.GEMINI_API_KEY;
-const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+// Note: URL is defined but not used directly - model is configured in recipeDetailPlanner.ts
 
 export async function POST(request: NextRequest) {
   try {

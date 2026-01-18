@@ -81,10 +81,16 @@ export default function LearnAndEarnGame({
 
   const quizLength = moduleData?.quiz.length ?? 0;
   const currentQuestionData = useMemo(() => {
+    console.log(
+      "useMemo currentQuestionData recalculating, currentQuestion:",
+      currentQuestion
+    );
     if (!moduleData || moduleData.quiz.length === 0) {
       return null;
     }
-    return moduleData.quiz[currentQuestion] ?? null;
+    const question = moduleData.quiz[currentQuestion] ?? null;
+    console.log("currentQuestionData:", question?.question?.substring(0, 50));
+    return question;
   }, [moduleData, currentQuestion]);
 
   useEffect(() => {
@@ -106,6 +112,16 @@ export default function LearnAndEarnGame({
     setShowFeedback(false);
     setLastAnswerCorrect(null);
   }, [moduleData]);
+
+  // Debug useEffect - track state changes
+  useEffect(() => {
+    console.log("🔄 STATE CHANGED:", {
+      currentQuestion,
+      score,
+      isQuizActive,
+      showFeedback,
+    });
+  }, [currentQuestion, score, isQuizActive, showFeedback]);
 
   const handleGenerateModule = async (event?: FormEvent) => {
     event?.preventDefault?.();
@@ -178,32 +194,52 @@ export default function LearnAndEarnGame({
   };
 
   const handleStartQuiz = () => {
-    if (!moduleData) {
+    if (!moduleData || moduleData.quiz.length === 0) {
+      console.error("Cannot start quiz: no module data or empty quiz");
       return;
     }
-    setIsQuizActive(true);
-    setIsComplete(false);
+    console.log(`Starting quiz with ${moduleData.quiz.length} questions`);
     setCurrentQuestion(0);
     setAnswers(new Array(moduleData.quiz.length).fill(-1));
     setScore(0);
+    setIsQuizActive(true);
+    setIsComplete(false);
     setShowFeedback(false);
     setLastAnswerCorrect(null);
     setLastAward(null);
   };
 
   const handleSelectOption = (optionIndex: number) => {
+    console.log("handleSelectOption called with:", optionIndex);
+    console.log("Current state:", {
+      moduleData: !!moduleData,
+      showFeedback,
+      isQuizActive,
+      currentQuestionData: !!currentQuestionData,
+    });
+
     if (!moduleData || showFeedback || !isQuizActive || !currentQuestionData) {
+      console.log("Early return from handleSelectOption");
       return;
     }
-    const isCorrect = optionIndex === currentQuestionData.answer;
-    setAnswers((prev) => {
-      const next = [...prev];
-      next[currentQuestion] = optionIndex;
-      return next;
-    });
+    const correctAnswer = currentQuestionData.answer;
+    const isCorrect = optionIndex === correctAnswer;
+    console.log("Answer check:", { optionIndex, correctAnswer, isCorrect });
+
+    // Update answers array
+    const newAnswers = [...answers];
+    newAnswers[currentQuestion] = optionIndex;
+    setAnswers(newAnswers);
+
+    // Update score immediately if correct
     if (isCorrect) {
-      setScore((prev) => prev + 1);
+      console.log("Correct answer! Incrementing score from", score);
+      setScore((prevScore) => {
+        console.log("Score update:", prevScore, "->", prevScore + 1);
+        return prevScore + 1;
+      });
     }
+
     setLastAnswerCorrect(isCorrect);
     setShowFeedback(true);
   };
@@ -227,15 +263,35 @@ export default function LearnAndEarnGame({
   };
 
   const handleNextQuestion = () => {
+    console.log("handleNextQuestion called");
+    console.log("State before:", {
+      moduleData: !!moduleData,
+      showFeedback,
+      currentQuestion,
+      score,
+    });
+
     if (!moduleData || !showFeedback) {
+      console.log(
+        "Early return: moduleData=",
+        !!moduleData,
+        "showFeedback=",
+        showFeedback
+      );
       return;
     }
     const nextIndex = currentQuestion + 1;
+    console.log(
+      `Moving to question ${nextIndex + 1} of ${moduleData.quiz.length}`
+    );
+
     if (nextIndex < moduleData.quiz.length) {
+      console.log("Setting currentQuestion to:", nextIndex);
       setCurrentQuestion(nextIndex);
       setShowFeedback(false);
       setLastAnswerCorrect(null);
     } else {
+      console.log("Quiz complete, finishing...");
       finishQuiz();
     }
   };
@@ -401,14 +457,18 @@ export default function LearnAndEarnGame({
               )}
 
               {isQuizActive && currentQuestionData && (
-                <div className="space-y-4 rounded-2xl border p-5 border-white/10 bg-slate-950/40">
+                <div
+                  key={`quiz-question-${currentQuestion}`}
+                  className="space-y-4 rounded-2xl border p-5 border-white/10 bg-slate-950/40 notranslate"
+                  translate="no"
+                >
                   <div
                     className={`flex items-center justify-between text-xs uppercase tracking-wide ${getMutedTextColor()}`}
                   >
-                    <span>
+                    <span data-question-num={currentQuestion}>
                       Question {currentQuestion + 1} of {quizLength}
                     </span>
-                    <span>Score: {score}</span>
+                    <span data-score={score}>Score: {score}</span>
                   </div>
                   <p className="text-lg font-semibold">
                     {currentQuestionData.question}
@@ -418,7 +478,7 @@ export default function LearnAndEarnGame({
                       const state = optionStateFor(index);
                       return (
                         <button
-                          key={`${currentQuestionData.id}-${option}`}
+                          key={`${currentQuestion}-${index}`}
                           type="button"
                           onClick={() => handleSelectOption(index)}
                           disabled={showFeedback}

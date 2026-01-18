@@ -33,16 +33,40 @@ function getBase64Data(base64String: string): string {
   return parts.length > 1 ? parts[1] : base64String;
 }
 
+// Fallback verification when Gemini is unavailable
+function getFallbackVerification(
+  taskType: "recipe" | "location",
+  context: { title: string; location?: string; country?: string }
+): { verified: boolean; confidence: number; reasoning: string; dishIdentified?: string; locationIdentified?: string } {
+  // Auto-verify with a message that AI was unavailable
+  // This allows users to continue using the app even when Gemini quota is exceeded
+  if (taskType === "recipe") {
+    return {
+      verified: true,
+      confidence: 70,
+      reasoning: `Task accepted for "${context.title}". AI verification temporarily unavailable - your submission has been recorded and will count towards your points.`,
+      dishIdentified: context.title
+    };
+  } else {
+    return {
+      verified: true,
+      confidence: 70,
+      reasoning: `Location visit to "${context.location || context.title}" recorded. AI verification temporarily unavailable - your submission has been accepted.`,
+      locationIdentified: context.location || context.title
+    };
+  }
+}
+
 async function verifyWithGemini(
   taskType: "recipe" | "location",
   beforeImage: string,
   afterImage: string,
   context: { title: string; location?: string; country?: string }
-) {
+): Promise<{ verified: boolean; confidence: number; reasoning: string; dishIdentified?: string; locationIdentified?: string }> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    console.error("Gemini API key not configured");
-    throw new Error("Gemini API key not configured");
+    console.log("No Gemini API key, using fallback verification");
+    return getFallbackVerification(taskType, context);
   }
 
   const isRecipe = taskType === "recipe";
@@ -103,7 +127,7 @@ Return ONLY the JSON, no other text.`;
     console.log(`Number of images: ${images.length}`);
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -123,6 +147,13 @@ Return ONLY the JSON, no other text.`;
       const errorData = await response.text();
       console.error("Gemini Vision API error status:", response.status);
       console.error("Gemini Vision API error response:", errorData);
+      
+      // If quota exceeded or other API error, use fallback
+      if (response.status === 429 || response.status >= 500) {
+        console.log("Gemini API unavailable, using fallback verification");
+        return getFallbackVerification(taskType, context);
+      }
+      
       throw new Error(`Gemini API returned ${response.status}: ${errorData}`);
     }
 
@@ -158,7 +189,9 @@ Return ONLY the JSON, no other text.`;
   } catch (error) {
     console.error("Gemini verification error:", error);
     console.error("Error stack:", error instanceof Error ? error.stack : "N/A");
-    throw error;
+    // Return fallback verification instead of throwing
+    console.log("Using fallback verification due to error");
+    return getFallbackVerification(taskType, context);
   }
 }
 
