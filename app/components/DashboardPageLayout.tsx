@@ -34,12 +34,11 @@ export default function DashboardPageLayout({
     ? `${baseClass} ${contentClassName}`
     : baseClass;
 
-  const mainClass = "min-h-screen bg-black px-4 py-16 transition-colors duration-300";
+  const mainClass =
+    "min-h-screen bg-black px-4 py-16 transition-colors duration-300";
 
   return (
-    <main
-      className={`${mainClass} text-white`}
-    >
+    <main className={`${mainClass} text-white`}>
       <div className="mx-auto flex max-w-6xl flex-col gap-8 lg:flex-row">
         <DashboardSidebar />
         <section className={sectionClass}>
@@ -51,11 +50,7 @@ export default function DashboardPageLayout({
                 </h1>
               )}
               {description && (
-                <p
-                  className="text-sm text-white/70"
-                >
-                  {description}
-                </p>
+                <p className="text-sm text-white/70">{description}</p>
               )}
             </header>
           )}

@@ -20,7 +20,7 @@ export default function Navbar(e: NavbarProps) {
   return (
     <motion.nav
       className="fixed top-0 left-0 right-0 z-50 border-b border-neutral-800"
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{ backgroundColor: "#0a0a0a" }}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
